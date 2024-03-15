@@ -1,134 +1,102 @@
 package com.bit.productservice.service;
 
-
+import com.bit.productservice.ProductServiceApplication;
 import com.bit.productservice.dto.ProductRequest;
 import com.bit.productservice.dto.ProductResponse;
 import com.bit.productservice.exception.ProductNotFoundException;
 import com.bit.productservice.model.Product;
 import com.bit.productservice.repository.ProductRepository;
+import io.micrometer.common.util.StringUtils;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class ProductServiceImpl implements ProductService {
 
+    private static final Logger logger = LogManager.getLogger(ProductServiceApplication.class);
     private final ProductRepository productRepository;
 
     @Override
     public ProductResponse getProduct (Long id) {
+        logger.info("Fetching product with ID: {}", id);
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + id));
 
-        Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product not found with id " + id));
+        logger.info("Retrieved product: {}", product);
         return mapToProductResponse(product);
     }
 
     @Override
     public List<ProductResponse> getAllProducts() {
+        logger.info("Fetching all products");
         List<Product> products = productRepository.findAll();
+
+        logger.info("Retrieved {} products", products.size());
         return products.stream().map(this::mapToProductResponse).toList();
     }
 
     @Override
     public List<ProductResponse> getDeletedProducts() {
+        logger.info("Fetching all deleted products");
         List<Product> products = productRepository.findSoftDeletedProducts();
+
+        logger.info("Retrieved {} deleted products", products.size());
         return products.stream().map(this::mapToProductResponse).toList();
     }
 
     @Override
-    public Page<ProductResponse> getAllProductsPaginated(int page, int size) {
-        Page<Product> productPage = productRepository.findAll(PageRequest.of(page, size));
-        return productPage.map(this::mapToProductResponse);
-    }
+    public Page<ProductResponse> getAllProductsFilteredAndSorted (Pageable pageable, String name, String description, BigDecimal minPrice, BigDecimal maxPrice) {
+        logger.info("Fetching all products with filters and sorting: pageable={}, name={}, description={}, minPrice={}, maxPrice={}",
+                pageable, name, description, minPrice, maxPrice);
+        Page<Product> productsPage = productRepository.findAll((root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (StringUtils.isNotBlank(name)) {
+                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
+            }
+            if (StringUtils.isNotBlank(description)) {
+                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), "%" + description.toLowerCase() + "%"));
+            }
+            if (minPrice != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("price"), minPrice));
+            }
+            if (maxPrice != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("price"), maxPrice));
+            }
 
-    @Override
-    public List<ProductResponse> getAllProductsSorted(String sortBy, Sort.Direction direction) {
-        List<Product> products = productRepository.findAll(Sort.by(direction, sortBy));
-        return products.stream().map(this::mapToProductResponse).toList();
-    }
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        }, pageable);
 
-    @Override
-    public Page<ProductResponse> getAllProductsPaginatedAndSorted(int page, int size, String sortBy, Sort.Direction direction) {
-        Page<Product> productPage = productRepository.findAll(PageRequest.of(page, size, direction, sortBy));
-        return productPage.map(this::mapToProductResponse);
-    }
-
-    public Page<ProductResponse> getAllProductsFiltered(String name, String description, BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
-
-        Page<Product> productPage = Page.empty();
-        if (name != null && description == null && minPrice == null && maxPrice == null) {
-            productPage = productRepository.findByNameContaining(name, pageable);
-        }
-        if (name == null && description != null && minPrice == null && maxPrice == null) {
-            productPage = productRepository.findByDescriptionContaining(description, pageable);
-        }
-        if (name == null && description == null && minPrice != null && maxPrice == null) {
-            productPage = productRepository.findByPriceGreaterThanEqual(minPrice, pageable);
-        }
-        if (name == null && description == null && minPrice == null && maxPrice != null) {
-            productPage = productRepository.findByPriceLessThanEqual(maxPrice, pageable);
-        }
-        if (name != null && description != null && minPrice == null && maxPrice == null) {
-            productPage = productRepository.findByNameContainingAndDescriptionContaining(name, description, pageable);
-        }
-        if (name != null && description == null && minPrice != null && maxPrice == null) {
-            productPage = productRepository.findByNameContainingAndPriceGreaterThanEqual(name, minPrice, pageable);
-        }
-        if (name != null && description == null && minPrice == null && maxPrice != null) {
-            productPage = productRepository.findByNameContainingAndPriceLessThanEqual(name, maxPrice, pageable);
-        }
-        if (name == null && description != null && minPrice != null && maxPrice == null) {
-            productPage = productRepository.findByDescriptionContainingAndPriceGreaterThanEqual(description, minPrice, pageable);
-        }
-        if (name == null && description != null && minPrice == null && maxPrice != null) {
-            productPage = productRepository.findByDescriptionContainingAndPriceLessThanEqual(description, maxPrice, pageable);
-        }
-        if (name == null && description == null && minPrice != null && maxPrice != null) {
-            productPage = productRepository.findByPriceBetween(minPrice, maxPrice, pageable);
-        }
-        if (name != null && description != null && minPrice != null && maxPrice == null) {
-            productPage = productRepository.findByNameContainingAndDescriptionContainingAndPriceGreaterThanEqual(name, description, minPrice, pageable);
-        }
-        if (name != null && description != null && minPrice == null && maxPrice != null) {
-            productPage = productRepository.findByNameContainingAndDescriptionContainingAndPriceLessThanEqual(name, description, maxPrice, pageable);
-        }
-        if (name != null && description == null && minPrice != null && maxPrice != null) {
-            productPage = productRepository.findByNameContainingAndPriceBetween(name, minPrice, maxPrice, pageable);
-        }
-        if (name == null && description != null && minPrice != null && maxPrice != null) {
-            productPage = productRepository.findByDescriptionContainingAndPriceBetween(description, minPrice, maxPrice, pageable);
-        }
-        if (name != null && description != null && minPrice != null && maxPrice != null) {
-            productPage = productRepository.findByNameContainingAndDescriptionContainingAndPriceBetween(name, description, minPrice, maxPrice, pageable);
-        }
-
-
-        return productPage.map(this::mapToProductResponse);
+        logger.info("Retrieved {} products", productsPage.getTotalElements());
+        return productsPage.map(this::mapToProductResponse);
     }
 
 
     @Override
     public ProductResponse createProduct(ProductRequest productRequest) {
+        logger.info("Creating product: {}", productRequest);
         Product product = Product.builder()
                 .name(productRequest.getName())
                 .description(productRequest.getDescription())
                 .price(productRequest.getPrice())
                 .build();
         productRepository.save(product);
+
+        logger.info("Created product with ID: {}", product.getId());
         return mapToProductResponse(product);
     }
 
     @Override
     public ProductResponse updateProduct (Long id, ProductRequest updatedProduct) {
-
+        logger.info("Updating product with ID {}: {}", id, updatedProduct);
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product doesn't exist with id " + id));
 
@@ -138,16 +106,18 @@ public class ProductServiceImpl implements ProductService {
 
         productRepository.save(existingProduct);
 
+        logger.info("Updated product with ID {}: {}", id, existingProduct);
         return mapToProductResponse(existingProduct);
     }
 
     @Override
     public void deleteProduct (Long id) {
-
-        productRepository.findById(id)
+        logger.info("Deleting product with ID: {}", id);
+        Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + id));
 
         productRepository.deleteById(id);
+        logger.info("Deleted product: {}", existingProduct);
     }
 
 

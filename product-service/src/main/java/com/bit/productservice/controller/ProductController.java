@@ -1,10 +1,14 @@
 package com.bit.productservice.controller;
 
+import com.bit.productservice.ProductServiceApplication;
 import com.bit.productservice.dto.ProductRequest;
 import com.bit.productservice.dto.ProductResponse;
 import com.bit.productservice.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -20,84 +24,83 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductController {
 
+    private static final Logger logger = LogManager.getLogger(ProductServiceApplication.class);
+
     private final ProductService productService;
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProduct(@PathVariable("id") Long id) {
+        logger.info("Received request to fetch product with ID: {}", id);
         ProductResponse productResponse = productService.getProduct(id);
+
+        logger.info("Returning product response: {}", productResponse);
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
 
     @GetMapping()
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
-        return new ResponseEntity<> (productService.getAllProducts(), HttpStatus.OK);
+        logger.info("Received request to fetch all products");
+        List<ProductResponse> productResponses = productService.getAllProducts();
+
+        logger.info("Returning {} product responses", productResponses.size());
+        return new ResponseEntity<>(productResponses, HttpStatus.OK);
     }
 
     @GetMapping("/deleted")
     public ResponseEntity<List<ProductResponse>> getDeletedProducts() {
-        return new ResponseEntity<> (productService.getDeletedProducts(), HttpStatus.OK);
+        logger.info("Received request to fetch all deleted products");
+        List<ProductResponse> deletedProductResponses = productService.getDeletedProducts();
+
+        logger.info("Returning {} deleted product responses", deletedProductResponses.size());
+        return new ResponseEntity<>(deletedProductResponses, HttpStatus.OK);
     }
 
-    @GetMapping("/paginated")
-    public ResponseEntity<Page<ProductResponse>> getAllProductsPaginated(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        Page<ProductResponse> productResponses = productService.getAllProductsPaginated(page, size);
-        return new ResponseEntity<>(productResponses, HttpStatus.OK);
-    }
-
-    @GetMapping("/sorted")
-    public ResponseEntity<List<ProductResponse>> getAllProductsSorted(
-            @RequestParam(defaultValue = "name") String sortBy,
-            @RequestParam(defaultValue = "ASC") String direction
-    ) {
-        List<ProductResponse> productResponses = productService.getAllProductsSorted(sortBy, Sort.Direction.valueOf(direction.toUpperCase()));
-        return new ResponseEntity<>(productResponses, HttpStatus.OK);
-    }
-
-    @GetMapping("/paginatedAndSorted")
-    public ResponseEntity<Page<ProductResponse>> getAllProductsPaginatedAndSorted(
+    @GetMapping("/filteredAndSorted")
+    public ResponseEntity<Page<ProductResponse>> getAllProductsFilteredAndSorted(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "name") String sortBy,
-            @RequestParam(defaultValue = "ASC") String direction
-    ) {
-        Page<ProductResponse> productResponses = productService.getAllProductsPaginatedAndSorted(page, size, sortBy, Sort.Direction.valueOf(direction.toUpperCase()));
-        return new ResponseEntity<>(productResponses, HttpStatus.OK);
-    }
-
-    @GetMapping("/filtered")
-    public ResponseEntity<Page<ProductResponse>> getProducts(
+            @RequestParam(required = false, defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "ASC") String direction,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String description,
             @RequestParam(required = false) BigDecimal minPrice,
-            @RequestParam(required = false) BigDecimal maxPrice,
-            Pageable pageable) {
+            @RequestParam(required = false) BigDecimal maxPrice
+    ) {
+        logger.info("Received request to fetch all products with filters and sorting: page={}, size={}, sortBy={}, direction={}, name={}, description={}, minPrice={}, maxPrice={}",
+                page, size, sortBy, direction, name, description, minPrice, maxPrice);
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
+        Page<ProductResponse> productResponses = productService.getAllProductsFilteredAndSorted(pageable, name, description, minPrice, maxPrice);
 
-        Page<ProductResponse> productResponses = productService.getAllProductsFiltered(name, description, minPrice, maxPrice, pageable);
+        logger.info("Returning {} product responses filtered and sorted", productResponses.getTotalElements());
         return new ResponseEntity<>(productResponses, HttpStatus.OK);
     }
 
+
     @PostMapping
     public ResponseEntity<ProductResponse> createProduct(@RequestBody @Valid ProductRequest productRequest){
+        logger.info("Received request to create product: {}", productRequest);
         ProductResponse productResponse = productService.createProduct(productRequest);
+
+        logger.info("Returning product response's ID: {}", productResponse.getId());
         return new ResponseEntity<>(productResponse, HttpStatus.CREATED);
     }
-
 
     @PutMapping("{id}")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id,
                                                 @RequestBody @Valid ProductRequest updatedProduct){
-
+        logger.info("Received request to update product with ID {}: {}", id, updatedProduct);
         ProductResponse productResponse = productService.updateProduct(id, updatedProduct);
+
+        logger.info("Returning product response with ID {}: {}", id, productResponse);
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable Long id){
-         productService.deleteProduct(id);
-         return new ResponseEntity<>("Product deleted successfully!", HttpStatus.OK);
+        logger.info("Received request to delete product with ID: {}", id);
+        productService.deleteProduct(id);
 
+        logger.info("Product with ID {} deleted successfully", id);
+        return new ResponseEntity<>("Product deleted successfully!", HttpStatus.OK);
     }
 }

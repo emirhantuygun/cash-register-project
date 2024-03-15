@@ -1,0 +1,19 @@
+2024-03-15 17:06:31 [main] INFO  : Updating product with ID 1: ProductRequest(name=Updated Product, description=Updated Description, price=30.0)
+2024-03-15 17:06:31 [main] INFO  : Updated product with ID 1: Product(id=1, name=Updated Product, description=Updated Description, price=30.0)
+2024-03-15 17:06:32 [main] INFO  : Creating product: ProductRequest(name=Test Product, description=Test Description, price=10.0)
+2024-03-15 17:06:32 [main] INFO  : Created product with ID: 1
+2024-03-15 17:06:32 [main] INFO  : Deleting product with ID: 1
+2024-03-15 17:06:32 [main] INFO  : Fetching product with ID: 1
+2024-03-15 17:06:32 [main] INFO  : Retrieved product: Product(id=1, name=Product 1, description=null, price=null)
+2024-03-15 17:06:32 [main] INFO  : Fetching all products with filters and sorting: pageable=Page request [number: 0, size 10, sort: UNSORTED], name=test, description=description, minPrice=10, maxPrice=100
+2024-03-15 17:06:32 [main] INFO  : Retrieved 2 products
+2024-03-15 17:06:32 [main] INFO  : Deleting product with ID: 1
+2024-03-15 17:06:32 [main] INFO  : Deleted product: Product(id=1, name=Existing Product, description=Existing Description, price=20.0)
+2024-03-15 17:06:32 [main] INFO  : Fetching all products with filters and sorting: pageable=Page request [number: 0, size 10, sort: UNSORTED], name=null, description=null, minPrice=null, maxPrice=null
+2024-03-15 17:06:32 [main] INFO  : Retrieved 0 products
+2024-03-15 17:06:32 [main] INFO  : Fetching all products
+2024-03-15 17:06:32 [main] INFO  : Retrieved 2 products
+2024-03-15 17:06:32 [main] INFO  : Fetching product with ID: 999
+2024-03-15 17:06:32 [main] INFO  : Fetching all deleted products
+2024-03-15 17:06:32 [main] INFO  : Retrieved 2 deleted products
+2024-03-15 17:06:32 [main] INFO  : Updating product with ID 1: ProductRequest(name=Updated Product, description=Updated Description, price=30.0)
