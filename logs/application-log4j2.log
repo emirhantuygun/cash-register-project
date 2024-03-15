@@ -1,0 +1,39 @@
+2024-03-14 16:26:44 [background-preinit] INFO  : HV000001: Hibernate Validator 8.0.1.Final
+2024-03-14 16:26:44 [restartedMain] INFO  : Starting ProductServiceApplication using Java 21 with PID 4940 (C:\Users\Emirhan\Desktop\cash-register-project\product-service\target\classes started by Emirhan in C:\Users\Emirhan\Desktop\cash-register-project)
+2024-03-14 16:26:44 [restartedMain] INFO  : No active profile set, falling back to 1 default profile: "default"
+2024-03-14 16:26:44 [restartedMain] INFO  : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2024-03-14 16:26:44 [restartedMain] INFO  : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2024-03-14 16:26:46 [restartedMain] INFO  : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-03-14 16:26:46 [restartedMain] INFO  : Finished Spring Data repository scanning in 108 ms. Found 1 JPA repository interface.
+2024-03-14 16:26:47 [restartedMain] INFO  : Tomcat initialized with port 8080 (http)
+2024-03-14 16:26:47 [restartedMain] INFO  : Initializing ProtocolHandler ["http-nio-8080"]
+2024-03-14 16:26:47 [restartedMain] INFO  : Starting service [Tomcat]
+2024-03-14 16:26:47 [restartedMain] INFO  : Starting Servlet engine: [Apache Tomcat/10.1.19]
+2024-03-14 16:26:47 [restartedMain] INFO  : Initializing Spring embedded WebApplicationContext
+2024-03-14 16:26:47 [restartedMain] INFO  : Root WebApplicationContext: initialization completed in 2882 ms
+2024-03-14 16:26:47 [restartedMain] INFO  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-03-14 16:26:47 [restartedMain] INFO  : HHH000412: Hibernate ORM core version 6.4.4.Final
+2024-03-14 16:26:48 [restartedMain] INFO  : HHH000026: Second-level cache disabled
+2024-03-14 16:26:48 [restartedMain] INFO  : No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-03-14 16:26:48 [restartedMain] INFO  : HikariPool-1 - Starting...
+2024-03-14 16:26:48 [restartedMain] INFO  : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@49232ed0
+2024-03-14 16:26:48 [restartedMain] INFO  : HikariPool-1 - Start completed.
+2024-03-14 16:26:49 [restartedMain] WARN  : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2024-03-14 16:26:51 [restartedMain] INFO  : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-03-14 16:26:51 [restartedMain] INFO  : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-03-14 16:26:51 [restartedMain] INFO  : Hibernate is in classpath; If applicable, HQL parser will be used.
+2024-03-14 16:26:51 [restartedMain] WARN  : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-03-14 16:26:52 [restartedMain] INFO  : LiveReload server is running on port 35729
+2024-03-14 16:26:52 [restartedMain] INFO  : Starting ProtocolHandler ["http-nio-8080"]
+2024-03-14 16:26:52 [restartedMain] INFO  : Tomcat started on port 8080 (http) with context path ''
+2024-03-14 16:26:52 [restartedMain] INFO  : Started ProductServiceApplication in 9.154 seconds (process running for 11.635)
+2024-03-14 16:27:28 [http-nio-8080-exec-1] INFO  : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-03-14 16:27:28 [http-nio-8080-exec-1] INFO  : Initializing Servlet 'dispatcherServlet'
+2024-03-14 16:27:28 [http-nio-8080-exec-1] INFO  : Completed initialization in 4 ms
+2024-03-14 16:27:28 [http-nio-8080-exec-1] INFO  : Received request to fetch all products with filters and sorting: page=0, size=4, sortBy=price, direction=DESC, name=null, description=null, minPrice=100, maxPrice=800
+2024-03-14 16:27:28 [http-nio-8080-exec-1] INFO  : Fetching all products with filters and sorting: pageable=Page request [number: 0, size 4, sort: price: DESC], name=null, description=null, minPrice=100, maxPrice=800
+2024-03-14 16:27:29 [http-nio-8080-exec-1] INFO  : Retrieved 7 products
+2024-03-14 16:27:29 [http-nio-8080-exec-1] INFO  : Returning 7 product responses filtered and sorted
+2024-03-14 16:28:02 [SpringApplicationShutdownHook] INFO  : Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-03-14 16:28:02 [SpringApplicationShutdownHook] INFO  : HikariPool-1 - Shutdown initiated...
+2024-03-14 16:28:02 [SpringApplicationShutdownHook] INFO  : HikariPool-1 - Shutdown completed.
