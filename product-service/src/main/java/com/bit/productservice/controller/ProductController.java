@@ -14,13 +14,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/products")
 @RequiredArgsConstructor
 public class ProductController {
 
@@ -87,9 +86,9 @@ public class ProductController {
 
     @PutMapping("{id}")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id,
-                                                @RequestBody @Valid ProductRequest updatedProduct){
-        logger.info("Received request to update product with ID {}: {}", id, updatedProduct);
-        ProductResponse productResponse = productService.updateProduct(id, updatedProduct);
+                                                @RequestBody @Valid ProductRequest productRequest){
+        logger.info("Received request to update product with ID {}: {}", id, productRequest);
+        ProductResponse productResponse = productService.updateProduct(id, productRequest);
 
         logger.info("Returning product response with ID {}: {}", id, productResponse);
         return new ResponseEntity<>(productResponse, HttpStatus.OK);

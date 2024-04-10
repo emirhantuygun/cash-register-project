@@ -95,14 +95,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse updateProduct (Long id, ProductRequest updatedProduct) {
-        logger.info("Updating product with ID {}: {}", id, updatedProduct);
+    public ProductResponse updateProduct (Long id, ProductRequest productRequest) {
+        logger.info("Updating product with ID {}: {}", id, productRequest);
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product doesn't exist with id " + id));
 
-        existingProduct.setName(updatedProduct.getName());
-        existingProduct.setDescription(updatedProduct.getDescription());
-        existingProduct.setPrice(updatedProduct.getPrice());
+        existingProduct.setName(productRequest.getName());
+        existingProduct.setDescription(productRequest.getDescription());
+        existingProduct.setPrice(productRequest.getPrice());
 
         productRepository.save(existingProduct);
 
