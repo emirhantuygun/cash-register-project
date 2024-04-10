@@ -4,6 +4,7 @@ import com.bit.usermanagementservice.UserManagementServiceApplication;
 import com.bit.usermanagementservice.dto.UserRequest;
 import com.bit.usermanagementservice.dto.UserResponse;
 import com.bit.usermanagementservice.exception.UserNotFoundException;
+import com.bit.usermanagementservice.exception.UserNotSoftDeletedException;
 import com.bit.usermanagementservice.model.AppUser;
 import com.bit.usermanagementservice.model.Role;
 import com.bit.usermanagementservice.repository.RoleRepository;
@@ -89,6 +90,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse restoreUser(Long id) {
+        if (!userRepository.isUserSoftDeleted(id)) {
+            throw new UserNotSoftDeletedException("User with id " + id + " is not soft-deleted and cannot be restored.");
+        }
         userRepository.restoreUser(id);
         AppUser user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Couldn't restore the user with id " + id));

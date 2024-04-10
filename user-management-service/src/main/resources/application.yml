@@ -1,8 +1,8 @@
 spring:
   application:
-    name: PRODUCT-SERVICE
+    name: USER-SERVICE
 server:
-  port: 8083
+  port: 8082
 eureka:
   client:
     serviceUrl:

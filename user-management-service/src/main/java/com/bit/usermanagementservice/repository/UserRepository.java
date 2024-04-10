@@ -14,6 +14,9 @@ public interface UserRepository extends JpaRepository<AppUser, Long> {
     @Query(value = "SELECT * FROM users WHERE deleted = true", nativeQuery = true)
     List<AppUser> findSoftDeletedUsers();
 
+    @Query(value = "SELECT CASE WHEN deleted = true THEN true ELSE false END FROM users WHERE id = :id", nativeQuery = true)
+    boolean isUserSoftDeleted(@Param("id") Long id);
+
     @Transactional
     @Modifying
     @Query(value = "UPDATE users SET deleted = false WHERE id = :id", nativeQuery = true)

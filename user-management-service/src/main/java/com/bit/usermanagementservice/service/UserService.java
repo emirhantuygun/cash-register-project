@@ -2,8 +2,6 @@ package com.bit.usermanagementservice.service;
 
 import com.bit.usermanagementservice.dto.UserRequest;
 import com.bit.usermanagementservice.dto.UserResponse;
-import com.bit.usermanagementservice.model.AppUser;
-
 import java.util.List;
 
 public interface UserService {
