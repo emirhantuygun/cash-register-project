@@ -16,5 +16,6 @@ public interface ProductService {
     ProductResponse createProduct(ProductRequest productRequest);
     ProductResponse updateProduct (Long id, ProductRequest updatedProduct);
     void deleteProduct (Long id);
-
+    ProductResponse restoreUser(Long id);
+    void deleteProductPermanently(Long id);
 }

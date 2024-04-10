@@ -21,6 +21,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Page<Product> findAll(Specification<Product> spec, Pageable pageable);
 
+    @Query(value = "SELECT CASE WHEN deleted = true THEN true ELSE false END FROM products WHERE id = :id", nativeQuery = true)
+    boolean isProductSoftDeleted(@Param("id") Long id);
+
     @Transactional
     @Modifying
     @Query(value = "UPDATE products SET deleted = false WHERE id = :id", nativeQuery = true)
@@ -30,4 +33,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Modifying
     @Query(value = "DELETE FROM products WHERE id = :id", nativeQuery = true)
     void deletePermanently(@Param("id") Long id);
+
+
 }

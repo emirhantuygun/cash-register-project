@@ -94,12 +94,26 @@ public class ProductController {
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
 
+    @PutMapping("/restore/{id}")
+    public ResponseEntity<ProductResponse> restoreProduct(@PathVariable Long id){
+        ProductResponse productResponse = productService.restoreUser(id);
+
+        return new ResponseEntity<>(productResponse, HttpStatus.OK);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable Long id){
         logger.info("Received request to delete product with ID: {}", id);
         productService.deleteProduct(id);
 
         logger.info("Product with ID {} deleted successfully", id);
-        return new ResponseEntity<>("Product deleted successfully!", HttpStatus.OK);
+        return new ResponseEntity<>("Product soft deleted successfully!", HttpStatus.OK);
+    }
+
+    @DeleteMapping("/permanent/{id}")
+    public ResponseEntity<String> deleteProductPermanently(@PathVariable Long id){
+        productService.deleteProductPermanently(id);
+
+        return new ResponseEntity<>("Product deleted permanently!", HttpStatus.OK);
     }
 }
