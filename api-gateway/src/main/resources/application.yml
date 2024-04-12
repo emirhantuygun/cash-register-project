@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: API-GATEWAY
+
+server:
+  port: 8080
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka/}
+  instance:
+    hostname: localhost
+
+jwt:
+  signerKey: "4bb6d1dfbafb64a681139d1586b6f1160d18159afd57c8c79136d7490630407c"
+  authorities-key: "roles"
+
+database:
+  url: "jdbc:postgresql://localhost:5432/auth-service"
+  username: "postgres"
+  password: "emirhan"
