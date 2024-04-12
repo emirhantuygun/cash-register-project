@@ -1,0 +1,10 @@
+package com.bit.authservice.dto;
+
+public enum AuthStatus {
+  USER_CREATED_SUCCESSFULLY,
+  USER_NOT_CREATED,
+  LOGIN_SUCCESS,
+  LOGIN_FAILED,
+  TOKEN_REFRESHED_SUCCESSFULLY,
+  TOKEN_REFRESH_FAILED
+}
