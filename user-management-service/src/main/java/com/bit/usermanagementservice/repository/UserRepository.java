@@ -26,4 +26,8 @@ public interface UserRepository extends JpaRepository<AppUser, Long> {
     @Modifying
     @Query(value = "DELETE FROM users WHERE id = :id", nativeQuery = true)
     void deletePermanently(@Param("id") Long id);
+
+    boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
 }

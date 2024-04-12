@@ -2,6 +2,8 @@ package com.bit.usermanagementservice.service;
 
 import com.bit.usermanagementservice.dto.UserRequest;
 import com.bit.usermanagementservice.dto.UserResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import java.util.List;
 
 public interface UserService {

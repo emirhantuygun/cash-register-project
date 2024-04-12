@@ -3,6 +3,7 @@ package com.bit.usermanagementservice.controller;
 import com.bit.usermanagementservice.dto.UserRequest;
 import com.bit.usermanagementservice.dto.UserResponse;
 import com.bit.usermanagementservice.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -75,7 +76,7 @@ public class UserController {
     public ResponseEntity<String> deleteUser(@PathVariable Long id){
         userService.deleteUser(id);
 
-        return new ResponseEntity<>("User safe deleted successfully!", HttpStatus.OK);
+        return new ResponseEntity<>("User soft deleted successfully!", HttpStatus.OK);
     }
 
     @DeleteMapping("/permanent/{id}")
