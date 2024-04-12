@@ -25,6 +25,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
+    @ExceptionHandler(ProductNotSoftDeletedException.class)
+    @ResponseBody
+    public ResponseEntity<String> handleProductNotSoftDeletedException(ProductNotSoftDeletedException ex) {
+        logger.error("Product not soft-deleted: " + ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseBody
     public ResponseEntity<String> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {

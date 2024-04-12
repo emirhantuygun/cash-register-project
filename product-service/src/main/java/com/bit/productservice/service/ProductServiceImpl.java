@@ -4,6 +4,7 @@ import com.bit.productservice.ProductServiceApplication;
 import com.bit.productservice.dto.ProductRequest;
 import com.bit.productservice.dto.ProductResponse;
 import com.bit.productservice.exception.ProductNotFoundException;
+import com.bit.productservice.exception.ProductNotSoftDeletedException;
 import com.bit.productservice.model.Product;
 import com.bit.productservice.repository.ProductRepository;
 import io.micrometer.common.util.StringUtils;
@@ -14,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +28,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
     @Override
-    public ProductResponse getProduct (Long id) {
+    public ProductResponse getProduct(Long id) {
         logger.info("Fetching product with ID: {}", id);
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + id));
@@ -54,7 +56,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductResponse> getAllProductsFilteredAndSorted (Pageable pageable, String name, String description, BigDecimal minPrice, BigDecimal maxPrice) {
+    public Page<ProductResponse> getAllProductsFilteredAndSorted(Pageable pageable, String name, String description, BigDecimal minPrice, BigDecimal maxPrice) {
         logger.info("Fetching all products with filters and sorting: pageable={}, name={}, description={}, minPrice={}, maxPrice={}",
                 pageable, name, description, minPrice, maxPrice);
         Page<Product> productsPage = productRepository.findAll((root, query, criteriaBuilder) -> {
@@ -95,7 +97,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse updateProduct (Long id, ProductRequest productRequest) {
+    public ProductResponse updateProduct(Long id, ProductRequest productRequest) {
         logger.info("Updating product with ID {}: {}", id, productRequest);
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product doesn't exist with id " + id));
@@ -111,7 +113,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void deleteProduct (Long id) {
+    public ProductResponse restoreUser(Long id) {
+        if (!productRepository.isProductSoftDeleted(id)) {
+            throw new ProductNotSoftDeletedException("Product with id " + id + " is not soft-deleted and cannot be restored.");
+        }
+        productRepository.restoreProduct(id);
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("Couldn't restore the product with id " + id));
+        return mapToProductResponse(product);
+    }
+
+    @Override
+    public void deleteProduct(Long id) {
         logger.info("Deleting product with ID: {}", id);
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + id));
@@ -120,6 +133,10 @@ public class ProductServiceImpl implements ProductService {
         logger.info("Deleted product: {}", existingProduct);
     }
 
+    @Override
+    public void deleteProductPermanently(Long id) {
+        productRepository.deletePermanently(id);
+    }
 
     private ProductResponse mapToProductResponse(Product product) {
         return ProductResponse.builder()
