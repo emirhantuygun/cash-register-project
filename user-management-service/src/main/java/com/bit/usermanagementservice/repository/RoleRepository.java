@@ -1,6 +1,6 @@
 package com.bit.usermanagementservice.repository;
 
-import com.bit.usermanagementservice.model.Role;
+import com.bit.usermanagementservice.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

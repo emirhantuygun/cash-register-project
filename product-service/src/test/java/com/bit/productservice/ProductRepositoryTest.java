@@ -1,6 +1,6 @@
 package com.bit.productservice;
 
-import com.bit.productservice.model.Product;
+import com.bit.productservice.entity.Product;
 import com.bit.productservice.repository.ProductRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

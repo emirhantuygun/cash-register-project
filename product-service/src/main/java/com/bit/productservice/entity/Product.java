@@ -1,4 +1,4 @@
-package com.bit.productservice.model;
+package com.bit.productservice.entity;
 
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
@@ -20,6 +20,9 @@ public class Product {
     private Long id;
     private String name;
     private String description;
+
+    @Column(name = "barcode_number")
+    private String barcodeNumber;
     private BigDecimal price;
 
 }

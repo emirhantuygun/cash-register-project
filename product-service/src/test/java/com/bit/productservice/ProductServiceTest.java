@@ -5,9 +5,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.bit.productservice.dto.ProductRequest;
-import com.bit.productservice.model.Product;
+import com.bit.productservice.entity.Product;
 import com.bit.productservice.exception.ProductNotFoundException;
 import com.bit.productservice.repository.ProductRepository;
+import com.bit.productservice.service.BarcodeService;
 import com.bit.productservice.service.ProductServiceImpl;
 import com.bit.productservice.dto.ProductResponse;
 
@@ -27,12 +28,15 @@ import java.util.function.Function;
 public class ProductServiceTest {
 
     private ProductRepository productRepository;
+
+    private BarcodeService barcodeService;
     private ProductServiceImpl productService;
 
     @BeforeEach
     public void setUp() {
         productRepository = mock(ProductRepository.class);
-        productService = new ProductServiceImpl(productRepository);
+        barcodeService = mock(BarcodeService.class);
+        productService = new ProductServiceImpl(productRepository, barcodeService);
     }
 
     @Test
@@ -154,8 +158,8 @@ public class ProductServiceTest {
 
         // Mock products and repository
         List<Product> products = Arrays.asList(
-                new Product(1L, "Test Product 1", "Description 1", BigDecimal.valueOf(50)),
-                new Product(2L, "Test Product 2", "Description 2", BigDecimal.valueOf(80))
+                new Product(1L, "Test Product 1", "Description 1", barcodeService.generateBarcodeNumber("Test Product 1"),BigDecimal.valueOf(50)),
+                new Product(2L, "Test Product 2", "Description 2",barcodeService.generateBarcodeNumber("Test Product 2"), BigDecimal.valueOf(80))
         );
         Page<Product> productPage = new PageImpl<>(products);
 

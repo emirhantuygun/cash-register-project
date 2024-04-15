@@ -16,7 +16,7 @@ import java.util.List;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger logger = LogManager.getLogger(ProductServiceApplication.class);
+    private final Logger logger = LogManager.getLogger(ProductServiceApplication.class);
 
     @ExceptionHandler(ProductNotFoundException.class)
     @ResponseBody

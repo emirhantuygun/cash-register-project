@@ -1,7 +1,7 @@
 package com.bit.usermanagementservice.initializer;
 
-import com.bit.usermanagementservice.model.AppUser;
-import com.bit.usermanagementservice.model.Role;
+import com.bit.usermanagementservice.entity.AppUser;
+import com.bit.usermanagementservice.entity.Role;
 import com.bit.usermanagementservice.repository.RoleRepository;
 import com.bit.usermanagementservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

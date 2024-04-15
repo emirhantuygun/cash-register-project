@@ -27,10 +27,9 @@ public class GatewayService {
 
 
     private final RestTemplate restTemplate;
-
     private final ObjectMapper objectMapper;
 
-    public void createUser(AuthUserRequest authUserRequest) {
+    protected void createUser(AuthUserRequest authUserRequest) {
         try {
             String createUrl = GATEWAY_URL + CREATE_ENDPOINT;
             HttpHeaders headers = new HttpHeaders();
@@ -64,7 +63,7 @@ public class GatewayService {
         }
     }
 
-    public void updateUser(Long id, AuthUserRequest authUserRequest) {
+    protected void updateUser(Long id, AuthUserRequest authUserRequest) {
         try {
             String updateUrl = GATEWAY_URL + UPDATE_ENDPOINT;
 
@@ -95,7 +94,7 @@ public class GatewayService {
         }
     }
 
-    public void restoreUser(Long id) {
+    protected void restoreUser(Long id) {
         try {
             String restoreUrl = GATEWAY_URL + RESTORE_ENDPOINT;
 
@@ -121,7 +120,7 @@ public class GatewayService {
         }
     }
 
-    public void deleteUser(Long id) {
+    protected void deleteUser(Long id) {
         try {
             String deleteUrl = GATEWAY_URL + DELETE_ENDPOINT;
 
@@ -147,7 +146,7 @@ public class GatewayService {
         }
     }
 
-    public void deleteUserPermanently(Long id) {
+    protected void deleteUserPermanently(Long id) {
         try {
             String deleteUrl = GATEWAY_URL + DELETE_PERMANENTLY_ENDPOINT;
 

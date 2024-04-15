@@ -5,7 +5,7 @@ import com.bit.productservice.dto.ProductRequest;
 import com.bit.productservice.dto.ProductResponse;
 import com.bit.productservice.exception.ProductNotFoundException;
 import com.bit.productservice.exception.ProductNotSoftDeletedException;
-import com.bit.productservice.model.Product;
+import com.bit.productservice.entity.Product;
 import com.bit.productservice.repository.ProductRepository;
 import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.criteria.Predicate;
@@ -26,6 +26,7 @@ public class ProductServiceImpl implements ProductService {
 
     private static final Logger logger = LogManager.getLogger(ProductServiceApplication.class);
     private final ProductRepository productRepository;
+    private final BarcodeService barcodeService;
 
     @Override
     public ProductResponse getProduct(Long id) {
@@ -88,6 +89,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = Product.builder()
                 .name(productRequest.getName())
                 .description(productRequest.getDescription())
+                .barcodeNumber(barcodeService.generateBarcodeNumber(productRequest.getName()))
                 .price(productRequest.getPrice())
                 .build();
         productRepository.save(product);
@@ -104,6 +106,7 @@ public class ProductServiceImpl implements ProductService {
 
         existingProduct.setName(productRequest.getName());
         existingProduct.setDescription(productRequest.getDescription());
+        existingProduct.setBarcodeNumber(barcodeService.generateBarcodeNumber(productRequest.getName()));
         existingProduct.setPrice(productRequest.getPrice());
 
         productRepository.save(existingProduct);
@@ -143,6 +146,7 @@ public class ProductServiceImpl implements ProductService {
                 .id(product.getId())
                 .name(product.getName())
                 .description(product.getDescription())
+                .barcodeNumber(product.getBarcodeNumber())
                 .price(product.getPrice())
                 .build();
     }

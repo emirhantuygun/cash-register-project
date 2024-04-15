@@ -7,8 +7,8 @@ import com.bit.usermanagementservice.dto.UserResponse;
 import com.bit.usermanagementservice.exception.InvalidRoleException;
 import com.bit.usermanagementservice.exception.UserNotFoundException;
 import com.bit.usermanagementservice.exception.UserNotSoftDeletedException;
-import com.bit.usermanagementservice.model.AppUser;
-import com.bit.usermanagementservice.model.Role;
+import com.bit.usermanagementservice.entity.AppUser;
+import com.bit.usermanagementservice.entity.Role;
 import com.bit.usermanagementservice.repository.RoleRepository;
 import com.bit.usermanagementservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +17,15 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserServiceImpl implements UserService {
 
     @Value("#{'${default-roles}'.split(', ')}")

@@ -1,4 +1,4 @@
-package com.bit.usermanagementservice.model;
+package com.bit.saleservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -8,28 +8,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-@Table(name = "roles")
+@Table(name = "campaigns")
 @Entity
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Role {
+public class Campaign {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String name;
+    private String details;
+    private Date expiration;
 
-    @Column(unique = true)
-    private String roleName;
+    @ManyToMany(mappedBy = "campaigns", cascade = CascadeType.DETACH)
+    private List<Sale> sales = new ArrayList<>();
 
-    @JsonIgnore
-    @ManyToMany(mappedBy = "roles", cascade = CascadeType.DETACH)
-    private List<AppUser> users = new ArrayList<>();
-
-    public Role (String roleName){
-        this.roleName = roleName;
-    }
 }

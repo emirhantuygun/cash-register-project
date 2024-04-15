@@ -1,6 +1,6 @@
 package com.bit.productservice.repository;
 
-import com.bit.productservice.model.Product;
+import com.bit.productservice.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

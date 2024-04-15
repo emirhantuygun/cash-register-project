@@ -16,7 +16,8 @@ public class GatewayConfig {
 
     public GatewayConfig() {
         endpointRoleMapping.put("/users", List.of("ADMIN"));
-        endpointRoleMapping.put("/sales", List.of("ADMIN"));
+        endpointRoleMapping.put("/sales", List.of("CASHIER"));
+        endpointRoleMapping.put("/campaigns", List.of("CASHIER"));
         endpointRoleMapping.put("/reports", List.of("ADMIN"));
     }
 
@@ -34,6 +35,10 @@ public class GatewayConfig {
 
                 .route("product-service", r -> r.path("/products/**")
                         .uri("lb://product-service"))
+
+                .route("sale-service", r -> r.path("/sales/**", "/campaigns/**")
+                        .filters(f -> f.filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping))))
+                        .uri("lb://sale-service"))
 
                 .build();
     }

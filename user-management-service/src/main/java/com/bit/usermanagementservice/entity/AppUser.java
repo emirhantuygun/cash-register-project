@@ -1,4 +1,4 @@
-package com.bit.usermanagementservice.model;
+package com.bit.usermanagementservice.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
