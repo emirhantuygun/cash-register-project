@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.List;
 
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class _GlobalExceptionHandler {
 
     private static final Logger logger = LogManager.getLogger(UserManagementServiceApplication.class);
 
@@ -33,9 +33,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
-    @ExceptionHandler(AuthException.class)
-    public ResponseEntity<String> handleAuthException(AuthException ex) {
-        logger.error("Failed to connect auth service: " + ex.getMessage());
+    @ExceptionHandler(AuthServiceException.class)
+    public ResponseEntity<String> handleAuthException(AuthServiceException ex) {
+        logger.error("Auth service connection failed: " + ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
     }
 

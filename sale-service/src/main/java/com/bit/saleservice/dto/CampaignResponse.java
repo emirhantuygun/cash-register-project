@@ -21,5 +21,5 @@ public class CampaignResponse {
     private String name;
     private String details;
     private Date expiration;
-    private List<Long> sales = new ArrayList<>();
+    private List<Long> saleIds = new ArrayList<>();
 }

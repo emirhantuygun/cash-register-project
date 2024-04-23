@@ -15,10 +15,11 @@ public class GatewayConfig {
     private final Map<String, List<String>> endpointRoleMapping = new HashMap<>();
 
     public GatewayConfig() {
+        endpointRoleMapping.put("/auth", List.of("ADMIN"));
         endpointRoleMapping.put("/users", List.of("ADMIN"));
-        endpointRoleMapping.put("/sales", List.of("CASHIER"));
+        endpointRoleMapping.put("/sales", List.of("CASHIER", "MANAGER"));
         endpointRoleMapping.put("/campaigns", List.of("CASHIER"));
-        endpointRoleMapping.put("/reports", List.of("ADMIN"));
+        endpointRoleMapping.put("/reports", List.of("MANAGER"));
     }
 
     @Bean
@@ -34,11 +35,16 @@ public class GatewayConfig {
                         .uri("lb://user-service"))
 
                 .route("product-service", r -> r.path("/products/**")
+                        .filters(f -> f.filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping))))
                         .uri("lb://product-service"))
 
                 .route("sale-service", r -> r.path("/sales/**", "/campaigns/**")
                         .filters(f -> f.filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping))))
                         .uri("lb://sale-service"))
+
+                .route("report-service", r -> r.path("/reports/**")
+                        .filters(f -> f.filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping))))
+                        .uri("lb://report-service"))
 
                 .build();
     }

@@ -32,7 +32,7 @@ public class CampaignProcessService {
 
     protected CampaignProcessResponse processCampaigns(CampaignProcessRequest campaignProcessRequest) {
 
-        List<Long> ids = campaignProcessRequest.getCampaigns();
+        List<Long> ids = campaignProcessRequest.getCampaignIds();
         boolean hasDuplicates = ids.stream().distinct().count() < ids.size();
 
         if (hasDuplicates) {

@@ -14,7 +14,7 @@ import org.springframework.validation.FieldError;
 import java.util.List;
 
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class _GlobalExceptionHandler {
 
     private final Logger logger = LogManager.getLogger(ProductServiceApplication.class);
 

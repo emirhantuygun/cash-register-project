@@ -1,24 +1,40 @@
 package com.bit.saleservice.initializer;
 
+import com.bit.saleservice.dto.CampaignProcessRequest;
+import com.bit.saleservice.dto.CampaignProcessResponse;
+import com.bit.saleservice.dto.CampaignProcessResult;
 import com.bit.saleservice.entity.Campaign;
+import com.bit.saleservice.entity.Payment;
+import com.bit.saleservice.entity.Product;
+import com.bit.saleservice.entity.Sale;
 import com.bit.saleservice.repository.CampaignRepository;
+import com.bit.saleservice.repository.ProductRepository;
+import com.bit.saleservice.repository.SaleRepository;
+import com.bit.saleservice.service.CampaignProcessService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class Initializer implements CommandLineRunner {
 
     private final CampaignRepository campaignRepository;
+    private final SaleRepository saleRepository;
+    private final ProductRepository productRepository;
+    private final CampaignProcessService campaignProcessService;
+
 
     @Override
     @Transactional
     public void run(String... args) {
         initializeCampaigns();
+        initializeSales();
     }
 
     private void initializeCampaigns() {
@@ -48,6 +64,40 @@ public class Initializer implements CommandLineRunner {
         campaignRepository.save(campaign_1);
         campaignRepository.save(campaign_2);
         campaignRepository.save(campaign_3);
+    }
+
+    private void initializeSales() {
+
+        for (int i = 1; i <= 20; i++) {
+            String cashier = String.format("Cashier %d", i);
+            Date date = new Date(System.currentTimeMillis() + 86400000 * i);
+
+            int paymentId = i % 4;
+            Payment paymentMethod = Payment.values()[paymentId];
+
+            Product product = Product.builder()
+                    .name("Product " + i)
+                    .barcodeNumber("0123456789" + i)
+                    .quantity(i)
+                    .price(BigDecimal.valueOf(i * 10))
+                    .totalPrice(BigDecimal.valueOf(i * 10).multiply(BigDecimal.valueOf(i)))
+                    .build();
+
+            BigDecimal total = product.getTotalPrice();
+
+            Sale sale = Sale.builder()
+                    .cashier(cashier)
+                    .date(date)
+                    .paymentMethod(paymentMethod)
+                    .campaigns(Collections.emptyList())
+                    .total(total)
+                    .totalWithCampaign(total)
+                    .build();
+
+            saleRepository.save(sale);
+            product.setSale(sale);
+            productRepository.save(product);
+        }
     }
 
 }

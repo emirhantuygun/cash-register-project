@@ -67,8 +67,7 @@ public class ProductController {
     ) {
         logger.info("Received request to fetch all products with filters and sorting: page={}, size={}, sortBy={}, direction={}, name={}, description={}, minPrice={}, maxPrice={}",
                 page, size, sortBy, direction, name, description, minPrice, maxPrice);
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
-        Page<ProductResponse> productResponses = productService.getAllProductsFilteredAndSorted(pageable, name, description, minPrice, maxPrice);
+        Page<ProductResponse> productResponses = productService.getAllProductsFilteredAndSorted(page, size, sortBy, direction, name, description, minPrice, maxPrice);
 
         logger.info("Returning {} product responses filtered and sorted", productResponses.getTotalElements());
         return new ResponseEntity<>(productResponses, HttpStatus.OK);
@@ -96,7 +95,7 @@ public class ProductController {
 
     @PutMapping("/restore/{id}")
     public ResponseEntity<ProductResponse> restoreProduct(@PathVariable Long id){
-        ProductResponse productResponse = productService.restoreUser(id);
+        ProductResponse productResponse = productService.restoreProduct(id);
 
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }

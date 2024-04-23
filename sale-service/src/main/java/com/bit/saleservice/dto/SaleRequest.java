@@ -16,6 +16,6 @@ public class SaleRequest {
 
     private String cashier;
     private String paymentMethod;
-    private List<Long> campaigns;
+    private List<Long> campaignIds;
     private List<ProductRequest> products;
 }

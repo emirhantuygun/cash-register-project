@@ -13,9 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,9 +58,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductResponse> getAllProductsFilteredAndSorted(Pageable pageable, String name, String description, BigDecimal minPrice, BigDecimal maxPrice) {
-        logger.info("Fetching all products with filters and sorting: pageable={}, name={}, description={}, minPrice={}, maxPrice={}",
-                pageable, name, description, minPrice, maxPrice);
+    public Page<ProductResponse> getAllProductsFilteredAndSorted(int page, int size, String sortBy, String direction, String name, String description, BigDecimal minPrice, BigDecimal maxPrice) {
+        logger.info("Fetching all products with filters and sorting");
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
         Page<Product> productsPage = productRepository.findAll((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             if (StringUtils.isNotBlank(name)) {
@@ -116,7 +117,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse restoreUser(Long id) {
+    public ProductResponse restoreProduct(Long id) {
         if (!productRepository.isProductSoftDeleted(id)) {
             throw new ProductNotSoftDeletedException("Product with id " + id + " is not soft-deleted and cannot be restored.");
         }
@@ -129,15 +130,17 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteProduct(Long id) {
         logger.info("Deleting product with ID: {}", id);
-        Product existingProduct = productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + id));
+        if (!productRepository.existsById(id))
+            throw new ProductNotFoundException("Product not found with id " + id);
 
         productRepository.deleteById(id);
-        logger.info("Deleted product: {}", existingProduct);
+        logger.info("Product deleted!");
     }
 
     @Override
     public void deleteProductPermanently(Long id) {
+        if (!productRepository.existsById(id))
+            throw new ProductNotFoundException("Product not found with id " + id);
         productRepository.deletePermanently(id);
     }
 

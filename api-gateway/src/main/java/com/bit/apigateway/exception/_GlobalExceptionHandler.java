@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class _GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidJwtTokenException.class)
     public ResponseEntity<String> handleInvalidJwtTokenException(InvalidJwtTokenException ex) {

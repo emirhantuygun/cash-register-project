@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 public class CampaignProcessRequest {
 
-    private List<Long> campaigns;
+    private List<Long> campaignIds;
     private List<Product> products;
     private BigDecimal total;
 }

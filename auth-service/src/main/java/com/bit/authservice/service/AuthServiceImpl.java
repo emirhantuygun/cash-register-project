@@ -121,6 +121,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void deleteUserPermanently(Long id) {
+        userRepository.deleteRolesForUser(id);
         userRepository.deletePermanently(id);
     }
 

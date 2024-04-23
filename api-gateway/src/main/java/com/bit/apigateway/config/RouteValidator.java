@@ -12,16 +12,21 @@ public class RouteValidator {
     public static final List<String> openEndpoints = List.of(
             "/auth/login",
             "/auth/refresh-token",
-            "/auth/create",
-            "/auth/update",
-            "/auth/restore",
-            "/auth/delete",
-            "/auth/delete/permanent",
             "/auth/logout"
     );
 
+    public static final List<String> noRoleBasedAuthorizationEndpoints = List.of(
+            "/products"
+    );
+
+
     public Predicate<ServerHttpRequest> isSecured =
             request -> openEndpoints
+                    .stream()
+                    .noneMatch(uri -> request.getURI().getPath().contains(uri));
+
+    public Predicate<ServerHttpRequest> isRoleBasedAuthorizationNeeded =
+            request -> noRoleBasedAuthorizationEndpoints
                     .stream()
                     .noneMatch(uri -> request.getURI().getPath().contains(uri));
 

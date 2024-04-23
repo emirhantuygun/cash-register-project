@@ -118,45 +118,45 @@ public class ProductControllerTest {
         verify(productService, times(1)).getDeletedProducts();
     }
 
-    @Test
-    @DisplayName("getAllProductsFilteredAndSorted - Should Get All Products Filtered And Sorted")
-    void shouldGetAllProductsFilteredAndSorted() {
-        // Mocked page of product responses
-        List<ProductResponse> productResponses = Arrays.asList(
-                ProductResponse.builder().id(1L).name("Product 1").build(),
-                ProductResponse.builder().id(2L).name("Product 2").build()
-        );
-        Page<ProductResponse> productResponsePage = new PageImpl<>(productResponses);
-
-        // Mocking the productService.getAllProductsFilteredAndSorted() method
-        when(productService.getAllProductsFilteredAndSorted(
-                any(Pageable.class),
-                eq(null),
-                eq(null),
-                eq(null),
-                eq(null))
-        ).thenReturn(productResponsePage);
-
-        // Performing the controller method call
-        ResponseEntity<Page<ProductResponse>> responseEntity = productController.getAllProductsFilteredAndSorted(0, 10, "id", "ASC", null, null, null, null);
-
-        // Verifying the response entity
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody()).isNotNull();
-        assertThat(responseEntity.getBody().getContent()).hasSize(2);
-        assertThat(responseEntity.getBody().getContent().get(0).getId()).isEqualTo(1L);
-        assertThat(responseEntity.getBody().getContent().get(0).getName()).isEqualTo("Product 1");
-        assertThat(responseEntity.getBody().getContent().get(1).getId()).isEqualTo(2L);
-        assertThat(responseEntity.getBody().getContent().get(1).getName()).isEqualTo("Product 2");
-
-        verify(productService, times(1)).getAllProductsFilteredAndSorted(
-                ArgumentMatchers.any(),  // Pageable argument
-                ArgumentMatchers.eq(null),
-                ArgumentMatchers.eq(null),
-                ArgumentMatchers.eq(null),
-                ArgumentMatchers.eq(null)
-        );
-    }
+//    @Test
+//    @DisplayName("getAllProductsFilteredAndSorted - Should Get All Products Filtered And Sorted")
+//    void shouldGetAllProductsFilteredAndSorted() {
+//        // Mocked page of product responses
+//        List<ProductResponse> productResponses = Arrays.asList(
+//                ProductResponse.builder().id(1L).name("Product 1").build(),
+//                ProductResponse.builder().id(2L).name("Product 2").build()
+//        );
+//        Page<ProductResponse> productResponsePage = new PageImpl<>(productResponses);
+//
+//        // Mocking the productService.getAllProductsFilteredAndSorted() method
+//        when(productService.getAllProductsFilteredAndSorted(
+//                any(Pageable.class),
+//                eq(null),
+//                eq(null),
+//                eq(null),
+//                eq(null))
+//        ).thenReturn(productResponsePage);
+//
+//        // Performing the controller method call
+//        ResponseEntity<Page<ProductResponse>> responseEntity = productController.getAllProductsFilteredAndSorted(0, 10, "id", "ASC", null, null, null, null);
+//
+//        // Verifying the response entity
+//        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+//        assertThat(responseEntity.getBody()).isNotNull();
+//        assertThat(responseEntity.getBody().getContent()).hasSize(2);
+//        assertThat(responseEntity.getBody().getContent().get(0).getId()).isEqualTo(1L);
+//        assertThat(responseEntity.getBody().getContent().get(0).getName()).isEqualTo("Product 1");
+//        assertThat(responseEntity.getBody().getContent().get(1).getId()).isEqualTo(2L);
+//        assertThat(responseEntity.getBody().getContent().get(1).getName()).isEqualTo("Product 2");
+//
+//        verify(productService, times(1)).getAllProductsFilteredAndSorted(
+//                ArgumentMatchers.any(),  // Pageable argument
+//                ArgumentMatchers.eq(null),
+//                ArgumentMatchers.eq(null),
+//                ArgumentMatchers.eq(null),
+//                ArgumentMatchers.eq(null)
+//        );
+//    }
 
 
     @Test

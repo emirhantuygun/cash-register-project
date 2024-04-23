@@ -41,12 +41,6 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
             if (routeValidator.isSecured.test(request)) {
                 logger.info("inside return (exchange, chain)");
 
-                String fullPath = exchange.getRequest().getPath().toString();
-                String basePath = fullPath.split("/")[1];
-                List<String> requiredRoles = config.getRoleMapping().get("/" + basePath);
-
-                System.out.println("got required roles: " + requiredRoles);
-
                 String token = exchange.getRequest().getHeaders().getFirst("Authorization");
 
                 if (token != null && token.startsWith("Bearer ")) {
@@ -64,20 +58,28 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
                         return completeResponse(exchange, HttpStatus.UNAUTHORIZED);
                     }
 
-                    List<String> roles = jwtUtils.getRoles(claims);
+                    if (routeValidator.isRoleBasedAuthorizationNeeded.test(request)) {
+                        List<String> roles = jwtUtils.getRoles(claims);
 
-                    if (roles == null || roles.isEmpty()) {
-                        logger.info("Token has no role!");
-                        return completeResponse(exchange, HttpStatus.UNAUTHORIZED);
+                        if (roles == null || roles.isEmpty()) {
+                            logger.info("Token has no role!");
+                            return completeResponse(exchange, HttpStatus.UNAUTHORIZED);
+                        }
+
+                        String fullPath = request.getPath().toString();
+                        String basePath = fullPath.split("/")[1];
+                        List<String> requiredRoles = config.getRoleMapping().get("/" + basePath);
+
+                        System.out.println("got required roles: " + requiredRoles);
+
+                        if (roles.stream().noneMatch(requiredRoles::contains)) {
+                            logger.info("Roles don't match, forbidden!");
+                            return completeResponse(exchange, HttpStatus.FORBIDDEN);
+                        }
                     }
 
-                    if (roles.stream().anyMatch(requiredRoles::contains)) {
-                        System.out.println("Authorization Successful!");
-                        return chain.filter(exchange);
-                    } else {
-                        logger.info("Roles don't match, forbidden!");
-                        return completeResponse(exchange, HttpStatus.FORBIDDEN);
-                    }
+                    System.out.println("Authorization Successful!");
+                    return chain.filter(exchange);
 
                 } else {
                     logger.info("Token is not provided or its type is not Bearer!");

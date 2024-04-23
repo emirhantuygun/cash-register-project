@@ -6,11 +6,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SoftDelete;
 
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "products")
+@SoftDelete
 @Data
 @Builder
 @NoArgsConstructor

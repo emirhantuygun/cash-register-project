@@ -11,14 +11,21 @@ import com.bit.usermanagementservice.entity.AppUser;
 import com.bit.usermanagementservice.entity.Role;
 import com.bit.usermanagementservice.repository.RoleRepository;
 import com.bit.usermanagementservice.repository.UserRepository;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import io.micrometer.common.util.StringUtils;
+import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,13 +70,40 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Page<UserResponse> getAllUsersFilteredAndSorted(int page, int size, String sortBy, String direction, String name, String username, String email, String roleName) {
+        logger.info("Fetching all users with filters and sorting");
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
+
+        Page<AppUser> usersPage = userRepository.findAll((root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (StringUtils.isNotBlank(name)) {
+                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
+            }
+            if (StringUtils.isNotBlank(username)) {
+                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("username")), "%" + username.toLowerCase() + "%"));
+            }
+            if (StringUtils.isNotBlank(email)) {
+                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), "%" + email.toLowerCase() + "%"));
+            }
+            if (StringUtils.isNotBlank(roleName)) {
+                Join<AppUser, Role> roleJoin = root.join("roles", JoinType.INNER);
+                predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(roleJoin.get("roleName")), roleName.toLowerCase()));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        }, pageable);
+
+        logger.info("Retrieved {} users", usersPage.getTotalElements());
+        return usersPage.map(this::mapToUserResponse);
+    }
+
+
+    @Override
     public UserResponse createUser(UserRequest userRequest) {
         logger.info("Creating a user");
 
         validateRoles(userRequest.getRoles());
         checkUniqueness(userRequest);
-
-        gatewayService.createUser(mapToAuthUserRequest(userRequest));
 
         AppUser user = AppUser.builder()
                 .name(userRequest.getName())
@@ -79,6 +113,7 @@ public class UserServiceImpl implements UserService {
                 .roles(getRolesAsRole(userRequest.getRoles()))
                 .build();
 
+        gatewayService.createUser(mapToAuthUserRequest(userRequest));
         userRepository.save(user);
 
         logger.info("Created user with ID: {}", user.getId());
@@ -103,10 +138,8 @@ public class UserServiceImpl implements UserService {
         existingUser.setPassword(userRequest.getPassword());
         existingUser.setRoles(getRolesAsRole(userRequest.getRoles()));
 
-
-        userRepository.save(existingUser);
-
         gatewayService.updateUser(id, mapToAuthUserRequest(userRequest));
+        userRepository.save(existingUser);
 
         logger.info("User updated with id {}", id);
         return mapToUserResponseWithoutPassword(existingUser);
@@ -117,11 +150,11 @@ public class UserServiceImpl implements UserService {
         if (!userRepository.isUserSoftDeleted(id)) {
             throw new UserNotSoftDeletedException("User with id " + id + " is not soft-deleted and cannot be restored.");
         }
+
+        gatewayService.restoreUser(id);
         userRepository.restoreUser(id);
         AppUser user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Couldn't restore the user with id " + id));
-
-        gatewayService.restoreUser(id);
 
         return mapToUserResponseWithoutPassword(user);
     }
@@ -133,9 +166,8 @@ public class UserServiceImpl implements UserService {
         if(!userRepository.existsById(id))
            throw new UserNotFoundException("User not found with id " + id);
 
-        userRepository.deleteById(id);
-
         gatewayService.deleteUser(id);
+        userRepository.deleteById(id);
 
         logger.info("User soft-deleted");
     }
@@ -145,9 +177,9 @@ public class UserServiceImpl implements UserService {
         if(!userRepository.existsById(id))
             throw new UserNotFoundException("User not found with id " + id);
         
-        userRepository.deletePermanently(id);
-
+        userRepository.deleteRolesForUser(id);
         gatewayService.deleteUserPermanently(id);
+        userRepository.deletePermanently(id);
     }
 
     private void checkUniqueness(UserRequest userRequest) {

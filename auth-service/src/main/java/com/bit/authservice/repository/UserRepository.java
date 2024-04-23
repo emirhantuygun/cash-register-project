@@ -17,6 +17,11 @@ public interface UserRepository extends JpaRepository<AppUser, Long> {
 
     @Transactional
     @Modifying
+    @Query(value = "UPDATE users SET deleted = true WHERE id = :id", nativeQuery = true)
+    void deleteById(@Param("id") Long id);
+
+    @Transactional
+    @Modifying
     @Query(value = "UPDATE users SET deleted = false WHERE id = :id", nativeQuery = true)
     void restoreUser(@Param("id") Long id);
 
@@ -24,4 +29,9 @@ public interface UserRepository extends JpaRepository<AppUser, Long> {
     @Modifying
     @Query(value = "DELETE FROM users WHERE id = :id", nativeQuery = true)
     void deletePermanently(@Param("id") Long id);
+
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE FROM user_roles WHERE user_id = :id", nativeQuery = true)
+    void deleteRolesForUser(@Param("id") Long id);
 }

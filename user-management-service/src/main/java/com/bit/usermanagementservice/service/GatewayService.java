@@ -1,18 +1,19 @@
 package com.bit.usermanagementservice.service;
 
 import com.bit.usermanagementservice.dto.AuthUserRequest;
-import com.bit.usermanagementservice.dto.UserRequest;
-import com.bit.usermanagementservice.exception.AuthException;
+import com.bit.usermanagementservice.exception.AuthServiceException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Service
 @RequiredArgsConstructor
@@ -32,11 +33,9 @@ public class GatewayService {
     protected void createUser(AuthUserRequest authUserRequest) {
         try {
             String createUrl = GATEWAY_URL + CREATE_ENDPOINT;
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
 
+            HttpHeaders headers = getHttpHeaders();
             String requestBody = objectMapper.writeValueAsString(authUserRequest);
-
             HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
 
             ResponseEntity<String> responseEntity = restTemplate.exchange(
@@ -47,29 +46,27 @@ public class GatewayService {
             );
 
             if (!(responseEntity.getStatusCode() == HttpStatus.CREATED)) {
-                throw new AuthException("User not created in auth-service!");
+                throw new AuthServiceException("User not created in auth-service!");
             }
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             HttpStatusCode statusCode = e.getStatusCode();
-            String responseBody = e.getResponseBodyAsString();
-            throw new AuthException("HTTP error: " + statusCode + "\n Response: " + responseBody);
+            throw new AuthServiceException("HTTP error: " + statusCode);
 
         } catch (RestClientException e) {
-            throw new AuthException("REST client error: " + e.getMessage());
+            throw new AuthServiceException("REST client error: " + e.getMessage());
 
         } catch (JsonProcessingException e) {
-            throw new AuthException("JSON processing error: " + e.getMessage());
+            throw new AuthServiceException("JSON processing error: " + e.getMessage());
         }
     }
+
 
     protected void updateUser(Long id, AuthUserRequest authUserRequest) {
         try {
             String updateUrl = GATEWAY_URL + UPDATE_ENDPOINT;
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
+            HttpHeaders headers = getHttpHeaders();
             HttpEntity<AuthUserRequest> requestEntity = new HttpEntity<>(authUserRequest, headers);
 
             ResponseEntity<String> responseEntity = restTemplate.exchange(
@@ -81,16 +78,15 @@ public class GatewayService {
             );
 
             if (!(responseEntity.getStatusCode().is2xxSuccessful())) {
-                throw new RuntimeException("User update failed in auth-service!");
+                throw new AuthServiceException("User update failed in auth-service!");
             }
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             HttpStatusCode statusCode = e.getStatusCode();
-            String responseBody = e.getResponseBodyAsString();
-            throw new AuthException("HTTP error: " + statusCode + "\n Response: " + responseBody);
+            throw new AuthServiceException("HTTP error: " + statusCode);
 
         } catch (RestClientException e) {
-            throw new AuthException("REST client error: " + e.getMessage());
+            throw new AuthServiceException("REST client error: " + e.getMessage());
         }
     }
 
@@ -98,25 +94,27 @@ public class GatewayService {
         try {
             String restoreUrl = GATEWAY_URL + RESTORE_ENDPOINT;
 
+            HttpHeaders headers = getHttpHeaders();
+            HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+
             ResponseEntity<String> responseEntity = restTemplate.exchange(
                     restoreUrl,
                     HttpMethod.PUT,
-                    null,
+                    requestEntity,
                     String.class,
                     id
             );
 
             if (!(responseEntity.getStatusCode().is2xxSuccessful())) {
-                throw new RuntimeException("User restore failed in auth-service!");
+                throw new AuthServiceException("User restore failed in auth-service!");
             }
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             HttpStatusCode statusCode = e.getStatusCode();
-            String responseBody = e.getResponseBodyAsString();
-            throw new AuthException("HTTP error: " + statusCode + "\n Response: " + responseBody);
+            throw new AuthServiceException("HTTP error: " + statusCode);
 
         } catch (RestClientException e) {
-            throw new AuthException("REST client error: " + e.getMessage());
+            throw new AuthServiceException("REST client error: " + e.getMessage());
         }
     }
 
@@ -124,25 +122,27 @@ public class GatewayService {
         try {
             String deleteUrl = GATEWAY_URL + DELETE_ENDPOINT;
 
+            HttpHeaders headers = getHttpHeaders();
+            HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+
             ResponseEntity<String> responseEntity = restTemplate.exchange(
                     deleteUrl,
                     HttpMethod.DELETE,
-                    null,
+                    requestEntity,
                     String.class,
                     id
             );
 
             if (!(responseEntity.getStatusCode().is2xxSuccessful())) {
-                throw new RuntimeException("User soft-delete failed in auth-service!");
+                throw new AuthServiceException("User soft-delete failed in auth-service!");
             }
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             HttpStatusCode statusCode = e.getStatusCode();
-            String responseBody = e.getResponseBodyAsString();
-            throw new AuthException("HTTP error: " + statusCode + "\n Response: " + responseBody);
+            throw new AuthServiceException("HTTP error: " + statusCode);
 
         } catch (RestClientException e) {
-            throw new AuthException("REST client error: " + e.getMessage());
+            throw new AuthServiceException("REST client error: " + e.getMessage());
         }
     }
 
@@ -150,25 +150,39 @@ public class GatewayService {
         try {
             String deleteUrl = GATEWAY_URL + DELETE_PERMANENTLY_ENDPOINT;
 
+            HttpHeaders headers = getHttpHeaders();
+            HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+
             ResponseEntity<String> responseEntity = restTemplate.exchange(
                     deleteUrl,
                     HttpMethod.DELETE,
-                    null,
+                    requestEntity,
                     String.class,
                     id
             );
 
             if (!(responseEntity.getStatusCode().is2xxSuccessful())) {
-                throw new RuntimeException("User permanent-delete failed in auth-service!");
+                throw new AuthServiceException("User permanent-delete failed in auth-service!");
             }
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             HttpStatusCode statusCode = e.getStatusCode();
-            String responseBody = e.getResponseBodyAsString();
-            throw new AuthException("HTTP error: " + statusCode + "\n Response: " + responseBody);
+            throw new AuthServiceException("HTTP error: " + statusCode);
 
         } catch (RestClientException e) {
-            throw new AuthException("REST client error: " + e.getMessage());
+            throw new AuthServiceException("REST client error: " + e.getMessage());
         }
+    }
+    private HttpHeaders getHttpHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes != null) {
+            HttpServletRequest httpServletRequest = attributes.getRequest();
+            String token = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
+            headers.set(HttpHeaders.AUTHORIZATION, token);
+        }
+        return headers;
     }
 }

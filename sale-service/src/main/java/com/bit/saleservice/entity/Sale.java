@@ -5,12 +5,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SoftDelete;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table(name = "sales")
+@SoftDelete
 @Data
 @Builder
 @NoArgsConstructor
@@ -27,11 +30,10 @@ public class Sale {
     @Column(name = "payment_method")
     private Payment paymentMethod;
 
-
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
-            name = "user_campaigns",
-            joinColumns = @JoinColumn(name = "user_id"),
+            name = "sale_campaigns",
+            joinColumns = @JoinColumn(name = "sale_id"),
             inverseJoinColumns = @JoinColumn(name = "campaign_id"))
     private List<Campaign> campaigns;
 
@@ -39,4 +41,5 @@ public class Sale {
     private List<Product> products;
 
     private BigDecimal total;
+    private BigDecimal totalWithCampaign;
 }

@@ -20,11 +20,11 @@ import java.util.List;
 public class SaleResponse {
 
     private Long id;
-
     private String cashier;
     private Date date;
-    private Payment paymentMethod;
-    private List<String> campaigns;
+    private String paymentMethod;
+    private List<String> campaignNames;
     private List<ProductResponse> products;
     private BigDecimal total;
+    private BigDecimal totalWithCampaign;
 }

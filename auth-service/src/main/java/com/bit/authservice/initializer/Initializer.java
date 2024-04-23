@@ -28,7 +28,8 @@ public class Initializer implements CommandLineRunner {
     @Transactional
     public void run(String... args) {
         initializeRoles();
-        initializeAdminUser();
+        initializeSuperUser();
+        initializeUsers();
     }
 
     private void initializeRoles() {
@@ -39,14 +40,33 @@ public class Initializer implements CommandLineRunner {
         }
     }
 
-    private void initializeAdminUser() {
+    private void initializeSuperUser() {
 
-        var encodedPassword = passwordEncoder.encode("admin");
+        var encodedPassword = passwordEncoder.encode("super");
+        Role cashierRole = roleRepository.findByRoleName("CASHIER").orElseThrow();
+        Role managerRole = roleRepository.findByRoleName("MANAGER").orElseThrow();
         Role adminRole = roleRepository.findByRoleName("ADMIN").orElseThrow();
 
         userRepository.save(AppUser.builder()
-                .username("admin")
+                .username("super")
                 .password(encodedPassword)
-                .roles(List.of(adminRole)).build());
+                .roles(List.of(cashierRole, managerRole, adminRole)).build());
+    }
+
+    private void initializeUsers() {
+
+        for (int i = 2; i <= 20; i++) {
+            String username = String.format("user%d", i);
+            String password = String.format("user%d54", i);
+            var encodedPassword = passwordEncoder.encode(password);
+
+            Long roleId = 1L + i % 3;
+            Role role = roleRepository.findById(roleId).orElseThrow();
+
+            userRepository.save(AppUser.builder()
+                    .username(username)
+                    .password(encodedPassword)
+                    .roles(List.of(role)).build());
+        }
     }
 }
