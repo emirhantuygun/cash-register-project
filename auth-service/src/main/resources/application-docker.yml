@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: AUTH-SERVICE
+
+jwt:
+  signerKey: "4bb6d1dfbafb64a681139d1586b6f1160d18159afd57c8c79136d7490630407c"
+  access-token-expiration: 3600000  # an hour
+  refresh-token-expiration: 86400000  # a day
+  authorities-key: "roles"
+
+gateway:
+  host: api-gateway
+  port: 8080
+
+default-roles: CASHIER, MANAGER, ADMIN

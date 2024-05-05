@@ -1,11 +1,17 @@
 spring:
   application:
     name: REPORT-SERVICE
+
 server:
   port: 8085
+
 eureka:
   client:
     serviceUrl:
-      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka/}
+      defaultZone: http://localhost:8761/eureka
   instance:
     hostname: localhost
+
+gateway:
+  host: localhost
+  port: 8080

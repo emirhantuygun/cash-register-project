@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: USER-SERVICE
+
+default-roles: CASHIER, MANAGER, ADMIN
+
+gateway:
+  host: api-gateway
+  port: 8080

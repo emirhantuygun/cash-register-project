@@ -4,8 +4,10 @@ import com.bit.usermanagementservice.dto.AuthUserRequest;
 import com.bit.usermanagementservice.exception.AuthServiceException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -19,7 +21,11 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @RequiredArgsConstructor
 public class GatewayService {
 
-    private final String GATEWAY_URL = "http://localhost:8080/";
+    @Value("${gateway.host}")
+    private String GATEWAY_HOST;
+    @Value("${gateway.port}")
+    private String GATEWAY_PORT;
+    private String GATEWAY_URL;
     private final String CREATE_ENDPOINT = "auth/create";
     private final String UPDATE_ENDPOINT = "auth/update/{id}";
     private final String RESTORE_ENDPOINT = "auth/restore/{id}";
@@ -29,6 +35,11 @@ public class GatewayService {
 
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+
+    @PostConstruct
+    private void initGatewayUrl() {
+        GATEWAY_URL = "http://" + GATEWAY_HOST + ":" + GATEWAY_PORT + "/";
+    }
 
     protected void createUser(AuthUserRequest authUserRequest) {
         try {

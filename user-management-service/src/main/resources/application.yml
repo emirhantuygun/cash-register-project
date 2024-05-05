@@ -8,9 +8,13 @@ server:
 eureka:
   client:
     serviceUrl:
-      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka/}
+      defaultZone: http://localhost:8761/eureka
   instance:
     hostname: localhost
 
 default-roles: CASHIER, MANAGER, ADMIN
+
+gateway:
+  host: localhost
+  port: 8080
 

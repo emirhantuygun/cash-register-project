@@ -3,8 +3,10 @@ package com.bit.reportservice.service;
 import com.bit.reportservice.dto.SaleResponse;
 import com.bit.reportservice.exception.SaleServiceException;
 import com.bit.reportservice.wrapper.PageWrapper;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -26,13 +28,23 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GatewayService {
 
-    private final String GATEWAY_URL = "http://localhost:8080/";
+    @Value("${gateway.host}")
+    private String GATEWAY_HOST;
+
+    @Value("${gateway.port}")
+    private String GATEWAY_PORT;
+    private String GATEWAY_URL;
     private final String GET_SALE_ENDPOINT = "sales/{id}";
     private final String GET_ALL_SALES_ENDPOINT = "sales";
     private final String GET_DELETED_SALES_ENDPOINT = "sales/deleted";
     private final String GET_ALL_SALES_FILTERED_AND_SORTED_ENDPOINT = "sales/filteredAndSorted";
 
     private final RestTemplate restTemplate;
+
+    @PostConstruct
+    private void initGatewayUrl() {
+        GATEWAY_URL = "http://" + GATEWAY_HOST + ":" + GATEWAY_PORT + "/";
+    }
 
     protected SaleResponse getSale(Long id) {
         try {

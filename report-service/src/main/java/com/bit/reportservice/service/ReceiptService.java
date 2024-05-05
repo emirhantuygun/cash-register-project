@@ -4,17 +4,19 @@ import com.bit.reportservice.dto.ProductResponse;
 import com.bit.reportservice.dto.SaleResponse;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
+import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 @Service
 public class ReceiptService {
-    private final String FONT_PATH = "fonts/scoreboard.ttf"; // Adjust the font file path
-    private final String IMAGE_PATH = "report-service/src/main/resources/static/images/32bit.png"; // Adjust the font file path
+    private final String FONT_PATH = "fonts/scoreboard.ttf";
+    private final String IMAGE_PATH = "/static/images/32bit.png";
     private final String LOCATION = "KEMALPASA, ESENTEPE CAMPUS, 54050";
     private final String PHONE_NUMBER = "0264 295 54 54";
     private final String CITY = "SERDIVAN/SAKARYA";
@@ -46,12 +48,18 @@ public class ReceiptService {
 
             // IMAGE
 
-            Image image = Image.getInstance(IMAGE_PATH);
-            image.scaleToFit(150, 150); // Resize the image if necessary
-            image.setAlignment(Image.ALIGN_CENTER);
-            document.add(image);
+            try (InputStream inputStream = getClass().getResourceAsStream(IMAGE_PATH)) {
+                if (inputStream != null) {
+                    Image image = Image.getInstance(IOUtils.toByteArray(inputStream));
 
-            document.add(new Paragraph("\n", space));
+                    image.scaleToFit(150, 150); // Resize the image if necessary
+                    image.setAlignment(Image.ALIGN_CENTER);
+                    document.add(image);
+
+                    document.add(new Paragraph("\n", space));
+                }
+            }
+
 
             // LOCATION, PHONE NUMBER, CITY
 

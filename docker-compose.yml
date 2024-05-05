@@ -1,0 +1,249 @@
+version: '3.8'
+
+services:
+  postgres-product:
+    container_name: postgres-product
+    image: postgres
+    environment:
+      POSTGRES_DB: product-service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: emirhan
+      PGDATA: /data/postgres
+    volumes:
+      - ./postgres-product:/data/postgres
+    expose:
+      - "${POSTGRES_PRODUCT_PORT}"
+    ports:
+      - "${POSTGRES_PRODUCT_PORT}:${POSTGRES_PRODUCT_PORT}"
+    command: -p ${POSTGRES_PRODUCT_PORT}
+    networks:
+      - postgres-product
+    restart: always
+
+  postgres-sale:
+    container_name: postgres-sale
+    image: postgres
+    environment:
+      POSTGRES_DB: sale-service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: emirhan
+      PGDATA: /data/postgres
+    volumes:
+      - ./postgres-sale:/data/postgres
+    expose:
+      - "${POSTGRES_SALE_PORT}"
+    ports:
+      - "${POSTGRES_SALE_PORT}:${POSTGRES_SALE_PORT}"
+    command: -p ${POSTGRES_SALE_PORT}
+    networks:
+      - postgres-sale
+    restart: always
+
+  postgres-user:
+    container_name: postgres-user
+    image: postgres
+    environment:
+      POSTGRES_DB: user-service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: emirhan
+      PGDATA: /data/postgres
+    volumes:
+      - ./postgres-user:/data/postgres
+    expose:
+      - "${POSTGRES_USER_PORT}"
+    ports:
+      - "${POSTGRES_USER_PORT}:${POSTGRES_USER_PORT}"
+    command: -p ${POSTGRES_USER_PORT}
+    networks:
+      - postgres-user
+    restart: always
+
+  postgres-auth:
+    container_name: postgres-auth
+    image: postgres
+    environment:
+      POSTGRES_DB: auth-service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: emirhan
+      PGDATA: /data/postgres
+    volumes:
+      - ./postgres-auth:/data/postgres
+    expose:
+      - "${POSTGRES_AUTH_PORT}"
+    ports:
+      - "${POSTGRES_AUTH_PORT}:${POSTGRES_AUTH_PORT}"
+    command: -p ${POSTGRES_AUTH_PORT}
+    networks:
+      - postgres-auth
+    restart: always
+
+
+  service-registry:
+    container_name: service-registry
+    image: emirhantuygun/service-registry:latest
+    ports:
+      - "${SERVICE_REGISTRY_PORT}:${SERVICE_REGISTRY_PORT}"
+    expose:
+      - "${SERVICE_REGISTRY_PORT}"
+    networks:
+      - registry
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+
+  api-gateway:
+    container_name: api-gateway
+    image: emirhantuygun/api-gateway:latest
+    ports:
+      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
+    expose:
+      - "${API_GATEWAY_PORT}"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - postgres-auth
+      - registry
+    depends_on:
+      - service-registry
+
+
+  product-service:
+    container_name: product-service
+    image: emirhantuygun/product-service:latest
+    expose:
+      - "${PRODUCT_SERVICE_PORT}"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - postgres-product
+      - registry
+    depends_on:
+      - service-registry
+      - api-gateway
+      - postgres-product
+
+
+  sale-service:
+    container_name: sale-service
+    image: emirhantuygun/sale-service:latest
+    expose:
+      - "${SALE_SERVICE_PORT}"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - postgres-sale
+      - registry
+    depends_on:
+      - service-registry
+      - api-gateway
+      - postgres-sale
+      - product-service
+
+
+  report-service:
+    container_name: report-service
+    image: emirhantuygun/report-service:latest
+    expose:
+      - "${REPORT_SERVICE_PORT}"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - registry
+    depends_on:
+      - service-registry
+      - api-gateway
+      - sale-service
+
+
+  auth-service:
+    container_name: auth-service
+    image: emirhantuygun/auth-service:latest
+    expose:
+      - "${AUTH_SERVICE_PORT}"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - postgres-auth
+      - registry
+    depends_on:
+      - service-registry
+      - api-gateway
+      - postgres-auth
+
+
+  user-service:
+    container_name: user-service
+    image: emirhantuygun/user-management-service:latest
+    expose:
+      - "${USER_SERVICE_PORT}"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - postgres-user
+      - registry
+    depends_on:
+      - service-registry
+      - api-gateway
+      - postgres-user
+      - auth-service
+
+
+networks:
+  postgres-product:
+  postgres-sale:
+  postgres-auth:
+  postgres-user:
+  registry:
+
+
+
+
+
+
+
+
+
+
+
+#version: '3.8'
+#services:
+#
+#  postgres:
+#    container_name: postgres_container
+#    image: postgres
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: emirhan
+#      PGDATA: /data/postgres
+#    volumes:
+#      - postgres:/data/postgres
+#    ports:
+#      - "5432:5432"
+#    networks:
+#      - postgres
+#    restart: unless-stopped
+#
+#  pgadmin:
+#    container_name: pgadmin_container
+#    image: dpage/pgadmin4
+#    environment:
+#      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+#      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+#      PGADMIN_CONFIG_SERVER_MODE: 'False'
+#    volumes:
+#      - pgadmin:/var/lib/pgadmin
+#    ports:
+#      - "5050:80"
+#    networks:
+#      - postgres
+#    restart: unless-stopped
+#
+#networks:
+#  postgres:
+#    driver: bridge
+#
+#volumes:
+#  postgres:
+#  pgadmin:
+
+
