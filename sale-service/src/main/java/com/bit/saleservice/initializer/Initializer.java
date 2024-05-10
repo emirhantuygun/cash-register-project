@@ -70,10 +70,9 @@ public class Initializer implements CommandLineRunner {
 
         for (int i = 1; i <= 20; i++) {
             String cashier = String.format("Cashier %d", i);
-            Date date = new Date(System.currentTimeMillis() + 86400000 * i);
+            Date date = new Date(System.currentTimeMillis());
 
-            int paymentId = i % 4;
-            Payment paymentMethod = Payment.values()[paymentId];
+            Payment paymentMethod = Payment.CASH;
 
             Product product = Product.builder()
                     .name("Product " + i)
@@ -84,12 +83,16 @@ public class Initializer implements CommandLineRunner {
                     .build();
 
             BigDecimal total = product.getTotalPrice();
+            BigDecimal cash = total.add(BigDecimal.valueOf(5));
+            BigDecimal change = cash.subtract(total);
 
             Sale sale = Sale.builder()
                     .cashier(cashier)
                     .date(date)
                     .paymentMethod(paymentMethod)
                     .campaigns(Collections.emptyList())
+                    .cash(cash)
+                    .change(change)
                     .total(total)
                     .totalWithCampaign(total)
                     .build();

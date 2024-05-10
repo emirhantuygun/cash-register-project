@@ -273,6 +273,29 @@ public class ReceiptService {
             totalCellRight.setBorder(Rectangle.NO_BORDER);
             totalTable.addCell(totalCellRight);
 
+            if (sale.getCash() != null) {
+                PdfPCell cashCellLeft = new PdfPCell(new Phrase("CASH: ", bold));
+                cashCellLeft.setHorizontalAlignment(Element.ALIGN_LEFT);
+                cashCellLeft.setBorder(Rectangle.NO_BORDER);
+                totalTable.addCell(cashCellLeft);
+
+                PdfPCell cashCellRight = new PdfPCell(new Phrase(String.valueOf(sale.getCash()), light));
+                cashCellRight.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                cashCellRight.setBorder(Rectangle.NO_BORDER);
+                totalTable.addCell(cashCellRight);
+
+                PdfPCell changeCellLeft = new PdfPCell(new Phrase("CHANGE: ", bold));
+                changeCellLeft.setHorizontalAlignment(Element.ALIGN_LEFT);
+                changeCellLeft.setBorder(Rectangle.NO_BORDER);
+                totalTable.addCell(changeCellLeft);
+
+                PdfPCell changeCellRight = new PdfPCell(new Phrase(String.valueOf(sale.getChange()), light));
+                changeCellRight.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                changeCellRight.setBorder(Rectangle.NO_BORDER);
+                totalTable.addCell(changeCellRight);
+            }
+
+
             document.add(totalTable);
 
             document.add(hyphens);
