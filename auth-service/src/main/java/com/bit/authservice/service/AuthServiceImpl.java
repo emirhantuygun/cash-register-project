@@ -10,16 +10,21 @@ import com.bit.authservice.repository.RoleRepository;
 import com.bit.authservice.repository.TokenRepository;
 import com.bit.authservice.repository.UserRepository;
 import com.bit.authservice.util.JwtUtils;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.exceptions.JedisException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,8 +40,27 @@ public class AuthServiceImpl implements AuthService {
     private final RoleRepository roleRepository;
     private final JwtUtils jwtUtils;
     private final TokenRepository tokenRepository;
-    private final UserDetailsServiceImpl userDetailsServiceImpl;
+    private final UserDetailsService userDetailsService;
     private static final Logger logger = LogManager.getLogger(AuthServiceApplication.class);
+    private Jedis jedis;
+
+    @Value("${redis.host}")
+    private String redisHost;
+
+    @Value("${redis.port}")
+    private String redisPort;
+
+    @PostConstruct
+    public void init() {
+        this.jedis = new Jedis(redisHost, Integer.parseInt(redisPort));
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            // Remove all keys from Redis
+            jedis.flushAll();
+            // Close the Redis connection
+            jedis.close();
+        }));
+    }
 
     @Override
     public List<String> login(AuthRequest authRequest) {
@@ -64,8 +88,7 @@ public class AuthServiceImpl implements AuthService {
             String username = jwtUtils.extractUsername(refreshToken);
 
             if (username != null) {
-
-                UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(username);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                 if (userDetails != null && jwtUtils.isValid(refreshToken, userDetails)) {
 
@@ -126,13 +149,23 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private void saveUserToken(AppUser user, String jwtToken) {
+
         var token = Token.builder()
                 .token(jwtToken)
                 .user(user)
                 .loggedOut(false)
                 .build();
         tokenRepository.save(token);
+
+        try {
+            jedis.set("token:" + token.getId() + ":is_logged_out", "false");
+            jedis.set(jwtToken, String.valueOf(token.getId()));
+
+        } catch (JedisException e) {
+            throw new RuntimeException("Failed to set token status in Redis", e);
+        }
     }
+
     private void revokeAllTokenByUser(long id) {
         List<Token> validTokens = tokenRepository.findAllTokensByUser(id);
 
@@ -140,15 +173,25 @@ public class AuthServiceImpl implements AuthService {
             return;
         }
 
-        validTokens.forEach(t -> t.setLoggedOut(true));
+        validTokens.forEach(t -> {
+            t.setLoggedOut(true);
+            try {
+                jedis.set("token:" + t.getId() + ":is_logged_out", "true");
+
+            } catch (JedisException e) {
+                throw new RuntimeException("Failed to set token status in Redis", e);
+            }
+        });
 
         tokenRepository.saveAll(validTokens);
     }
+
     private List<String> getRolesAsString(List<Role> roles) {
         return roles.stream()
                 .map(Role::getRoleName)
                 .collect(Collectors.toList());
     }
+
     private List<Role> getRolesAsRole(List<String> roles) {
         List<Role> rolesList = new ArrayList<>();
         roles.forEach(roleName -> {

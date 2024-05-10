@@ -8,8 +8,8 @@ jwt:
   refresh-token-expiration: 86400000  # a day
   authorities-key: "roles"
 
-gateway:
-  host: api-gateway
-  port: 8080
-
 default-roles: CASHIER, MANAGER, ADMIN
+
+redis:
+  host: "redis"
+  port: "6380"

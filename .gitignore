@@ -7,6 +7,7 @@ target/
 /postgres-user/
 /postgres-product/
 /postgres-sale/
+/redis/
 /logs/
 
 ### STS ###

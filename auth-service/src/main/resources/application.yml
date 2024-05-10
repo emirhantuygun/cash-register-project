@@ -19,3 +19,7 @@ jwt:
   authorities-key: "roles"
 
 default-roles: CASHIER, MANAGER, ADMIN
+
+redis:
+  host: "localhost"
+  port: "6379"

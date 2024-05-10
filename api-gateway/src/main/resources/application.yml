@@ -27,3 +27,7 @@ route:
   product: "lb://product-service"
   sale: "lb://sale-service"
   report: "lb://report-service"
+
+redis:
+  host: "localhost"
+  port: "6379"

@@ -23,4 +23,6 @@ route:
   sale: "http://sale-service:8084"
   report: "http://report-service:8085"
 
-
+redis:
+  host: "redis"
+  port: "6380"
