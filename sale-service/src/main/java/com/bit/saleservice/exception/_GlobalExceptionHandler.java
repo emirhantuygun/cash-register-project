@@ -43,6 +43,12 @@ public class _GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
+    @ExceptionHandler(InsufficientCashException.class)
+    public ResponseEntity<Object> handleInsufficientCashException(InsufficientCashException ex) {
+        logger.error("Insufficient cash: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
     @ExceptionHandler(ProductNotFoundException.class)
     public ResponseEntity<String> handleProductNotFoundException(ProductNotFoundException ex) {
         logger.error("Product not found: {}", ex.getMessage());

@@ -33,11 +33,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SaleServiceImpl implements SaleService {
 
-    private final String GATEWAY_URL = "http://localhost:8080/";
-    private final String GET_ENDPOINT = "products/";
-
     private static final Logger logger = LogManager.getLogger(SaleServiceApplication.class);
-
     private final SaleRepository saleRepository;
     private final ProductRepository productRepository;
     private final CampaignProcessService campaignProcessService;
@@ -125,17 +121,31 @@ public class SaleServiceImpl implements SaleService {
         List<Product> products = getProducts(saleRequest.getProducts());
         Payment paymentMethod = getPaymentMethod(saleRequest.getPaymentMethod());
         BigDecimal total = getTotal(products);
+        BigDecimal cash = null;
+        BigDecimal change = null;
 
         CampaignProcessResult campaignProcessResult = processCampaigns(saleRequest.getCampaignIds(), products, total);
         products = campaignProcessResult.getProducts();
+        BigDecimal totalWithCampaign = campaignProcessResult.getTotalWithCampaign();
+
+        if (paymentMethod == Payment.CASH) {
+            cash = saleRequest.getCash();
+            if (cash.compareTo(totalWithCampaign) < 0) {
+                throw new InsufficientCashException("Insufficient cash for payment");
+            }
+            change = cash.subtract(total);
+        }
 
         Sale sale = Sale.builder()
                 .cashier(saleRequest.getCashier())
                 .date(new Date())
                 .paymentMethod(paymentMethod)
                 .campaigns(campaignProcessResult.getCampaigns())
+                .cash(cash)
+                .change(change)
                 .total(total)
-                .totalWithCampaign(campaignProcessResult.getTotalWithCampaign()).build();
+                .totalWithCampaign(totalWithCampaign)
+                .build();
 
         saleRepository.save(sale);
         products.forEach(product -> product.setSale(sale));
@@ -154,16 +164,29 @@ public class SaleServiceImpl implements SaleService {
         List<Product> products = getProducts(saleRequest.getProducts());
         Payment paymentMethod = getPaymentMethod(saleRequest.getPaymentMethod());
         BigDecimal total = getTotal(products);
+        BigDecimal cash = null;
+        BigDecimal change = null;
 
         CampaignProcessResult campaignProcessResult = processCampaigns(saleRequest.getCampaignIds(), products, total);
         products = campaignProcessResult.getProducts();
+        BigDecimal totalWithCampaign = campaignProcessResult.getTotalWithCampaign();
+
+        if (paymentMethod == Payment.CASH) {
+            cash = saleRequest.getCash();
+            if (cash.compareTo(totalWithCampaign) < 0) {
+                throw new InsufficientCashException("Insufficient cash for payment");
+            }
+            change = cash.subtract(total);
+        }
 
         existingSale.setCashier(saleRequest.getCashier());
         existingSale.setDate(new Date());
         existingSale.setPaymentMethod(paymentMethod);
         existingSale.setCampaigns(campaignProcessResult.getCampaigns());
+        existingSale.setCash(cash);
+        existingSale.setChange(change);
         existingSale.setTotal(total);
-        existingSale.setTotalWithCampaign(campaignProcessResult.getTotalWithCampaign());
+        existingSale.setTotalWithCampaign(totalWithCampaign);
 
         saleRepository.save(existingSale);
         products.forEach(product -> product.setSale(existingSale));
@@ -302,6 +325,8 @@ public class SaleServiceImpl implements SaleService {
                 .paymentMethod(sale.getPaymentMethod().toString())
                 .campaignNames(campaignNames)
                 .products(productResponses)
+                .cash(sale.getCash())
+                .change(sale.getChange())
                 .total(sale.getTotal())
                 .totalWithCampaign(sale.getTotalWithCampaign()).build();
     }

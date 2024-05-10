@@ -25,6 +25,8 @@ public class SaleResponse {
     private String paymentMethod;
     private List<String> campaignNames;
     private List<ProductResponse> products;
+    private BigDecimal cash;
+    private BigDecimal change;
     private BigDecimal total;
     private BigDecimal totalWithCampaign;
 }
