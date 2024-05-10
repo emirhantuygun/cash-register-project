@@ -133,7 +133,7 @@ public class SaleServiceImpl implements SaleService {
             if (cash.compareTo(totalWithCampaign) < 0) {
                 throw new InsufficientCashException("Insufficient cash for payment");
             }
-            change = cash.subtract(total);
+            change = cash.subtract(totalWithCampaign);
         }
 
         Sale sale = Sale.builder()
@@ -176,7 +176,7 @@ public class SaleServiceImpl implements SaleService {
             if (cash.compareTo(totalWithCampaign) < 0) {
                 throw new InsufficientCashException("Insufficient cash for payment");
             }
-            change = cash.subtract(total);
+            change = cash.subtract(totalWithCampaign);
         }
 
         existingSale.setCashier(saleRequest.getCashier());

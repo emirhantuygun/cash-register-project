@@ -1,6 +1,7 @@
 package com.bit.saleservice.service;
 
 import com.bit.saleservice.dto.ProductServiceResponse;
+import com.bit.saleservice.exception.ProductNotFoundException;
 import com.bit.saleservice.exception.ProductServiceException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -58,8 +59,11 @@ public class GatewayService {
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             HttpStatusCode statusCode = e.getStatusCode();
-            throw new ProductServiceException("HTTP error: " + statusCode);
+            if (statusCode == HttpStatus.NOT_FOUND) {
+                throw new ProductNotFoundException("Product not found with id: " + id);
+            }
 
+            throw new ProductServiceException("HTTP error: " + statusCode.value());
         } catch (RestClientException e) {
             throw new ProductServiceException("REST client error: " + e.getMessage());
         }
