@@ -184,7 +184,6 @@ public class SaleServiceImpl implements SaleService {
 
         existingSale.setCashier(saleRequest.getCashier());
         existingSale.setDate(new Date());
-        existingSale.setPaymentMethod(paymentMethod);
         existingSale.setCampaigns(campaignProcessResult.getCampaigns());
         existingSale.setCash(cash);
         existingSale.setChange(change);
