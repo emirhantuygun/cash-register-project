@@ -161,6 +161,9 @@ public class SaleServiceImpl implements SaleService {
         Sale existingSale = saleRepository.findById(id)
                 .orElseThrow(() -> new SaleNotFoundException("Sale doesn't exist with id " + id));
 
+        if(!saleRequest.getPaymentMethod().equalsIgnoreCase(existingSale.getPaymentMethod().toString()))
+            throw new PaymentMethodUpdateNotAllowedException("Payment method can't be updated");
+
         List<Product> products = getProducts(saleRequest.getProducts());
         Payment paymentMethod = getPaymentMethod(saleRequest.getPaymentMethod());
         BigDecimal total = getTotal(products);

@@ -18,13 +18,18 @@ public class _GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleCampaignNotApplicableException(CampaignNotApplicableException ex) {
         logger.error("Campaign not applicable: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+
     }
     @ExceptionHandler(SaleNotSoftDeletedException.class)
     public ResponseEntity<Object> handleSaleNotSoftDeletedException(SaleNotSoftDeletedException ex) {
         logger.error("Sale not soft deleted: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
-
+    @ExceptionHandler(PaymentMethodUpdateNotAllowedException.class)
+    public ResponseEntity<Object> handlePaymentMethodUpdateNotAllowedException(PaymentMethodUpdateNotAllowedException ex) {
+        logger.error("Payment method update not allowed: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
     @ExceptionHandler(InvalidPaymentMethodException.class)
     public ResponseEntity<Object> handleInvalidPaymentMethodException(InvalidPaymentMethodException ex) {
         logger.error("Invalid payment method: {}", ex.getMessage());
