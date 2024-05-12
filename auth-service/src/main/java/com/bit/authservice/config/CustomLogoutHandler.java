@@ -12,9 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import redis.clients.jedis.Jedis;
 
-//  CACHE KULLANARAK LOGUT DURUMUNU CHECK EDEBİLİRSİN
-//  ŞUAN İÇİN API GATEWAY AUTH SERVICE TOKEN TABLE'INI SORGULUYOR
-
 @Configuration
 @RequiredArgsConstructor
 public class CustomLogoutHandler implements LogoutHandler {

@@ -162,7 +162,7 @@ public class SaleServiceImpl implements SaleService {
                 .orElseThrow(() -> new SaleNotFoundException("Sale doesn't exist with id " + id));
 
         if(!saleRequest.getPaymentMethod().equalsIgnoreCase(existingSale.getPaymentMethod().toString()))
-            throw new PaymentMethodUpdateNotAllowedException("Payment method can't be updated");
+            throw new PaymentMethodUpdateNotAllowedException("Payment method update not allowed");
 
         List<Product> products = getProducts(saleRequest.getProducts());
         Payment paymentMethod = getPaymentMethod(saleRequest.getPaymentMethod());
