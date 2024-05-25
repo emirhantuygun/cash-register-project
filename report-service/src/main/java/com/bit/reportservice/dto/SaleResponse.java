@@ -24,4 +24,5 @@ public class SaleResponse {
     private BigDecimal change;
     private BigDecimal total;
     private BigDecimal totalWithCampaign;
+    private MixedPayment mixedPayment;
 }

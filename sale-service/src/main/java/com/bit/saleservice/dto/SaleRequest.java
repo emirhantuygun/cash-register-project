@@ -1,6 +1,6 @@
 package com.bit.saleservice.dto;
 
-import com.bit.saleservice.entity.Payment;
+import com.bit.saleservice.entity.MixedPayment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,4 +20,5 @@ public class SaleRequest {
     private List<Long> campaignIds;
     private List<ProductRequest> products;
     private BigDecimal cash;
+    private MixedPayment mixedPayment;
 }

@@ -120,7 +120,7 @@ public class ReceiptService {
             PdfPCell leftCell3 = new PdfPCell();
             Phrase phraseLeft3 = new Phrase();
             phraseLeft3.add(new Chunk("PAYMENT: ", bold));
-            phraseLeft3.add(new Chunk(sale.getPaymentMethod(), light));
+            phraseLeft3.add(new Chunk(sale.getPaymentMethod().replace("_", " "), light));
             leftCell3.addElement(phraseLeft3);
             leftCell3.setHorizontalAlignment(Element.ALIGN_LEFT);
             leftCell3.setBorder(Rectangle.NO_BORDER);
@@ -273,13 +273,45 @@ public class ReceiptService {
             totalCellRight.setBorder(Rectangle.NO_BORDER);
             totalTable.addCell(totalCellRight);
 
-            if (sale.getCash() != null) {
+            if (sale.getPaymentMethod().equals("CASH")) {
                 PdfPCell cashCellLeft = new PdfPCell(new Phrase("CASH: ", bold));
                 cashCellLeft.setHorizontalAlignment(Element.ALIGN_LEFT);
                 cashCellLeft.setBorder(Rectangle.NO_BORDER);
                 totalTable.addCell(cashCellLeft);
 
                 PdfPCell cashCellRight = new PdfPCell(new Phrase(String.valueOf(sale.getCash()), light));
+                cashCellRight.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                cashCellRight.setBorder(Rectangle.NO_BORDER);
+                totalTable.addCell(cashCellRight);
+
+                PdfPCell changeCellLeft = new PdfPCell(new Phrase("CHANGE: ", bold));
+                changeCellLeft.setHorizontalAlignment(Element.ALIGN_LEFT);
+                changeCellLeft.setBorder(Rectangle.NO_BORDER);
+                totalTable.addCell(changeCellLeft);
+
+                PdfPCell changeCellRight = new PdfPCell(new Phrase(String.valueOf(sale.getChange()), light));
+                changeCellRight.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                changeCellRight.setBorder(Rectangle.NO_BORDER);
+                totalTable.addCell(changeCellRight);
+            }
+
+            if (sale.getPaymentMethod().equals("MIXED")) {
+                PdfPCell creditCardCellLeft = new PdfPCell(new Phrase("CREDIT CARD: ", bold));
+                creditCardCellLeft.setHorizontalAlignment(Element.ALIGN_LEFT);
+                creditCardCellLeft.setBorder(Rectangle.NO_BORDER);
+                totalTable.addCell(creditCardCellLeft);
+
+                PdfPCell creditCardCellRight = new PdfPCell(new Phrase(String.valueOf(sale.getMixedPayment().getCreditCardAmount()), light));
+                creditCardCellRight.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                creditCardCellRight.setBorder(Rectangle.NO_BORDER);
+                totalTable.addCell(creditCardCellRight);
+
+                PdfPCell cashCellLeft = new PdfPCell(new Phrase("CASH: ", bold));
+                cashCellLeft.setHorizontalAlignment(Element.ALIGN_LEFT);
+                cashCellLeft.setBorder(Rectangle.NO_BORDER);
+                totalTable.addCell(cashCellLeft);
+
+                PdfPCell cashCellRight = new PdfPCell(new Phrase(String.valueOf(sale.getMixedPayment().getCashAmount()), light));
                 cashCellRight.setHorizontalAlignment(Element.ALIGN_RIGHT);
                 cashCellRight.setBorder(Rectangle.NO_BORDER);
                 totalTable.addCell(cashCellRight);

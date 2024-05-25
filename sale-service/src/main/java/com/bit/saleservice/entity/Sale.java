@@ -39,10 +39,11 @@ public class Sale {
 
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL)
     private List<Product> products;
-
     private BigDecimal cash;
     private BigDecimal change;
     private BigDecimal total;
     private BigDecimal totalWithCampaign;
 
+    @Embedded
+    private MixedPayment mixedPayment;
 }

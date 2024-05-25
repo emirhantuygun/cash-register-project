@@ -117,7 +117,7 @@ public class GatewayService {
                     getUrl,
                     HttpMethod.GET,
                     requestEntity,
-                    new ParameterizedTypeReference<List<SaleResponse>>() {
+                    new ParameterizedTypeReference<>() {
                     }
             );
 

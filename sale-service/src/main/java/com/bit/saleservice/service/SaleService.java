@@ -2,11 +2,8 @@ package com.bit.saleservice.service;
 
 import com.bit.saleservice.dto.SaleRequest;
 import com.bit.saleservice.dto.SaleResponse;
-import com.bit.saleservice.entity.Payment;
 import org.springframework.data.domain.Page;
-
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 public interface SaleService {

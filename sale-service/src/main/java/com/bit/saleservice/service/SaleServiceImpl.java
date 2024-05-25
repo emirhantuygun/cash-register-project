@@ -2,10 +2,7 @@ package com.bit.saleservice.service;
 
 import com.bit.saleservice.SaleServiceApplication;
 import com.bit.saleservice.dto.*;
-import com.bit.saleservice.entity.Campaign;
-import com.bit.saleservice.entity.Payment;
-import com.bit.saleservice.entity.Product;
-import com.bit.saleservice.entity.Sale;
+import com.bit.saleservice.entity.*;
 import com.bit.saleservice.exception.*;
 import com.bit.saleservice.repository.ProductRepository;
 import com.bit.saleservice.repository.SaleRepository;
@@ -21,12 +18,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -121,30 +119,42 @@ public class SaleServiceImpl implements SaleService {
         List<Product> products = getProducts(saleRequest.getProducts());
         Payment paymentMethod = getPaymentMethod(saleRequest.getPaymentMethod());
         BigDecimal total = getTotal(products);
+        BigDecimal totalWithCampaign = null;
+        List<Long> campaignIds = saleRequest.getCampaignIds();
+        List<Campaign> campaigns = null;
         BigDecimal cash = null;
         BigDecimal change = null;
+        MixedPayment mixedPayment = null;
 
-        CampaignProcessResult campaignProcessResult = processCampaigns(saleRequest.getCampaignIds(), products, total);
-        products = campaignProcessResult.getProducts();
-        BigDecimal totalWithCampaign = campaignProcessResult.getTotalWithCampaign();
-
-        if (paymentMethod == Payment.CASH) {
-            cash = saleRequest.getCash();
-            if (cash.compareTo(totalWithCampaign) < 0) {
-                throw new InsufficientCashException("Insufficient cash for payment");
-            }
-            change = cash.subtract(totalWithCampaign);
+        if (campaignIds != null && !campaignIds.isEmpty()) {
+            CampaignProcessResult campaignProcessResult = processCampaigns(campaignIds, products, total);
+            products = campaignProcessResult.getProducts();
+            totalWithCampaign = campaignProcessResult.getTotalWithCampaign();
+            campaigns = campaignProcessResult.getCampaigns();
         }
+
+        change = switch (paymentMethod) {
+            case CASH -> {
+                cash = saleRequest.getCash();
+                yield processCashPayment(cash, totalWithCampaign);
+            }
+            case MIXED -> {
+                mixedPayment = saleRequest.getMixedPayment();
+                yield processMixedPayment(mixedPayment, totalWithCampaign);
+            }
+            default -> change;
+        };
 
         Sale sale = Sale.builder()
                 .cashier(saleRequest.getCashier())
                 .date(new Date())
                 .paymentMethod(paymentMethod)
-                .campaigns(campaignProcessResult.getCampaigns())
+                .campaigns(campaigns)
                 .cash(cash)
                 .change(change)
                 .total(total)
                 .totalWithCampaign(totalWithCampaign)
+                .mixedPayment(mixedPayment)
                 .build();
 
         saleRepository.save(sale);
@@ -161,34 +171,47 @@ public class SaleServiceImpl implements SaleService {
         Sale existingSale = saleRepository.findById(id)
                 .orElseThrow(() -> new SaleNotFoundException("Sale doesn't exist with id " + id));
 
-        if(!saleRequest.getPaymentMethod().equalsIgnoreCase(existingSale.getPaymentMethod().toString()))
+        Payment paymentMethod = getPaymentMethod(saleRequest.getPaymentMethod());
+
+        if (paymentMethod != existingSale.getPaymentMethod())
             throw new PaymentMethodUpdateNotAllowedException("Payment method update not allowed");
 
         List<Product> products = getProducts(saleRequest.getProducts());
-        Payment paymentMethod = getPaymentMethod(saleRequest.getPaymentMethod());
         BigDecimal total = getTotal(products);
+        BigDecimal totalWithCampaign = null;
+        List<Long> campaignIds = saleRequest.getCampaignIds();
+        List<Campaign> campaigns = null;
         BigDecimal cash = null;
         BigDecimal change = null;
+        MixedPayment mixedPayment = null;
 
-        CampaignProcessResult campaignProcessResult = processCampaigns(saleRequest.getCampaignIds(), products, total);
-        products = campaignProcessResult.getProducts();
-        BigDecimal totalWithCampaign = campaignProcessResult.getTotalWithCampaign();
-
-        if (paymentMethod == Payment.CASH) {
-            cash = saleRequest.getCash();
-            if (cash.compareTo(totalWithCampaign) < 0) {
-                throw new InsufficientCashException("Insufficient cash for payment");
-            }
-            change = cash.subtract(totalWithCampaign);
+        if (campaignIds != null && !campaignIds.isEmpty()) {
+            CampaignProcessResult campaignProcessResult = processCampaigns(campaignIds, products, total);
+            products = campaignProcessResult.getProducts();
+            totalWithCampaign = campaignProcessResult.getTotalWithCampaign();
+            campaigns = campaignProcessResult.getCampaigns();
         }
+
+        change = switch (paymentMethod) {
+            case CASH -> {
+                cash = saleRequest.getCash();
+                yield processCashPayment(cash, totalWithCampaign);
+            }
+            case MIXED -> {
+                mixedPayment = saleRequest.getMixedPayment();
+                yield processMixedPayment(mixedPayment, totalWithCampaign);
+            }
+            default -> change;
+        };
 
         existingSale.setCashier(saleRequest.getCashier());
         existingSale.setDate(new Date());
-        existingSale.setCampaigns(campaignProcessResult.getCampaigns());
+        existingSale.setCampaigns(campaigns);
         existingSale.setCash(cash);
         existingSale.setChange(change);
         existingSale.setTotal(total);
         existingSale.setTotalWithCampaign(totalWithCampaign);
+        existingSale.setMixedPayment(mixedPayment);
 
         saleRepository.save(existingSale);
         products.forEach(product -> product.setSale(existingSale));
@@ -272,17 +295,16 @@ public class SaleServiceImpl implements SaleService {
         List<Campaign> campaigns = null;
         BigDecimal totalWithCampaign = total;
 
-        if (campaignIds != null && !campaignIds.isEmpty()) {
-            CampaignProcessRequest campaignProcessRequest = CampaignProcessRequest.builder()
-                    .campaignIds(campaignIds)
-                    .products(products)
-                    .total(total).build();
-            CampaignProcessResponse campaignProcessResponse = campaignProcessService.processCampaigns(campaignProcessRequest);
+        CampaignProcessRequest campaignProcessRequest = CampaignProcessRequest.builder()
+                .campaignIds(campaignIds)
+                .products(products)
+                .total(total).build();
+        CampaignProcessResponse campaignProcessResponse = campaignProcessService.processCampaigns(campaignProcessRequest);
 
-            campaigns = campaignProcessService.getCampaigns(campaignIds);
-            products = campaignProcessResponse.getProducts();
-            totalWithCampaign = campaignProcessResponse.getTotal();
-        }
+        campaigns = campaignProcessService.getCampaigns(campaignIds);
+        products = campaignProcessResponse.getProducts();
+        totalWithCampaign = campaignProcessResponse.getTotal();
+
 
         return new CampaignProcessResult(campaigns, products, totalWithCampaign);
     }
@@ -308,6 +330,36 @@ public class SaleServiceImpl implements SaleService {
         return campaignNames;
     }
 
+    private BigDecimal processCashPayment(BigDecimal cash, BigDecimal totalWithCampaign) {
+        if(cash == null)
+            throw new CashNotProvidedException("Cash not provided");
+
+        if (cash.compareTo(totalWithCampaign) < 0) {
+            throw new InsufficientCashException("Insufficient cash for payment");
+        }
+        return cash.subtract(totalWithCampaign);
+    }
+
+    private BigDecimal processMixedPayment(MixedPayment mixedPayment, BigDecimal totalWithCampaign) {
+        if (mixedPayment == null){
+            throw new MixedPaymentNotFoundException("Mixed payment not found");
+        }
+        BigDecimal cashAmount = mixedPayment.getCashAmount();
+        BigDecimal creditCardAmount = mixedPayment.getCreditCardAmount();
+
+        if (cashAmount == null || creditCardAmount == null)
+            throw new InvalidMixedPaymentException("Invalid mixed payment");
+
+        BigDecimal amountPaid = cashAmount.add(creditCardAmount);
+
+        if (amountPaid.compareTo(totalWithCampaign) < 0) {
+            throw new InsufficientMixedPaymentException("The total payment is not enough to cover the sale amount.");
+        }
+
+        BigDecimal amountToBePaidByCash = totalWithCampaign.subtract(creditCardAmount);
+        return cashAmount.subtract(amountToBePaidByCash);
+    }
+
     private Payment getPaymentMethod(String paymentMethod) {
         try {
             return Payment.valueOf(paymentMethod.toUpperCase());
@@ -330,7 +382,8 @@ public class SaleServiceImpl implements SaleService {
                 .cash(sale.getCash())
                 .change(sale.getChange())
                 .total(sale.getTotal())
-                .totalWithCampaign(sale.getTotalWithCampaign()).build();
+                .totalWithCampaign(sale.getTotalWithCampaign())
+                .mixedPayment(sale.getMixedPayment()).build();
     }
 
 }

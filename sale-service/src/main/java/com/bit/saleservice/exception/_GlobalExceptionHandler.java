@@ -30,9 +30,24 @@ public class _GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         logger.error("Payment method update not allowed: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+    @ExceptionHandler(MixedPaymentNotFoundException.class)
+    public ResponseEntity<Object> handleMixedPaymentNotFoundException(MixedPaymentNotFoundException ex) {
+        logger.error("Mixed payment not found: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+    @ExceptionHandler(InvalidMixedPaymentException.class)
+    public ResponseEntity<Object> handleInvalidMixedPaymentException(InvalidMixedPaymentException ex) {
+        logger.error("Invalid mixed payment: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
     @ExceptionHandler(InvalidPaymentMethodException.class)
     public ResponseEntity<Object> handleInvalidPaymentMethodException(InvalidPaymentMethodException ex) {
         logger.error("Invalid payment method: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+    @ExceptionHandler(CashNotProvidedException.class)
+    public ResponseEntity<Object> handleCashNotProvidedException(CashNotProvidedException ex) {
+        logger.error("Cash not provided: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
@@ -51,6 +66,12 @@ public class _GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(InsufficientCashException.class)
     public ResponseEntity<Object> handleInsufficientCashException(InsufficientCashException ex) {
         logger.error("Insufficient cash: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(InsufficientMixedPaymentException.class)
+    public ResponseEntity<Object> handleInsufficientMixedPaymentException(InsufficientMixedPaymentException ex) {
+        logger.error("Insufficient mixed payment: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 

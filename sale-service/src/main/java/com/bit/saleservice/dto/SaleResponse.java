@@ -1,6 +1,7 @@
 package com.bit.saleservice.dto;
 
 import com.bit.saleservice.entity.Campaign;
+import com.bit.saleservice.entity.MixedPayment;
 import com.bit.saleservice.entity.Payment;
 import com.bit.saleservice.entity.Product;
 import jakarta.persistence.*;
@@ -29,4 +30,5 @@ public class SaleResponse {
     private BigDecimal change;
     private BigDecimal total;
     private BigDecimal totalWithCampaign;
+    private MixedPayment mixedPayment;
 }
