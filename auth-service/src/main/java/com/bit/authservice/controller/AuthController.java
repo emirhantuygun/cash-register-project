@@ -1,5 +1,6 @@
 package com.bit.authservice.controller;
 
+import com.bit.authservice.config.RabbitMQConfig;
 import com.bit.authservice.dto.AuthRequest;
 import com.bit.authservice.dto.AuthResponse;
 import com.bit.authservice.dto.AuthStatus;
@@ -7,6 +8,7 @@ import com.bit.authservice.dto.UserRequest;
 import com.bit.authservice.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -59,6 +61,7 @@ public class AuthController {
     }
 
     @PostMapping("/create")
+    @RabbitListener(queues = RabbitMQConfig.QUEUE_NAME)
     public ResponseEntity<String> createUser(@RequestBody UserRequest userRequest) {
         try {
             authService.createUser(userRequest);

@@ -1,6 +1,7 @@
 package com.bit.usermanagementservice.service;
 
 import com.bit.usermanagementservice.UserManagementServiceApplication;
+import com.bit.usermanagementservice.config.RabbitMQConfig;
 import com.bit.usermanagementservice.dto.AuthUserRequest;
 import com.bit.usermanagementservice.dto.UserRequest;
 import com.bit.usermanagementservice.dto.UserResponse;
@@ -16,6 +17,7 @@ import jakarta.persistence.criteria.JoinType;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -41,6 +43,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final GatewayService gatewayService;
+    private final RabbitTemplate rabbitTemplate;
+
 
     @Override
     public UserResponse getUser(Long id) {
@@ -113,7 +117,10 @@ public class UserServiceImpl implements UserService {
                 .roles(getRolesAsRole(userRequest.getRoles()))
                 .build();
 
-        gatewayService.createUser(mapToAuthUserRequest(userRequest));
+//        gatewayService.createUser(mapToAuthUserRequest(userRequest));
+        AuthUserRequest authUserRequest = mapToAuthUserRequest(userRequest);
+        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.ROUTING_KEY, authUserRequest);
+
         userRepository.save(user);
 
         logger.info("Created user with ID: {}", user.getId());
