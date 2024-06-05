@@ -1,7 +1,6 @@
 package com.bit.usermanagementservice.service;
 
 import com.bit.usermanagementservice.UserManagementServiceApplication;
-import com.bit.usermanagementservice.config.RabbitMQConfig;
 import com.bit.usermanagementservice.dto.AuthUserRequest;
 import com.bit.usermanagementservice.dto.UserRequest;
 import com.bit.usermanagementservice.dto.UserResponse;
@@ -12,6 +11,7 @@ import com.bit.usermanagementservice.entity.AppUser;
 import com.bit.usermanagementservice.entity.Role;
 import com.bit.usermanagementservice.repository.RoleRepository;
 import com.bit.usermanagementservice.repository.UserRepository;
+import com.bit.usermanagementservice.wrapper.UpdateUserMessage;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +44,24 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final GatewayService gatewayService;
     private final RabbitTemplate rabbitTemplate;
+
+    @Value("${rabbitmq.exchange}")
+    private String EXCHANGE;
+
+    @Value("${rabbitmq.routingKey.create}")
+    private String ROUTING_KEY_CREATE;
+
+    @Value("${rabbitmq.routingKey.update}")
+    private String ROUTING_KEY_UPDATE;
+
+    @Value("${rabbitmq.routingKey.delete}")
+    private String ROUTING_KEY_DELETE;
+
+    @Value("${rabbitmq.routingKey.deletePermanent}")
+    private String ROUTING_KEY_DELETE_PERMANENT;
+
+    @Value("${rabbitmq.routingKey.restore}")
+    private String ROUTING_KEY_RESTORE;
 
 
     @Override
@@ -119,7 +137,7 @@ public class UserServiceImpl implements UserService {
 
 //        gatewayService.createUser(mapToAuthUserRequest(userRequest));
         AuthUserRequest authUserRequest = mapToAuthUserRequest(userRequest);
-        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE, RabbitMQConfig.ROUTING_KEY_CREATE, authUserRequest);
+        rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_CREATE, authUserRequest);
 
         userRepository.save(user);
 
@@ -147,7 +165,9 @@ public class UserServiceImpl implements UserService {
 
 //        gatewayService.updateUser(id, mapToAuthUserRequest(userRequest));
         AuthUserRequest authUserRequest = mapToAuthUserRequest(userRequest);
-        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE, RabbitMQConfig.ROUTING_KEY_UPDATE, authUserRequest);
+        UpdateUserMessage updateUserMessage = new UpdateUserMessage(id, authUserRequest);
+        rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_UPDATE, updateUserMessage);
+
         userRepository.save(existingUser);
 
         logger.info("User updated with id {}", id);
@@ -161,7 +181,7 @@ public class UserServiceImpl implements UserService {
         }
 
 //        gatewayService.restoreUser(id);
-        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE, RabbitMQConfig.ROUTING_KEY_RESTORE, id);
+        rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_RESTORE, id);
         userRepository.restoreUser(id);
         AppUser user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Couldn't restore the user with id " + id));
@@ -177,7 +197,7 @@ public class UserServiceImpl implements UserService {
            throw new UserNotFoundException("User not found with id " + id);
 
 //        gatewayService.deleteUser(id);
-        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE, RabbitMQConfig.ROUTING_KEY_DELETE, id);
+        rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_DELETE, id);
         userRepository.deleteById(id);
 
         logger.info("User soft-deleted");
@@ -190,7 +210,7 @@ public class UserServiceImpl implements UserService {
         
         userRepository.deleteRolesForUser(id);
 //        gatewayService.deleteUserPermanently(id);
-        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE, RabbitMQConfig.ROUTING_KEY_DELETE_PERMANENT, id);
+        rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_DELETE_PERMANENT, id);
         userRepository.deletePermanently(id);
     }
 
