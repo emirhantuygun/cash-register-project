@@ -109,7 +109,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    @RabbitListener(queues = RabbitMQConfig.QUEUE_NAME)
+    @RabbitListener(queues = RabbitMQConfig.USER_QUEUE_CREATE)
     public void createUser(UserRequest userRequest) {
 
         var encodedPassword = passwordEncoder.encode(userRequest.getPassword());
@@ -124,6 +124,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @RabbitListener(queues = RabbitMQConfig.USER_QUEUE_UPDATE)
     public void updateUser(Long id, UserRequest userRequest) {
         AppUser existingUser = userRepository.findById(id).orElseThrow();
         var encodedPassword = passwordEncoder.encode(userRequest.getPassword());
@@ -136,16 +137,19 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @RabbitListener(queues = RabbitMQConfig.USER_QUEUE_RESTORE)
     public void restoreUser(Long id) {
         userRepository.restoreUser(id);
     }
 
     @Override
+    @RabbitListener(queues = RabbitMQConfig.USER_QUEUE_DELETE)
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
 
     @Override
+    @RabbitListener(queues = RabbitMQConfig.USER_QUEUE_DELETE_PERMANENT)
     public void deleteUserPermanently(Long id) {
         userRepository.deleteRolesForUser(id);
         userRepository.deletePermanently(id);

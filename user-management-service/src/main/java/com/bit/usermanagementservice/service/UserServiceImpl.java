@@ -119,7 +119,7 @@ public class UserServiceImpl implements UserService {
 
 //        gatewayService.createUser(mapToAuthUserRequest(userRequest));
         AuthUserRequest authUserRequest = mapToAuthUserRequest(userRequest);
-        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.ROUTING_KEY, authUserRequest);
+        rabbitTemplate.convertAndSend(RabbitMQConfig.USER_EXCHANGE, RabbitMQConfig.ROUTING_KEY_CREATE, authUserRequest);
 
         userRepository.save(user);
 
@@ -145,7 +145,9 @@ public class UserServiceImpl implements UserService {
         existingUser.setPassword(userRequest.getPassword());
         existingUser.setRoles(getRolesAsRole(userRequest.getRoles()));
 
-        gatewayService.updateUser(id, mapToAuthUserRequest(userRequest));
+//        gatewayService.updateUser(id, mapToAuthUserRequest(userRequest));
+        AuthUserRequest authUserRequest = mapToAuthUserRequest(userRequest);
+        rabbitTemplate.convertAndSend(RabbitMQConfig.USER_EXCHANGE, RabbitMQConfig.ROUTING_KEY_UPDATE, authUserRequest);
         userRepository.save(existingUser);
 
         logger.info("User updated with id {}", id);
@@ -158,7 +160,8 @@ public class UserServiceImpl implements UserService {
             throw new UserNotSoftDeletedException("User with id " + id + " is not soft-deleted and cannot be restored.");
         }
 
-        gatewayService.restoreUser(id);
+//        gatewayService.restoreUser(id);
+        rabbitTemplate.convertAndSend(RabbitMQConfig.USER_EXCHANGE, RabbitMQConfig.ROUTING_KEY_RESTORE, id);
         userRepository.restoreUser(id);
         AppUser user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Couldn't restore the user with id " + id));
@@ -173,7 +176,8 @@ public class UserServiceImpl implements UserService {
         if(!userRepository.existsById(id))
            throw new UserNotFoundException("User not found with id " + id);
 
-        gatewayService.deleteUser(id);
+//        gatewayService.deleteUser(id);
+        rabbitTemplate.convertAndSend(RabbitMQConfig.USER_EXCHANGE, RabbitMQConfig.ROUTING_KEY_DELETE, id);
         userRepository.deleteById(id);
 
         logger.info("User soft-deleted");
@@ -185,7 +189,8 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException("User not found with id " + id);
         
         userRepository.deleteRolesForUser(id);
-        gatewayService.deleteUserPermanently(id);
+//        gatewayService.deleteUserPermanently(id);
+        rabbitTemplate.convertAndSend(RabbitMQConfig.USER_EXCHANGE, RabbitMQConfig.ROUTING_KEY_DELETE_PERMANENT, id);
         userRepository.deletePermanently(id);
     }
 
