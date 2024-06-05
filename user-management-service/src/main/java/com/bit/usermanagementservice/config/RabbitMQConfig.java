@@ -18,19 +18,19 @@ public class RabbitMQConfig {
     public static String EXCHANGE;
 
     @Value("${rabbitmq.queue.create}")
-    public static String USER_QUEUE_CREATE;
+    private String USER_QUEUE_CREATE;
 
     @Value("${rabbitmq.queue.update}")
-    public static String USER_QUEUE_UPDATE;
+    private String USER_QUEUE_UPDATE;
 
     @Value("${rabbitmq.queue.delete}")
-    public static String USER_QUEUE_DELETE;
+    private String USER_QUEUE_DELETE;
 
     @Value("${rabbitmq.queue.deletePermanent}")
-    public static String USER_QUEUE_DELETE_PERMANENT;
+    private String USER_QUEUE_DELETE_PERMANENT;
 
     @Value("${rabbitmq.queue.restore}")
-    public static String USER_QUEUE_RESTORE;
+    private String USER_QUEUE_RESTORE;
 
     @Value("${rabbitmq.routingKey.create}")
     public static String ROUTING_KEY_CREATE;

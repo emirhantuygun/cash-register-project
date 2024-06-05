@@ -15,37 +15,37 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
     @Value("${rabbitmq.exchange}")
-    public static String EXCHANGE;
+    private String EXCHANGE;
 
     @Value("${rabbitmq.queue.create}")
-    public static String USER_QUEUE_CREATE;
+    private String USER_QUEUE_CREATE;
 
     @Value("${rabbitmq.queue.update}")
-    public static String USER_QUEUE_UPDATE;
+    private String USER_QUEUE_UPDATE;
 
     @Value("${rabbitmq.queue.delete}")
-    public static String USER_QUEUE_DELETE;
+    private String USER_QUEUE_DELETE;
 
     @Value("${rabbitmq.queue.deletePermanent}")
-    public static String USER_QUEUE_DELETE_PERMANENT;
+    private String USER_QUEUE_DELETE_PERMANENT;
 
     @Value("${rabbitmq.queue.restore}")
-    public static String USER_QUEUE_RESTORE;
+    private String USER_QUEUE_RESTORE;
 
     @Value("${rabbitmq.routingKey.create}")
-    public static String ROUTING_KEY_CREATE;
+    private String ROUTING_KEY_CREATE;
 
     @Value("${rabbitmq.routingKey.update}")
-    public static String ROUTING_KEY_UPDATE;
+    private String ROUTING_KEY_UPDATE;
 
     @Value("${rabbitmq.routingKey.delete}")
-    public static String ROUTING_KEY_DELETE;
+    private String ROUTING_KEY_DELETE;
 
     @Value("${rabbitmq.routingKey.deletePermanent}")
-    public static String ROUTING_KEY_DELETE_PERMANENT;
+    private String ROUTING_KEY_DELETE_PERMANENT;
 
     @Value("${rabbitmq.routingKey.restore}")
-    public static String ROUTING_KEY_RESTORE;
+    private String ROUTING_KEY_RESTORE;
 
     @Bean
     public DirectExchange userExchange() {
