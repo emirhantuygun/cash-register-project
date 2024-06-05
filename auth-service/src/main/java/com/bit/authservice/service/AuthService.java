@@ -2,6 +2,7 @@ package com.bit.authservice.service;
 
 import com.bit.authservice.dto.AuthRequest;
 import com.bit.authservice.dto.UserRequest;
+import com.bit.authservice.wrapper.UpdateUserMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -15,6 +16,8 @@ public interface AuthService {
   List<String> refreshToken(HttpServletRequest request);
 
   void updateUser(Long id, UserRequest userRequest);
+
+  void updateUserWrapped(UpdateUserMessage updateUserMessage);
 
   void restoreUser(Long id);
 

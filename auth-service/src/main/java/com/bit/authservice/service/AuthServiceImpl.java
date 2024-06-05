@@ -11,6 +11,7 @@ import com.bit.authservice.repository.RoleRepository;
 import com.bit.authservice.repository.TokenRepository;
 import com.bit.authservice.repository.UserRepository;
 import com.bit.authservice.util.JwtUtils;
+import com.bit.authservice.wrapper.UpdateUserMessage;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -124,8 +125,24 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    @RabbitListener(queues = "${rabbitmq.queue.update}")
     public void updateUser(Long id, UserRequest userRequest) {
+        AppUser existingUser = userRepository.findById(id).orElseThrow();
+        var encodedPassword = passwordEncoder.encode(userRequest.getPassword());
+
+        existingUser.setUsername(userRequest.getUsername());
+        existingUser.setPassword(encodedPassword);
+        existingUser.setRoles(getRolesAsRole(userRequest.getRoles()));
+
+        userRepository.save(existingUser);
+    }
+
+    @Override
+    @RabbitListener(queues = "${rabbitmq.queue.update}")
+    public void updateUserWrapped(UpdateUserMessage updateUserMessage) {
+
+        Long id = updateUserMessage.getId();
+        UserRequest userRequest = updateUserMessage.getUserRequest();
+
         AppUser existingUser = userRepository.findById(id).orElseThrow();
         var encodedPassword = passwordEncoder.encode(userRequest.getPassword());
 
