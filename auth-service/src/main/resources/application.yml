@@ -23,3 +23,18 @@ default-roles: CASHIER, MANAGER, ADMIN
 redis:
   host: "localhost"
   port: "6379"
+
+rabbitmq:
+  exchange: user-exchange
+  queue:
+    create: user-queue-create
+    update: user-queue-update
+    delete: user-queue-delete
+    deletePermanent: user-queue-delete-permanent
+    restore: user-queue-restore
+  routingKey:
+    create: user.create
+    update: user.update
+    delete: user.delete
+    deletePermanent: user.delete.permanent
+    restore: user.restore

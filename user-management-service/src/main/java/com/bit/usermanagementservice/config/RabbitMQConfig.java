@@ -1,9 +1,5 @@
 package com.bit.usermanagementservice.config;
 
-import org.springframework.amqp.core.Queue;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
@@ -11,27 +7,49 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMQConfig {
 
-    public static final String USER_EXCHANGE = "user-exchange";
-    public static final String USER_QUEUE_CREATE = "user-queue-create";
-    public static final String USER_QUEUE_UPDATE = "user-queue-update";
-    public static final String USER_QUEUE_DELETE = "user-queue-delete";
-    public static final String USER_QUEUE_DELETE_PERMANENT = "user-queue-delete-permanent";
-    public static final String USER_QUEUE_RESTORE = "user-queue-restore";
-    public static final String ROUTING_KEY_CREATE = "user.create";
-    public static final String ROUTING_KEY_UPDATE = "user.update";
-    public static final String ROUTING_KEY_DELETE = "user.delete";
-    public static final String ROUTING_KEY_DELETE_PERMANENT = "user.delete.permanent";
-    public static final String ROUTING_KEY_RESTORE = "user.restore";
+    @Value("${rabbitmq.exchange}")
+    public static String EXCHANGE;
+
+    @Value("${rabbitmq.queue.create}")
+    public static String USER_QUEUE_CREATE;
+
+    @Value("${rabbitmq.queue.update}")
+    public static String USER_QUEUE_UPDATE;
+
+    @Value("${rabbitmq.queue.delete}")
+    public static String USER_QUEUE_DELETE;
+
+    @Value("${rabbitmq.queue.deletePermanent}")
+    public static String USER_QUEUE_DELETE_PERMANENT;
+
+    @Value("${rabbitmq.queue.restore}")
+    public static String USER_QUEUE_RESTORE;
+
+    @Value("${rabbitmq.routingKey.create}")
+    public static String ROUTING_KEY_CREATE;
+
+    @Value("${rabbitmq.routingKey.update}")
+    public static String ROUTING_KEY_UPDATE;
+
+    @Value("${rabbitmq.routingKey.delete}")
+    public static String ROUTING_KEY_DELETE;
+
+    @Value("${rabbitmq.routingKey.deletePermanent}")
+    public static String ROUTING_KEY_DELETE_PERMANENT;
+
+    @Value("${rabbitmq.routingKey.restore}")
+    public static String ROUTING_KEY_RESTORE;
 
     @Bean
     public DirectExchange userExchange() {
-        return new DirectExchange(USER_EXCHANGE);
+        return new DirectExchange(EXCHANGE);
     }
 
     @Bean
