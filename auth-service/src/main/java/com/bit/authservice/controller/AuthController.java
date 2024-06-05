@@ -61,7 +61,6 @@ public class AuthController {
     }
 
     @PostMapping("/create")
-    @RabbitListener(queues = RabbitMQConfig.QUEUE_NAME)
     public ResponseEntity<String> createUser(@RequestBody UserRequest userRequest) {
         try {
             authService.createUser(userRequest);
