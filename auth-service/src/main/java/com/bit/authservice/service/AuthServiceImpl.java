@@ -1,9 +1,8 @@
 package com.bit.authservice.service;
 
 import com.bit.authservice.AuthServiceApplication;
-import com.bit.authservice.config.RabbitMQConfig;
 import com.bit.authservice.dto.AuthRequest;
-import com.bit.authservice.dto.UserRequest;
+import com.bit.authservice.dto.AuthUserRequest;
 import com.bit.authservice.entity.AppUser;
 import com.bit.authservice.entity.Role;
 import com.bit.authservice.entity.Token;
@@ -111,27 +110,27 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @RabbitListener(queues = "${rabbitmq.queue.create}")
-    public void createUser(UserRequest userRequest) {
+    public void createUser(AuthUserRequest authUserRequest) {
 
-        var encodedPassword = passwordEncoder.encode(userRequest.getPassword());
+        var encodedPassword = passwordEncoder.encode(authUserRequest.getPassword());
 
         var appUser = AppUser.builder()
-                .username(userRequest.getUsername())
+                .username(authUserRequest.getUsername())
                 .password(encodedPassword)
-                .roles(getRolesAsRole(userRequest.getRoles()))
+                .roles(getRolesAsRole(authUserRequest.getRoles()))
                 .build();
 
         userRepository.save(appUser);
     }
 
     @Override
-    public void updateUser(Long id, UserRequest userRequest) {
+    public void updateUser(Long id, AuthUserRequest authUserRequest) {
         AppUser existingUser = userRepository.findById(id).orElseThrow();
-        var encodedPassword = passwordEncoder.encode(userRequest.getPassword());
+        var encodedPassword = passwordEncoder.encode(authUserRequest.getPassword());
 
-        existingUser.setUsername(userRequest.getUsername());
+        existingUser.setUsername(authUserRequest.getUsername());
         existingUser.setPassword(encodedPassword);
-        existingUser.setRoles(getRolesAsRole(userRequest.getRoles()));
+        existingUser.setRoles(getRolesAsRole(authUserRequest.getRoles()));
 
         userRepository.save(existingUser);
     }
@@ -141,14 +140,14 @@ public class AuthServiceImpl implements AuthService {
     public void updateUserWrapped(UpdateUserMessage updateUserMessage) {
 
         Long id = updateUserMessage.getId();
-        UserRequest userRequest = updateUserMessage.getUserRequest();
+        AuthUserRequest authUserRequest = updateUserMessage.getAuthUserRequest();
 
         AppUser existingUser = userRepository.findById(id).orElseThrow();
-        var encodedPassword = passwordEncoder.encode(userRequest.getPassword());
+        var encodedPassword = passwordEncoder.encode(authUserRequest.getPassword());
 
-        existingUser.setUsername(userRequest.getUsername());
+        existingUser.setUsername(authUserRequest.getUsername());
         existingUser.setPassword(encodedPassword);
-        existingUser.setRoles(getRolesAsRole(userRequest.getRoles()));
+        existingUser.setRoles(getRolesAsRole(authUserRequest.getRoles()));
 
         userRepository.save(existingUser);
     }

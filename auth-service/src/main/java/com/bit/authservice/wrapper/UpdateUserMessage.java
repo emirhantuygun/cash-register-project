@@ -1,6 +1,6 @@
 package com.bit.authservice.wrapper;
 
-import com.bit.authservice.dto.UserRequest;
+import com.bit.authservice.dto.AuthUserRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateUserMessage {
     private Long id;
-    private UserRequest userRequest;
+    private AuthUserRequest authUserRequest;
 
 }
