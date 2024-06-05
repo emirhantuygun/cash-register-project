@@ -1,6 +1,7 @@
 package com.bit.authservice.service;
 
 import com.bit.authservice.AuthServiceApplication;
+import com.bit.authservice.config.RabbitMQConfig;
 import com.bit.authservice.dto.AuthRequest;
 import com.bit.authservice.dto.UserRequest;
 import com.bit.authservice.entity.AppUser;
@@ -15,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -107,6 +109,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @RabbitListener(queues = RabbitMQConfig.QUEUE_NAME)
     public void createUser(UserRequest userRequest) {
 
         var encodedPassword = passwordEncoder.encode(userRequest.getPassword());
