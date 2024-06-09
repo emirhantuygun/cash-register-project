@@ -25,6 +25,7 @@ services:
     ports:
       - "${RABBITMQ_PORT_1}:${RABBITMQ_PORT_1}"
       - "${RABBITMQ_PORT_2}:${RABBITMQ_PORT_2}"
+    restart: always
 
 
   postgres-product:
@@ -142,8 +143,8 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
-      - postgres-product
       - registry
+      - postgres-product
     depends_on:
       - service-registry
       - api-gateway
@@ -158,8 +159,8 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
-      - postgres-sale
       - registry
+      - postgres-sale
     depends_on:
       - service-registry
       - api-gateway
@@ -190,14 +191,16 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
-      - postgres-auth
       - registry
+      - postgres-auth
       - redis
+      - rabbitmq
     depends_on:
       - service-registry
       - api-gateway
       - postgres-auth
       - redis
+      - rabbitmq
 
 
   user-service:
@@ -208,13 +211,15 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
-      - postgres-user
       - registry
+      - postgres-user
+      - rabbitmq
     depends_on:
       - service-registry
       - api-gateway
       - postgres-user
       - auth-service
+      - rabbitmq
 
 
 networks:
@@ -224,6 +229,7 @@ networks:
   postgres-user:
   registry:
   redis:
+  rabbitmq:
 
 
 
