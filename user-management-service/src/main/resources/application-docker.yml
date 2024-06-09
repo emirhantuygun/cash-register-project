@@ -1,6 +1,8 @@
 spring:
   application:
     name: USER-SERVICE
+  rabbitmq:
+    host: rabbitmq
 
 default-roles: CASHIER, MANAGER, ADMIN
 

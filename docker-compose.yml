@@ -16,6 +16,17 @@ services:
     restart: always
 
 
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.12.14-management
+    expose:
+      - "${RABBITMQ_PORT_1}"
+      - "${RABBITMQ_PORT_2}"
+    ports:
+      - "${RABBITMQ_PORT_1}:${RABBITMQ_PORT_1}"
+      - "${RABBITMQ_PORT_2}:${RABBITMQ_PORT_2}"
+
+
   postgres-product:
     container_name: postgres-product
     image: postgres

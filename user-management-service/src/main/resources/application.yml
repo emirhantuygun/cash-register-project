@@ -1,6 +1,8 @@
 spring:
   application:
     name: USER-SERVICE
+  rabbitmq:
+    host: localhost
 
 server:
   port: 8082

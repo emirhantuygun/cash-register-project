@@ -1,6 +1,8 @@
 spring:
   application:
     name: AUTH-SERVICE
+  rabbitmq:
+    host: localhost
 
 server:
   port: 8081
