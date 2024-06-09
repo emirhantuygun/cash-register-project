@@ -25,6 +25,8 @@ services:
     ports:
       - "${RABBITMQ_PORT_1}:${RABBITMQ_PORT_1}"
       - "${RABBITMQ_PORT_2}:${RABBITMQ_PORT_2}"
+    networks:
+      - rabbitmq
     restart: always
 
 
