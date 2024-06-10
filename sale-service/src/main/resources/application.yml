@@ -13,5 +13,10 @@ eureka:
     hostname: localhost
 
 gateway:
-  host: localhost
+  host: "localhost"
   port: 8080
+
+endpoint:
+  product-service:
+    get-product: products/{id}
+    is-product-in-stock: stock/{id}

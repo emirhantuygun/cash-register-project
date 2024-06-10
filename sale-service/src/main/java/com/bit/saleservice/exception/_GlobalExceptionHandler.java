@@ -80,6 +80,19 @@ public class _GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         logger.error("Product not found: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
+
+    @ExceptionHandler(ClientErrorException.class)
+    public ResponseEntity<String> handleClientErrorException(ClientErrorException ex) {
+        logger.error("Client error: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ServerErrorException.class)
+    public ResponseEntity<String> handleServerErrorException(ServerErrorException ex) {
+        logger.error("Server error: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    }
+
     @ExceptionHandler(SaleNotFoundException.class)
     public ResponseEntity<String> handleSaleNotFoundException(SaleNotFoundException ex) {
         logger.error("Sale not found: {}", ex.getMessage());
