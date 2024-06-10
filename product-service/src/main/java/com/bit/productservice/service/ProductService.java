@@ -18,4 +18,5 @@ public interface ProductService {
     void deleteProduct (Long id);
     ProductResponse restoreProduct(Long id);
     void deleteProductPermanently(Long id);
+    Boolean isInStock(Long id);
 }

@@ -146,6 +146,13 @@ public class ProductServiceImpl implements ProductService {
         productRepository.deletePermanently(id);
     }
 
+    @Override
+    public Boolean isInStock(Long id){
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + id));
+        return product.getStockQuantity() > 0;
+    }
+
     private ProductResponse mapToProductResponse(Product product) {
         return ProductResponse.builder()
                 .id(product.getId())

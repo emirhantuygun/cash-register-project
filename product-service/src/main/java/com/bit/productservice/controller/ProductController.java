@@ -24,7 +24,6 @@ import java.util.List;
 public class ProductController {
 
     private static final Logger logger = LogManager.getLogger(ProductServiceApplication.class);
-
     private final ProductService productService;
 
     @GetMapping("/{id}")
@@ -73,6 +72,11 @@ public class ProductController {
         return new ResponseEntity<>(productResponses, HttpStatus.OK);
     }
 
+    @GetMapping("/in-stock/{id}")
+    public ResponseEntity<Boolean> isProductInStock(@PathVariable Long id) {
+        boolean inStock = productService.isInStock(id);
+        return ResponseEntity.ok(inStock);
+    }
 
     @PostMapping
     public ResponseEntity<ProductResponse> createProduct(@RequestBody @Valid ProductRequest productRequest){
