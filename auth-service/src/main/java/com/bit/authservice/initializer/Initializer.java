@@ -28,6 +28,9 @@ public class Initializer implements CommandLineRunner {
     @Transactional
     public void run(String... args) {
         initializeRoles();
+        initializeCashierUser();
+        initializeManagerUser();
+        initializeAdminUser();
         initializeSuperUser();
         initializeUsers();
     }
@@ -40,8 +43,37 @@ public class Initializer implements CommandLineRunner {
         }
     }
 
-    private void initializeSuperUser() {
+    private void initializeCashierUser() {
+        var encodedPassword = passwordEncoder.encode("cashier");
+        Role cashierRole = roleRepository.findByRoleName("CASHIER").orElseThrow();
 
+        userRepository.save(AppUser.builder()
+                .username("cashier")
+                .password(encodedPassword)
+                .roles(List.of(cashierRole)).build());
+    }
+
+    private void initializeManagerUser() {
+        var encodedPassword = passwordEncoder.encode("manager");
+        Role managerRole = roleRepository.findByRoleName("MANAGER").orElseThrow();
+
+        userRepository.save(AppUser.builder()
+                .username("manager")
+                .password(encodedPassword)
+                .roles(List.of(managerRole)).build());
+    }
+
+    private void initializeAdminUser() {
+        var encodedPassword = passwordEncoder.encode("admin");
+        Role adminRole = roleRepository.findByRoleName("ADMIN").orElseThrow();
+
+        userRepository.save(AppUser.builder()
+                .username("admin")
+                .password(encodedPassword)
+                .roles(List.of(adminRole)).build());
+    }
+
+    private void initializeSuperUser() {
         var encodedPassword = passwordEncoder.encode("super");
         Role cashierRole = roleRepository.findByRoleName("CASHIER").orElseThrow();
         Role managerRole = roleRepository.findByRoleName("MANAGER").orElseThrow();
@@ -55,7 +87,7 @@ public class Initializer implements CommandLineRunner {
 
     private void initializeUsers() {
 
-        for (int i = 2; i <= 20; i++) {
+        for (int i = 5; i <= 20; i++) {
             String username = String.format("user%d", i);
             String password = String.format("user%d54", i);
             var encodedPassword = passwordEncoder.encode(password);

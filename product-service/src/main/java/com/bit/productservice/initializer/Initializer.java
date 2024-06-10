@@ -33,6 +33,7 @@ public class Initializer implements CommandLineRunner {
                     .name(name)
                     .description(description)
                     .barcodeNumber(barcodeService.generateBarcodeNumber(name))
+                    .stockQuantity(10)
                     .price(price).build();
 
             productRepository.save(product);
