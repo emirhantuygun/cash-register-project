@@ -2,6 +2,7 @@ package com.bit.productservice.service;
 
 import com.bit.productservice.dto.ProductRequest;
 import com.bit.productservice.dto.ProductResponse;
+import com.bit.productservice.wrapper.ProductStockReduceRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
@@ -19,4 +20,5 @@ public interface ProductService {
     ProductResponse restoreProduct(Long id);
     void deleteProductPermanently(Long id);
     Boolean areEnoughProductsInStock(Long id, int requestedQuantity);
+    void reduceProductStock(ProductStockReduceRequest request);
 }

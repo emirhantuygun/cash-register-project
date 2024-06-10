@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
@@ -34,5 +35,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query(value = "DELETE FROM products WHERE id = :id", nativeQuery = true)
     void deletePermanently(@Param("id") Long id);
 
-
+    Optional<Product> findByName(String name);
 }

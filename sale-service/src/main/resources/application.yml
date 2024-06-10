@@ -1,6 +1,8 @@
 spring:
   application:
     name: SALE-SERVICE
+  rabbitmq:
+    host: localhost
 
 server:
   port: 8084
@@ -20,3 +22,8 @@ endpoint:
   product-service:
     get-product: products/{id}
     are-enough-products-in-stock: stock
+
+rabbitmq:
+  exchange: reduce-stock-exchange
+  queue: reduce-stock-queue
+  routingKey: reduce.stock

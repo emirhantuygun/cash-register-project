@@ -1,13 +1,11 @@
 package com.bit.saleservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SoftDelete;
-
 import java.math.BigDecimal;
 
 @Entity

@@ -1,6 +1,8 @@
 spring:
   application:
     name: PRODUCT-SERVICE
+  rabbitmq:
+    host: localhost
 
 server:
   port: 8083
@@ -14,3 +16,8 @@ eureka:
 
 company:
   name: 32bit
+
+rabbitmq:
+  exchange: reduce-stock-exchange
+  queue: reduce-stock-queue
+  routingKey: reduce.stock

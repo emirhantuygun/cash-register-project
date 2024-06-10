@@ -7,17 +7,21 @@ import com.bit.saleservice.exception.*;
 import com.bit.saleservice.repository.ProductRepository;
 import com.bit.saleservice.repository.SaleRepository;
 import com.bit.saleservice.wrapper.ProductStockCheckRequest;
+import com.bit.saleservice.wrapper.ProductStockReduceRequest;
 import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.math.BigDecimal;
@@ -32,11 +36,20 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SaleServiceImpl implements SaleService {
 
+    @Value("${rabbitmq.exchange}")
+    private String EXCHANGE;
+
+    @Value("${rabbitmq.queue}")
+    private String QUEUE;
+
+    @Value("${rabbitmq.routingKey}")
+    private String ROUTING_KEY;
     private static final Logger logger = LogManager.getLogger(SaleServiceApplication.class);
     private final SaleRepository saleRepository;
     private final ProductRepository productRepository;
     private final CampaignProcessService campaignProcessService;
     private final GatewayService gatewayService;
+    private final RabbitTemplate rabbitTemplate;
 
     @Override
     public SaleResponse getSale(Long id) {
@@ -115,6 +128,7 @@ public class SaleServiceImpl implements SaleService {
 
 
     @Override
+    @Transactional
     public SaleResponse createSale(SaleRequest saleRequest) {
 
         List<Product> products = getProducts(saleRequest.getProducts());
@@ -162,15 +176,23 @@ public class SaleServiceImpl implements SaleService {
         products.forEach(product -> product.setSale(sale));
         productRepository.saveAll(products);
 
+        reduceStocks(products);
+
         sale.setProducts(products);
         return mapToSaleResponse(sale);
     }
 
     @Override
+    @Transactional
     public SaleResponse updateSale(Long id, SaleRequest saleRequest) {
         logger.info("Updating sale with ID {}: {}", id, saleRequest);
         Sale existingSale = saleRepository.findById(id)
                 .orElseThrow(() -> new SaleNotFoundException("Sale doesn't exist with id " + id));
+
+        List<Product> oldProducts = existingSale.getProducts();
+        oldProducts.forEach(product -> {
+//            gatewayService.returnProduct();
+        });
 
         Payment paymentMethod = getPaymentMethod(saleRequest.getPaymentMethod());
 
@@ -255,6 +277,7 @@ public class SaleServiceImpl implements SaleService {
         saleRepository.deleteProductsForSale(id);
         saleRepository.deletePermanently(id);
     }
+
 
     private List<Product> getProducts(List<ProductRequest> productRequests) {
 
@@ -374,6 +397,13 @@ public class SaleServiceImpl implements SaleService {
         } catch (IllegalArgumentException e) {
             throw new InvalidPaymentMethodException("Invalid payment method: " + paymentMethod);
         }
+    }
+
+    private void reduceStocks(List<Product> products) {
+        products.forEach(product -> {
+            ProductStockReduceRequest productStockReduceRequest = new ProductStockReduceRequest(product.getName(), product.getQuantity());
+            rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY, productStockReduceRequest);
+        });
     }
 
     private SaleResponse mapToSaleResponse(Sale sale) {

@@ -121,6 +121,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
+    @Transactional
     public UserResponse createUser(UserRequest userRequest) {
         logger.info("Creating a user");
 
@@ -147,6 +148,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
+    @Transactional
     public UserResponse updateUser(Long id, UserRequest userRequest) {
         logger.info("Updating user with ID {}: {}", id, userRequest);
 
@@ -175,6 +177,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserResponse restoreUser(Long id) {
         if (!userRepository.isUserSoftDeleted(id)) {
             throw new UserNotSoftDeletedException("User with id " + id + " is not soft-deleted and cannot be restored.");
@@ -190,6 +193,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteUser(Long id) {
         logger.info("Deleting user with ID: {}", id);
 
@@ -204,6 +208,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteUserPermanently(Long id) {
         if(!userRepository.existsById(id))
             throw new UserNotFoundException("User not found with id " + id);

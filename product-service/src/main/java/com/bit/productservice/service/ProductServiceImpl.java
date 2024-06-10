@@ -7,16 +7,20 @@ import com.bit.productservice.exception.ProductNotFoundException;
 import com.bit.productservice.exception.ProductNotSoftDeletedException;
 import com.bit.productservice.entity.Product;
 import com.bit.productservice.repository.ProductRepository;
+import com.bit.productservice.wrapper.ProductStockReduceRequest;
 import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -151,6 +155,16 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + id));
         return product.getStockQuantity() >= requestedQuantity;
+    }
+
+    @Transactional
+    @RabbitListener(queues = "${rabbitmq.queue.create}")
+    public void reduceProductStock(ProductStockReduceRequest request) {
+        Product product = productRepository.findByName(request.getName())
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with name " + request.getName()));
+
+        product.setStockQuantity(product.getStockQuantity() - request.getRequestedQuantity());
+        productRepository.save(product);
     }
 
 
