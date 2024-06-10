@@ -72,9 +72,9 @@ public class ProductController {
         return new ResponseEntity<>(productResponses, HttpStatus.OK);
     }
 
-    @GetMapping("/in-stock/{id}")
+    @GetMapping("/stock/{id}")
     public ResponseEntity<Boolean> isProductInStock(@PathVariable Long id) {
-        boolean inStock = productService.isInStock(id);
+        boolean inStock = productService.isProductInStock(id);
         return ResponseEntity.ok(inStock);
     }
 

@@ -4,13 +4,10 @@ spring:
   rabbitmq:
     host: rabbitmq
 
-jwt:
-  signerKey: "4bb6d1dfbafb64a681139d1586b6f1160d18159afd57c8c79136d7490630407c"
-  access-token-expiration: 3600000  # an hour
-  refresh-token-expiration: 86400000  # a day
-  authorities-key: "roles"
-
-default-roles: CASHIER, MANAGER, ADMIN
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://service-registry:8761/eureka
 
 redis:
   host: "redis"

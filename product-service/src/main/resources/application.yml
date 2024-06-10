@@ -1,11 +1,16 @@
 spring:
   application:
     name: PRODUCT-SERVICE
+
 server:
   port: 8083
+
 eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka
   instance:
     hostname: localhost
+
+company:
+  name: 32bit

@@ -27,7 +27,9 @@ public class GatewayService {
     @Value("${gateway.port}")
     private String GATEWAY_PORT;
     private String GATEWAY_URL;
-    private final String GET_ENDPOINT = "products/{id}";
+
+    @Value("${gateway.port}")
+    private String GET_PRODUCT_ENDPOINT = "products/{id}";
 
     private final RestTemplate restTemplate;
 
