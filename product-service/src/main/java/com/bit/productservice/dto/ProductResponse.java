@@ -16,5 +16,6 @@ public class ProductResponse {
     private String name;
     private String description;
     private String barcodeNumber;
+    private Integer stockQuantity;
     private BigDecimal price;
 }

@@ -23,6 +23,9 @@ public class Product {
 
     @Column(name = "barcode_number")
     private String barcodeNumber;
+
+    @Column(name = "stock_quantity")
+    private Integer stockQuantity;
     private BigDecimal price;
 
 }

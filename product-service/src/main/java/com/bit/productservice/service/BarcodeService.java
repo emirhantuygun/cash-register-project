@@ -1,5 +1,6 @@
 package com.bit.productservice.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -7,7 +8,8 @@ import java.security.NoSuchAlgorithmException;
 @Service
 public class BarcodeService {
 
-    private final String COMPANY_NAME = "32bit";
+    @Value("${company.name}")
+    private String COMPANY_NAME;
 
     public String generateBarcodeNumber(String productName) {
         String combinedName = COMPANY_NAME + productName;

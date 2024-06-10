@@ -91,6 +91,7 @@ public class ProductServiceImpl implements ProductService {
                 .name(productRequest.getName())
                 .description(productRequest.getDescription())
                 .barcodeNumber(barcodeService.generateBarcodeNumber(productRequest.getName()))
+                .stockQuantity(productRequest.getStockQuantity())
                 .price(productRequest.getPrice())
                 .build();
         productRepository.save(product);
@@ -108,6 +109,7 @@ public class ProductServiceImpl implements ProductService {
         existingProduct.setName(productRequest.getName());
         existingProduct.setDescription(productRequest.getDescription());
         existingProduct.setBarcodeNumber(barcodeService.generateBarcodeNumber(productRequest.getName()));
+        existingProduct.setStockQuantity(productRequest.getStockQuantity());
         existingProduct.setPrice(productRequest.getPrice());
 
         productRepository.save(existingProduct);
@@ -150,6 +152,7 @@ public class ProductServiceImpl implements ProductService {
                 .name(product.getName())
                 .description(product.getDescription())
                 .barcodeNumber(product.getBarcodeNumber())
+                .stockQuantity(product.getStockQuantity())
                 .price(product.getPrice())
                 .build();
     }
