@@ -19,4 +19,4 @@ gateway:
 endpoint:
   product-service:
     get-product: products/{id}
-    is-product-in-stock: stock/{id}
+    are-enough-products-in-stock: stock

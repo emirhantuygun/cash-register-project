@@ -147,11 +147,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Boolean isProductInStock(Long id){
+    public Boolean areEnoughProductsInStock(Long id, int requestedQuantity) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + id));
-        return product.getStockQuantity() > 0;
+        return product.getStockQuantity() >= requestedQuantity;
     }
+
 
     private ProductResponse mapToProductResponse(Product product) {
         return ProductResponse.builder()

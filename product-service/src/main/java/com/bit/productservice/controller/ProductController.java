@@ -4,6 +4,7 @@ import com.bit.productservice.ProductServiceApplication;
 import com.bit.productservice.dto.ProductRequest;
 import com.bit.productservice.dto.ProductResponse;
 import com.bit.productservice.service.ProductService;
+import com.bit.productservice.wrapper.ProductStockCheckRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -72,11 +73,12 @@ public class ProductController {
         return new ResponseEntity<>(productResponses, HttpStatus.OK);
     }
 
-    @GetMapping("/stock/{id}")
-    public ResponseEntity<Boolean> isProductInStock(@PathVariable Long id) {
-        boolean inStock = productService.isProductInStock(id);
-        return ResponseEntity.ok(inStock);
+    @GetMapping("/stock")
+    public ResponseEntity<Boolean> areEnoughProductsInStock(@Valid @ModelAttribute ProductStockCheckRequest request) {
+        boolean enoughInStock = productService.areEnoughProductsInStock(request.getId(), request.getRequestedQuantity());
+        return ResponseEntity.ok(enoughInStock);
     }
+
 
     @PostMapping
     public ResponseEntity<ProductResponse> createProduct(@RequestBody @Valid ProductRequest productRequest){

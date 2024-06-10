@@ -81,6 +81,12 @@ public class _GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
+    @ExceptionHandler(ProductOutOfStockException.class)
+    public ResponseEntity<String> handleProductOutOfStockException(ProductOutOfStockException ex) {
+        logger.error("Product out of stock: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
     @ExceptionHandler(ClientErrorException.class)
     public ResponseEntity<String> handleClientErrorException(ClientErrorException ex) {
         logger.error("Client error: {}", ex.getMessage());

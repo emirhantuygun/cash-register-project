@@ -5,7 +5,7 @@ import com.bit.saleservice.exception.ClientErrorException;
 import com.bit.saleservice.exception.ProductNotFoundException;
 import com.bit.saleservice.exception.ProductServiceException;
 import com.bit.saleservice.exception.ServerErrorException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.bit.saleservice.wrapper.ProductStockCheckRequest;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +34,8 @@ public class GatewayService {
     @Value("${endpoint.product-service.get-product}")
     private String GET_PRODUCT_ENDPOINT;
 
-    @Value("${endpoint.product-service.is-product-in-stock}")
-    private String IS_PRODUCT_IN_STOCK_ENDPOINT;
+    @Value("${endpoint.product-service.are-enough-products-in-stock}")
+    private String ARE_ENOUGH_PRODUCTS_IN_STOCK_ENDPOINT;
 
     private String GATEWAY_URL;
     private final RestTemplate restTemplate;
@@ -79,14 +79,17 @@ public class GatewayService {
         }
     }
 
-    protected Mono<Boolean> checkProductInStock(Long id) {
+    protected Mono<Boolean> checkEnoughProductsInStock(ProductStockCheckRequest request) {
         return webClient.get()
-                .uri(GATEWAY_URL + IS_PRODUCT_IN_STOCK_ENDPOINT, id)
+                .uri(uriBuilder -> uriBuilder.path(GATEWAY_URL + ARE_ENOUGH_PRODUCTS_IN_STOCK_ENDPOINT)
+                        .queryParam("id", request.getId())
+                        .queryParam("requestedQuantity", request.getRequestedQuantity())
+                        .build())
                 .headers(httpHeaders -> httpHeaders.addAll(getHttpHeaders()))
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
                     if (clientResponse.statusCode() == HttpStatus.NOT_FOUND) {
-                        return Mono.error(new ProductNotFoundException("Product not found with id: " + id));
+                        return Mono.error(new ProductNotFoundException("Product not found with id: " + request.getId()));
                     }
                     return Mono.error(new ClientErrorException("Client error occurred while checking product stock"));
                 })

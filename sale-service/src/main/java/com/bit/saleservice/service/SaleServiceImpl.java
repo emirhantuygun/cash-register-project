@@ -6,6 +6,7 @@ import com.bit.saleservice.entity.*;
 import com.bit.saleservice.exception.*;
 import com.bit.saleservice.repository.ProductRepository;
 import com.bit.saleservice.repository.SaleRepository;
+import com.bit.saleservice.wrapper.ProductStockCheckRequest;
 import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
@@ -264,14 +265,21 @@ public class SaleServiceImpl implements SaleService {
                 ProductServiceResponse productServiceResponse = gatewayService.getProduct(productRequest.getId());
 
                 if (productServiceResponse != null) {
-                    BigDecimal totalPrice = productServiceResponse.getPrice().multiply(BigDecimal.valueOf(productRequest.getQuantity()));
-                    products.add(Product.builder()
-                            .name(productServiceResponse.getName())
-                            .barcodeNumber(productServiceResponse.getBarcodeNumber())
-                            .price(productServiceResponse.getPrice())
-                            .quantity(productRequest.getQuantity())
-                            .totalPrice(totalPrice)
-                            .build());
+                    ProductStockCheckRequest productStockCheckRequest = new ProductStockCheckRequest(productRequest.getId(), productRequest.getQuantity());
+                    boolean areEnoughProductsInStock = Boolean.TRUE.equals(gatewayService.checkEnoughProductsInStock(productStockCheckRequest).block());
+
+                    if (areEnoughProductsInStock) {
+                        BigDecimal totalPrice = productServiceResponse.getPrice().multiply(BigDecimal.valueOf(productRequest.getQuantity()));
+                        products.add(Product.builder()
+                                .name(productServiceResponse.getName())
+                                .barcodeNumber(productServiceResponse.getBarcodeNumber())
+                                .price(productServiceResponse.getPrice())
+                                .quantity(productRequest.getQuantity())
+                                .totalPrice(totalPrice)
+                                .build());
+                    } else {
+                        throw new ProductOutOfStockException("Not enough stock for product with id: " + productRequest.getId());
+                    }
                 }
 
             } catch (HttpClientErrorException ex) {
@@ -331,7 +339,7 @@ public class SaleServiceImpl implements SaleService {
     }
 
     private BigDecimal processCashPayment(BigDecimal cash, BigDecimal totalWithCampaign) {
-        if(cash == null)
+        if (cash == null)
             throw new CashNotProvidedException("Cash not provided");
 
         if (cash.compareTo(totalWithCampaign) < 0) {
@@ -341,7 +349,7 @@ public class SaleServiceImpl implements SaleService {
     }
 
     private BigDecimal processMixedPayment(MixedPayment mixedPayment, BigDecimal totalWithCampaign) {
-        if (mixedPayment == null){
+        if (mixedPayment == null) {
             throw new MixedPaymentNotFoundException("Mixed payment not found");
         }
         BigDecimal cashAmount = mixedPayment.getCashAmount();
