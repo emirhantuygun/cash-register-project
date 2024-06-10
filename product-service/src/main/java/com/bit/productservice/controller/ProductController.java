@@ -82,6 +82,7 @@ public class ProductController {
         return ResponseEntity.ok(enoughInStock);
     }
 
+    @PostMapping("/return")
     public ResponseEntity<String> returnProducts(@Valid @RequestBody ProductStockReturnRequest request) {
         productService.returnProducts(request);
         return ResponseEntity.ok("Product return request processed successfully.");
