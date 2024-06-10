@@ -8,6 +8,7 @@ import com.bit.saleservice.repository.ProductRepository;
 import com.bit.saleservice.repository.SaleRepository;
 import com.bit.saleservice.wrapper.ProductStockCheckRequest;
 import com.bit.saleservice.wrapper.ProductStockReduceRequest;
+import com.bit.saleservice.wrapper.ProductStockReturnRequest;
 import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
@@ -191,7 +192,8 @@ public class SaleServiceImpl implements SaleService {
 
         List<Product> oldProducts = existingSale.getProducts();
         oldProducts.forEach(product -> {
-//            gatewayService.returnProduct();
+            ProductStockReturnRequest productStockReturnRequest = new ProductStockReturnRequest(product.getName(), product.getQuantity());
+            gatewayService.returnProducts(productStockReturnRequest);
         });
 
         Payment paymentMethod = getPaymentMethod(saleRequest.getPaymentMethod());
@@ -240,8 +242,9 @@ public class SaleServiceImpl implements SaleService {
         products.forEach(product -> product.setSale(existingSale));
         productRepository.saveAll(products);
 
+        reduceStocks(products);
+
         existingSale.setProducts(products);
-        logger.info("Updated sale with ID {}: {}", id, existingSale);
         return mapToSaleResponse(existingSale);
     }
 

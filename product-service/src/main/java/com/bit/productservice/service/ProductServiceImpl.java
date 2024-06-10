@@ -8,6 +8,7 @@ import com.bit.productservice.exception.ProductNotSoftDeletedException;
 import com.bit.productservice.entity.Product;
 import com.bit.productservice.repository.ProductRepository;
 import com.bit.productservice.wrapper.ProductStockReduceRequest;
+import com.bit.productservice.wrapper.ProductStockReturnRequest;
 import io.micrometer.common.util.StringUtils;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
@@ -159,11 +160,21 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @RabbitListener(queues = "${rabbitmq.queue.create}")
+    @Override
     public void reduceProductStock(ProductStockReduceRequest request) {
         Product product = productRepository.findByName(request.getName())
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with name " + request.getName()));
 
         product.setStockQuantity(product.getStockQuantity() - request.getRequestedQuantity());
+        productRepository.save(product);
+    }
+
+    @Override
+    public void returnProducts(ProductStockReturnRequest request) {
+        Product product = productRepository.findByName(request.getName())
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with name " + request.getName()));
+
+        product.setStockQuantity(product.getStockQuantity() + request.getReturnedQuantity());
         productRepository.save(product);
     }
 

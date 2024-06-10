@@ -1,4 +1,4 @@
-package com.bit.saleservice.wrapper;
+package com.bit.productservice.wrapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

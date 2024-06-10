@@ -22,6 +22,7 @@ endpoint:
   product-service:
     get-product: products/{id}
     are-enough-products-in-stock: stock
+    return-products: return
 
 rabbitmq:
   exchange: reduce-stock-exchange

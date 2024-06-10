@@ -3,8 +3,10 @@ package com.bit.productservice.controller;
 import com.bit.productservice.ProductServiceApplication;
 import com.bit.productservice.dto.ProductRequest;
 import com.bit.productservice.dto.ProductResponse;
+import com.bit.productservice.exception.ProductNotFoundException;
 import com.bit.productservice.service.ProductService;
 import com.bit.productservice.wrapper.ProductStockCheckRequest;
+import com.bit.productservice.wrapper.ProductStockReturnRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
@@ -79,9 +82,13 @@ public class ProductController {
         return ResponseEntity.ok(enoughInStock);
     }
 
+    public ResponseEntity<String> returnProducts(@Valid @RequestBody ProductStockReturnRequest request) {
+        productService.returnProducts(request);
+        return ResponseEntity.ok("Product return request processed successfully.");
+    }
 
     @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(@RequestBody @Valid ProductRequest productRequest){
+    public ResponseEntity<ProductResponse> createProduct(@RequestBody @Valid ProductRequest productRequest) {
         logger.info("Received request to create product: {}", productRequest);
         ProductResponse productResponse = productService.createProduct(productRequest);
 
@@ -91,7 +98,7 @@ public class ProductController {
 
     @PutMapping("{id}")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id,
-                                                @RequestBody @Valid ProductRequest productRequest){
+                                                         @RequestBody @Valid ProductRequest productRequest) {
         logger.info("Received request to update product with ID {}: {}", id, productRequest);
         ProductResponse productResponse = productService.updateProduct(id, productRequest);
 
@@ -100,14 +107,14 @@ public class ProductController {
     }
 
     @PutMapping("/restore/{id}")
-    public ResponseEntity<ProductResponse> restoreProduct(@PathVariable Long id){
+    public ResponseEntity<ProductResponse> restoreProduct(@PathVariable Long id) {
         ProductResponse productResponse = productService.restoreProduct(id);
 
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable Long id){
+    public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
         logger.info("Received request to delete product with ID: {}", id);
         productService.deleteProduct(id);
 
@@ -116,7 +123,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/permanent/{id}")
-    public ResponseEntity<String> deleteProductPermanently(@PathVariable Long id){
+    public ResponseEntity<String> deleteProductPermanently(@PathVariable Long id) {
         productService.deleteProductPermanently(id);
 
         return new ResponseEntity<>("Product deleted permanently!", HttpStatus.OK);

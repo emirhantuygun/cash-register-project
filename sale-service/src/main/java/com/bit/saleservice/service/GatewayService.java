@@ -6,6 +6,7 @@ import com.bit.saleservice.exception.ProductNotFoundException;
 import com.bit.saleservice.exception.ProductServiceException;
 import com.bit.saleservice.exception.ServerErrorException;
 import com.bit.saleservice.wrapper.ProductStockCheckRequest;
+import com.bit.saleservice.wrapper.ProductStockReturnRequest;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,9 @@ public class GatewayService {
 
     @Value("${endpoint.product-service.are-enough-products-in-stock}")
     private String ARE_ENOUGH_PRODUCTS_IN_STOCK_ENDPOINT;
+
+    @Value("${endpoint.product-service.return-products}")
+    private String RETURN_PRODUCTS_ENDPOINT;
 
     private String GATEWAY_URL;
     private final RestTemplate restTemplate;
@@ -105,6 +109,37 @@ public class GatewayService {
                     // Handle the error and provide a default value
                     return Mono.just(false);
                 });
+    }
+
+
+    protected void returnProducts(ProductStockReturnRequest request){
+        try {
+            String returnUrl = GATEWAY_URL + RETURN_PRODUCTS_ENDPOINT;
+
+            HttpHeaders headers = getHttpHeaders();
+            HttpEntity<ProductStockReturnRequest> requestEntity = new HttpEntity<>(request, headers);
+
+            ResponseEntity<String> responseEntity = restTemplate.exchange(
+                    returnUrl,
+                    HttpMethod.POST,
+                    requestEntity,
+                    String.class
+            );
+
+            if (!(responseEntity.getStatusCode().is2xxSuccessful())) {
+                throw new ProductServiceException("Product return failed in product-service!");
+            }
+
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            HttpStatusCode statusCode = e.getStatusCode();
+            if (statusCode == HttpStatus.NOT_FOUND) {
+                throw new ProductNotFoundException("Product not found with name: " + request.getName());
+            }
+
+            throw new ProductServiceException("HTTP error: " + statusCode.value());
+        } catch (RestClientException e) {
+            throw new ProductServiceException("REST client error: " + e.getMessage());
+        }
     }
 
     private HttpHeaders getHttpHeaders() {
