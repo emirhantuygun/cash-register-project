@@ -47,5 +47,5 @@ public class Sale {
     @Embedded
     private MixedPayment mixedPayment;
 
-    private Boolean cancelled;
+    private boolean cancelled = false;
 }

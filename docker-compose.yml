@@ -153,6 +153,7 @@ services:
       - service-registry
       - api-gateway
       - postgres-product
+      - rabbitmq
 
 
   sale-service:
@@ -171,6 +172,7 @@ services:
       - api-gateway
       - postgres-sale
       - product-service
+      - rabbitmq
 
 
   report-service:
