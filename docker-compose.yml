@@ -26,7 +26,8 @@ services:
       - "${RABBITMQ_PORT_1}:${RABBITMQ_PORT_1}"
       - "${RABBITMQ_PORT_2}:${RABBITMQ_PORT_2}"
     networks:
-      - rabbitmq
+      - rabbitmq-user
+      - rabbitmq-stock
     restart: always
 
 
@@ -147,6 +148,7 @@ services:
     networks:
       - registry
       - postgres-product
+      - rabbitmq-stock
     depends_on:
       - service-registry
       - api-gateway
@@ -163,6 +165,7 @@ services:
     networks:
       - registry
       - postgres-sale
+      - rabbitmq-stock
     depends_on:
       - service-registry
       - api-gateway
@@ -196,7 +199,7 @@ services:
       - registry
       - postgres-auth
       - redis
-      - rabbitmq
+      - rabbitmq-user
     depends_on:
       - service-registry
       - api-gateway
@@ -215,7 +218,7 @@ services:
     networks:
       - registry
       - postgres-user
-      - rabbitmq
+      - rabbitmq-user
     depends_on:
       - service-registry
       - api-gateway
@@ -231,7 +234,8 @@ networks:
   postgres-user:
   registry:
   redis:
-  rabbitmq:
+  rabbitmq-user:
+  rabbitmq-stock:
 
 
 
