@@ -29,6 +29,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -190,63 +191,83 @@ public class SaleServiceImpl implements SaleService {
         Sale existingSale = saleRepository.findById(id)
                 .orElseThrow(() -> new SaleNotFoundException("Sale doesn't exist with id " + id));
 
+        Payment paymentMethod = getPaymentMethod(saleRequest.getPaymentMethod());
+        if (paymentMethod != existingSale.getPaymentMethod())
+            throw new PaymentMethodUpdateNotAllowedException("Payment method update not allowed");
+
         List<Product> oldProducts = existingSale.getProducts();
         oldProducts.forEach(product -> {
             ProductStockReturnRequest productStockReturnRequest = new ProductStockReturnRequest(product.getName(), product.getQuantity());
             gatewayService.returnProducts(productStockReturnRequest);
         });
 
-        Payment paymentMethod = getPaymentMethod(saleRequest.getPaymentMethod());
+        try {
+            List<Product> products = getProducts(saleRequest.getProducts());
+            BigDecimal total = getTotal(products);
+            BigDecimal totalWithCampaign = null;
+            List<Long> campaignIds = saleRequest.getCampaignIds();
+            List<Campaign> campaigns = null;
+            BigDecimal cash = null;
+            BigDecimal change = null;
+            MixedPayment mixedPayment = null;
 
-        if (paymentMethod != existingSale.getPaymentMethod())
-            throw new PaymentMethodUpdateNotAllowedException("Payment method update not allowed");
+            if (campaignIds != null && !campaignIds.isEmpty()) {
+                CampaignProcessResult campaignProcessResult = processCampaigns(campaignIds, products, total);
+                products = campaignProcessResult.getProducts();
+                totalWithCampaign = campaignProcessResult.getTotalWithCampaign();
+                campaigns = campaignProcessResult.getCampaigns();
+            }
 
-        List<Product> products = getProducts(saleRequest.getProducts());
-        BigDecimal total = getTotal(products);
-        BigDecimal totalWithCampaign = null;
-        List<Long> campaignIds = saleRequest.getCampaignIds();
-        List<Campaign> campaigns = null;
-        BigDecimal cash = null;
-        BigDecimal change = null;
-        MixedPayment mixedPayment = null;
+            change = switch (paymentMethod) {
+                case CASH -> {
+                    cash = saleRequest.getCash();
+                    yield processCashPayment(cash, totalWithCampaign);
+                }
+                case MIXED -> {
+                    mixedPayment = saleRequest.getMixedPayment();
+                    yield processMixedPayment(mixedPayment, totalWithCampaign);
+                }
+                default -> change;
+            };
 
-        if (campaignIds != null && !campaignIds.isEmpty()) {
-            CampaignProcessResult campaignProcessResult = processCampaigns(campaignIds, products, total);
-            products = campaignProcessResult.getProducts();
-            totalWithCampaign = campaignProcessResult.getTotalWithCampaign();
-            campaigns = campaignProcessResult.getCampaigns();
+            existingSale.setCashier(saleRequest.getCashier());
+            existingSale.setDate(new Date());
+            existingSale.setCampaigns(campaigns);
+            existingSale.setCash(cash);
+            existingSale.setChange(change);
+            existingSale.setTotal(total);
+            existingSale.setTotalWithCampaign(totalWithCampaign);
+            existingSale.setMixedPayment(mixedPayment);
+
+            saleRepository.save(existingSale);
+            products.forEach(product -> product.setSale(existingSale));
+            productRepository.saveAll(products);
+
+            reduceStocks(products);
+
+            existingSale.setProducts(products);
+            return mapToSaleResponse(existingSale);
+        } catch (Exception e) {
+
+            reduceStocks(oldProducts);
+            throw e; // Re-throw the exception to ensure transaction rollback
         }
-
-        change = switch (paymentMethod) {
-            case CASH -> {
-                cash = saleRequest.getCash();
-                yield processCashPayment(cash, totalWithCampaign);
-            }
-            case MIXED -> {
-                mixedPayment = saleRequest.getMixedPayment();
-                yield processMixedPayment(mixedPayment, totalWithCampaign);
-            }
-            default -> change;
-        };
-
-        existingSale.setCashier(saleRequest.getCashier());
-        existingSale.setDate(new Date());
-        existingSale.setCampaigns(campaigns);
-        existingSale.setCash(cash);
-        existingSale.setChange(change);
-        existingSale.setTotal(total);
-        existingSale.setTotalWithCampaign(totalWithCampaign);
-        existingSale.setMixedPayment(mixedPayment);
-
-        saleRepository.save(existingSale);
-        products.forEach(product -> product.setSale(existingSale));
-        productRepository.saveAll(products);
-
-        reduceStocks(products);
-
-        existingSale.setProducts(products);
-        return mapToSaleResponse(existingSale);
     }
+
+    @Override
+    public void cancelSale(Long id){
+        Sale existingSale = saleRepository.findById(id)
+                .orElseThrow(() -> new SaleNotFoundException("Sale doesn't exist with id " + id));
+        List<Product> oldProducts = existingSale.getProducts();
+        oldProducts.forEach(product -> {
+            ProductStockReturnRequest productStockReturnRequest = new ProductStockReturnRequest(product.getName(), product.getQuantity());
+            gatewayService.returnProducts(productStockReturnRequest);
+        });
+
+        existingSale.setCancelled(true);
+        saleRepository.save(existingSale);
+    }
+
 
     @Override
     public SaleResponse restoreSale(Long id) {

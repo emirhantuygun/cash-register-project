@@ -152,14 +152,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Boolean areEnoughProductsInStock(Long id, int requestedQuantity) {
+    public Boolean checkStock(Long id, int requestedQuantity) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + id));
         return product.getStockQuantity() >= requestedQuantity;
     }
 
     @Transactional
-    @RabbitListener(queues = "${rabbitmq.queue.create}")
+    @RabbitListener(queues = "${rabbitmq.queue}")
     @Override
     public void reduceProductStock(ProductStockReduceRequest request) {
         Product product = productRepository.findByName(request.getName())

@@ -20,7 +20,7 @@ public interface ProductService {
     void deleteProduct (Long id);
     ProductResponse restoreProduct(Long id);
     void deleteProductPermanently(Long id);
-    Boolean areEnoughProductsInStock(Long id, int requestedQuantity);
+    Boolean checkStock(Long id, int requestedQuantity);
     void reduceProductStock(ProductStockReduceRequest request);
     void returnProducts(ProductStockReturnRequest request);
 }

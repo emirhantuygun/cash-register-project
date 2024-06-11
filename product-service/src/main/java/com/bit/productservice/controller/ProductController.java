@@ -76,9 +76,9 @@ public class ProductController {
         return new ResponseEntity<>(productResponses, HttpStatus.OK);
     }
 
-    @GetMapping("/stock")
-    public ResponseEntity<Boolean> areEnoughProductsInStock(@Valid @ModelAttribute ProductStockCheckRequest request) {
-        boolean enoughInStock = productService.areEnoughProductsInStock(request.getId(), request.getRequestedQuantity());
+    @PostMapping("/stock")
+    public ResponseEntity<Boolean> checkStock(@Valid @RequestBody ProductStockCheckRequest request) {
+        boolean enoughInStock = productService.checkStock(request.getId(), request.getRequestedQuantity());
         return ResponseEntity.ok(enoughInStock);
     }
 

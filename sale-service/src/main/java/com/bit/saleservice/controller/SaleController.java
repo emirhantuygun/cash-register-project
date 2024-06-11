@@ -99,12 +99,21 @@ public class SaleController {
         return new ResponseEntity<>(saleResponse, HttpStatus.OK);
     }
 
+    @PutMapping("/cancel/{id}")
+    public ResponseEntity<String> cancelSale(@PathVariable Long id){
+        saleService.cancelSale(id);
+
+        return new ResponseEntity<>("Sale cancelled successfully!", HttpStatus.OK);
+    }
+
     @PutMapping("/restore/{id}")
     public ResponseEntity<SaleResponse> restoreSale(@PathVariable Long id){
         SaleResponse saleResponse = saleService.restoreSale(id);
 
         return new ResponseEntity<>(saleResponse, HttpStatus.OK);
     }
+
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteSale(@PathVariable Long id){

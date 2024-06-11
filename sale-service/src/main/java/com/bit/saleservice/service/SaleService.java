@@ -23,6 +23,8 @@ public interface SaleService {
 
     SaleResponse updateSale(Long id, SaleRequest saleRequest);
 
+    void cancelSale(Long id);
+
     SaleResponse restoreSale(Long id);
 
     void deleteSale(Long id);

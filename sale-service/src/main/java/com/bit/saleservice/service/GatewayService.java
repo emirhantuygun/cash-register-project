@@ -1,10 +1,7 @@
 package com.bit.saleservice.service;
 
 import com.bit.saleservice.dto.ProductServiceResponse;
-import com.bit.saleservice.exception.ClientErrorException;
-import com.bit.saleservice.exception.ProductNotFoundException;
-import com.bit.saleservice.exception.ProductServiceException;
-import com.bit.saleservice.exception.ServerErrorException;
+import com.bit.saleservice.exception.*;
 import com.bit.saleservice.wrapper.ProductStockCheckRequest;
 import com.bit.saleservice.wrapper.ProductStockReturnRequest;
 import jakarta.annotation.PostConstruct;
@@ -19,6 +16,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -35,8 +33,8 @@ public class GatewayService {
     @Value("${endpoint.product-service.get-product}")
     private String GET_PRODUCT_ENDPOINT;
 
-    @Value("${endpoint.product-service.are-enough-products-in-stock}")
-    private String ARE_ENOUGH_PRODUCTS_IN_STOCK_ENDPOINT;
+    @Value("${endpoint.product-service.check-stock}")
+    private String CHECK_STOCK_ENDPOINT;
 
     @Value("${endpoint.product-service.return-products}")
     private String RETURN_PRODUCTS_ENDPOINT;
@@ -50,7 +48,8 @@ public class GatewayService {
         GATEWAY_URL = "http://" + GATEWAY_HOST + ":" + GATEWAY_PORT + "/";
     }
 
-    protected ProductServiceResponse getProduct(Long id){
+
+    protected ProductServiceResponse getProduct(Long id) {
         try {
             String getUrl = GATEWAY_URL + GET_PRODUCT_ENDPOINT;
 
@@ -84,12 +83,10 @@ public class GatewayService {
     }
 
     protected Mono<Boolean> checkEnoughProductsInStock(ProductStockCheckRequest request) {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path(GATEWAY_URL + ARE_ENOUGH_PRODUCTS_IN_STOCK_ENDPOINT)
-                        .queryParam("id", request.getId())
-                        .queryParam("requestedQuantity", request.getRequestedQuantity())
-                        .build())
+        return webClient.post()
+                .uri(GATEWAY_URL + CHECK_STOCK_ENDPOINT)
                 .headers(httpHeaders -> httpHeaders.addAll(getHttpHeaders()))
+                .body(BodyInserters.fromValue(request))
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
                     if (clientResponse.statusCode() == HttpStatus.NOT_FOUND) {
@@ -104,6 +101,7 @@ public class GatewayService {
                 .doOnError(e -> {
                     // Log the error or take appropriate action
                     System.err.println("Error occurred while checking product stock: " + e.getMessage());
+                    throw new ProductStockCheckException("Error occurred while checking product stock", e);
                 })
                 .onErrorResume(e -> {
                     // Handle the error and provide a default value
@@ -112,7 +110,7 @@ public class GatewayService {
     }
 
 
-    protected void returnProducts(ProductStockReturnRequest request){
+    protected void returnProducts(ProductStockReturnRequest request) {
         try {
             String returnUrl = GATEWAY_URL + RETURN_PRODUCTS_ENDPOINT;
 

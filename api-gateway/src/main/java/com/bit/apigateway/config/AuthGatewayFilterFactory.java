@@ -46,15 +46,15 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
                 if (token != null && token.startsWith("Bearer ")) {
                     token = token.substring(7);
 
-                    if (jwtUtils.isLoggedOut(token)) {
-                        logger.info("Token is logged out!");
-                        return completeResponse(exchange, HttpStatus.UNAUTHORIZED);
-                    }
-
                     Claims claims = jwtUtils.getClaimsAndValidate(token);
 
                     if (claims == null) {
                         logger.info("Verification or validation failed!");
+                        return completeResponse(exchange, HttpStatus.UNAUTHORIZED);
+                    }
+
+                    if (jwtUtils.isLoggedOut(token)) {
+                        logger.info("Token is logged out!");
                         return completeResponse(exchange, HttpStatus.UNAUTHORIZED);
                     }
 

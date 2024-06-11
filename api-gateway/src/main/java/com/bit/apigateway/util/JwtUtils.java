@@ -67,6 +67,7 @@ public class JwtUtils {
         String tokenIdStr = jedis.get(token);
         if (tokenIdStr == null) {
             throw new TokenNotFoundException("Token not found in Redis");
+            //logged out exceptionn gerekli
         }
 
         // Retrieve is_logged_out status using the token ID
