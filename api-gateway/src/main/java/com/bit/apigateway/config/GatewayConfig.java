@@ -1,10 +1,17 @@
 package com.bit.apigateway.config;
 
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
+import io.github.resilience4j.timelimiter.TimeLimiterConfig;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.circuitbreaker.resilience4j.ReactiveResilience4JCircuitBreakerFactory;
+import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JConfigBuilder;
+import org.springframework.cloud.client.circuitbreaker.Customizer;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,9 +45,10 @@ public class GatewayConfig {
         return builder.routes()
 
                 .route("auth-service", r -> r.path("/auth/**")
-                        .filters(f -> f.filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping)))
-                                .circuitBreaker(c -> c.setName("auth-service")
-                                .setFallbackUri("forward:/fallback/auth")))
+                        .filters(f -> f
+                                .filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping)))
+//                                .circuitBreaker(c -> c.setName("circuit-breaker").setFallbackUri("forward:/fallback/auth"))
+                        )
                         .uri(AUTH_URI))
 
                 .route("user-service", r -> r.path("/users/**")
@@ -61,4 +69,14 @@ public class GatewayConfig {
 
                 .build();
     }
+
+    @Bean
+    public Customizer<ReactiveResilience4JCircuitBreakerFactory> defaultCustomizer(){
+        return factory -> factory.configureDefault(id -> new Resilience4JConfigBuilder(id)
+                .circuitBreakerConfig(CircuitBreakerConfig.ofDefaults())
+                .timeLimiterConfig(TimeLimiterConfig.custom()
+                        .timeoutDuration(Duration.ofSeconds(5)).build()).build());
+
+    }
+
 }
