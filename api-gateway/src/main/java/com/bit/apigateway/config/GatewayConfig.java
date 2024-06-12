@@ -39,7 +39,9 @@ public class GatewayConfig {
         return builder.routes()
 
                 .route("auth-service", r -> r.path("/auth/**")
-                        .filters(f -> f.filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping))))
+                        .filters(f -> f.filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping)))
+                                .circuitBreaker(c -> c.setName("auth-service")
+                                .setFallbackUri("forward:/fallback/auth")))
                         .uri(AUTH_URI))
 
                 .route("user-service", r -> r.path("/users/**")
