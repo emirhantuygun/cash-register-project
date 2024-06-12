@@ -12,7 +12,6 @@ eureka:
   instance:
     prefer-ip-address: true
 
-
 jwt:
   signerKey: "4bb6d1dfbafb64a681139d1586b6f1160d18159afd57c8c79136d7490630407c"
   authorities-key: "roles"
@@ -27,20 +26,3 @@ route:
 redis:
   host: "localhost"
   port: "6379"
-
-#resilience4j:
-#  circuitbreaker:
-#    instances:
-#      auth-service:
-#        registerHealthIndicator: true
-#        slidingWindowSize: 10
-#        permittedNumberOfCallsInHalfOpenState: 3
-#        minimumNumberOfCalls: 5
-#        waitDurationInOpenState: 10s
-#        failureRateThreshold: 50
-#        eventConsumerBufferSize: 10
-#        recordExceptions:
-#          - org.springframework.web.client.HttpServerErrorException
-#          - java.io.IOException
-#        ignoreExceptions:
-#          - org.springframework.web.client.HttpClientErrorException

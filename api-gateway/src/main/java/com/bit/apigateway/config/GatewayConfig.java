@@ -48,19 +48,27 @@ public class GatewayConfig {
                         .uri(AUTH_URI))
 
                 .route("user-service", r -> r.path("/users/**")
-                        .filters(f -> f.filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping))))
+                        .filters(f -> f
+                                .filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping)))
+                                .circuitBreaker(c -> c.setName("circuit-breaker").setFallbackUri("forward:/fallback/user")))
                         .uri(USER_URI))
 
                 .route("product-service", r -> r.path("/products/**")
-                        .filters(f -> f.filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping))))
+                        .filters(f -> f
+                                .filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping)))
+                                .circuitBreaker(c -> c.setName("circuit-breaker").setFallbackUri("forward:/fallback/product")))
                         .uri(PRODUCT_URI))
 
                 .route("sale-service", r -> r.path("/sales/**", "/campaigns/**")
-                        .filters(f -> f.filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping))))
+                        .filters(f -> f
+                                .filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping)))
+                                .circuitBreaker(c -> c.setName("circuit-breaker").setFallbackUri("forward:/fallback/sale")))
                         .uri(SALE_URI))
 
                 .route("report-service", r -> r.path("/reports/**")
-                        .filters(f -> f.filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping))))
+                        .filters(f -> f
+                                .filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping)))
+                                .circuitBreaker(c -> c.setName("circuit-breaker").setFallbackUri("forward:/fallback/report")))
                         .uri(REPORT_URI))
 
                 .build();
