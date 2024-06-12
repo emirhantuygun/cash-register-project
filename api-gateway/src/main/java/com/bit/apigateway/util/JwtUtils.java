@@ -1,6 +1,5 @@
 package com.bit.apigateway.util;
 
-import com.bit.apigateway.ApiGatewayApplication;
 import com.bit.apigateway.exception.InvalidJwtTokenException;
 import com.bit.apigateway.exception.TokenNotFoundException;
 import io.jsonwebtoken.Claims;

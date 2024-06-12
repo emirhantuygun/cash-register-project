@@ -18,4 +18,34 @@ public class _GlobalExceptionHandler {
     public ResponseEntity<String> handleInvalidJwtTokenException(InvalidJwtTokenException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
+
+    @ExceptionHandler(AuthServiceUnavailableException.class)
+    public ResponseEntity<String> handleAuthServiceUnavailableException(AuthServiceUnavailableException ex) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(UserServiceUnavailableException.class)
+    public ResponseEntity<String> handleUserServiceUnavailableException(UserServiceUnavailableException ex) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ProductServiceUnavailableException.class)
+    public ResponseEntity<String> handleProductServiceUnavailableException(ProductServiceUnavailableException ex) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(SaleServiceUnavailableException.class)
+    public ResponseEntity<String> handleSaleServiceUnavailableException(SaleServiceUnavailableException ex) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ReportServiceUnavailableException.class)
+    public ResponseEntity<String> handleReportServiceUnavailableException(ReportServiceUnavailableException ex) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(ex.getMessage());
+    }
 }
