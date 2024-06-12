@@ -10,8 +10,6 @@ import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +31,6 @@ public class GatewayConfig {
     private String REPORT_URI;
 
     public GatewayConfig() {
-        endpointRoleMapping.put("/auth", List.of("ADMIN"));
         endpointRoleMapping.put("/users", List.of("ADMIN"));
         endpointRoleMapping.put("/sales", List.of("CASHIER", "MANAGER"));
         endpointRoleMapping.put("/campaigns", List.of("CASHIER"));
@@ -47,8 +44,7 @@ public class GatewayConfig {
                 .route("auth-service", r -> r.path("/auth/**")
                         .filters(f -> f
                                 .filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping)))
-//                                .circuitBreaker(c -> c.setName("circuit-breaker").setFallbackUri("forward:/fallback/auth"))
-                        )
+                                .circuitBreaker(c -> c.setName("circuit-breaker").setFallbackUri("forward:/fallback/auth")))
                         .uri(AUTH_URI))
 
                 .route("user-service", r -> r.path("/users/**")
@@ -68,15 +64,6 @@ public class GatewayConfig {
                         .uri(REPORT_URI))
 
                 .build();
-    }
-
-    @Bean
-    public Customizer<ReactiveResilience4JCircuitBreakerFactory> defaultCustomizer(){
-        return factory -> factory.configureDefault(id -> new Resilience4JConfigBuilder(id)
-                .circuitBreakerConfig(CircuitBreakerConfig.ofDefaults())
-                .timeLimiterConfig(TimeLimiterConfig.custom()
-                        .timeoutDuration(Duration.ofSeconds(5)).build()).build());
-
     }
 
 }

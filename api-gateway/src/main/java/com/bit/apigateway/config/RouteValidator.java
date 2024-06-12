@@ -9,17 +9,14 @@ import java.util.function.Predicate;
 public class RouteValidator {
 
     public static final List<String> openEndpoints = List.of(
-            "/auth/login",
-            "/auth/refresh-token",
-            "/auth/logout"
+            "/auth"
     );
 
     public static final List<String> noRoleBasedAuthorizationEndpoints = List.of(
             "/products"
     );
 
-
-    public Predicate<ServerHttpRequest> isSecured =
+    public Predicate<ServerHttpRequest> isOpenEndpoint =
             request -> openEndpoints
                     .stream()
                     .noneMatch(uri -> request.getURI().getPath().contains(uri));
