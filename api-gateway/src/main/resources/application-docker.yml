@@ -3,18 +3,6 @@ eureka:
     serviceUrl:
       defaultZone: http://service-registry:8761/eureka
 
-database:
-  url: "jdbc:postgresql://postgres-auth:5436/auth-service"
-  username: "postgres"
-  password: "emirhan"
-
-route:
-  auth: "http://auth-service:8081"
-  user: "http://user-service:8082"
-  product: "http://product-service:8083"
-  sale: "http://sale-service:8084"
-  report: "http://report-service:8085"
-
 redis:
   host: "redis"
   port: "6380"

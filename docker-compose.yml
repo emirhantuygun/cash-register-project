@@ -1,9 +1,7 @@
-version: '3.8'
-
 services:
   redis:
     container_name: redis
-    image: redis:latest
+    image: redis:alpine
     volumes:
       - ./redis:/data
     expose:
@@ -18,7 +16,8 @@ services:
 
   rabbitmq:
     container_name: rabbitmq
-    image: rabbitmq:3.12.14-management
+#    image: rabbitmq:3.12.14-management
+    image: rabbitmq:alpine
     expose:
       - "${RABBITMQ_PORT_1}"
       - "${RABBITMQ_PORT_2}"
@@ -33,7 +32,7 @@ services:
 
   postgres-product:
     container_name: postgres-product
-    image: postgres
+    image: postgres:alpine
     environment:
       POSTGRES_DB: product-service
       POSTGRES_USER: postgres
@@ -52,7 +51,7 @@ services:
 
   postgres-sale:
     container_name: postgres-sale
-    image: postgres
+    image: postgres:alpine
     environment:
       POSTGRES_DB: sale-service
       POSTGRES_USER: postgres
@@ -71,7 +70,7 @@ services:
 
   postgres-user:
     container_name: postgres-user
-    image: postgres
+    image: postgres:alpine
     environment:
       POSTGRES_DB: user-service
       POSTGRES_USER: postgres
@@ -90,7 +89,7 @@ services:
 
   postgres-auth:
     container_name: postgres-auth
-    image: postgres
+    image: postgres:alpine
     environment:
       POSTGRES_DB: auth-service
       POSTGRES_USER: postgres
@@ -141,8 +140,6 @@ services:
   product-service:
     container_name: product-service
     image: emirhantuygun/product-service:latest
-    expose:
-      - "${PRODUCT_SERVICE_PORT}"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
@@ -159,8 +156,6 @@ services:
   sale-service:
     container_name: sale-service
     image: emirhantuygun/sale-service:latest
-    expose:
-      - "${SALE_SERVICE_PORT}"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
@@ -178,8 +173,6 @@ services:
   report-service:
     container_name: report-service
     image: emirhantuygun/report-service:latest
-    expose:
-      - "${REPORT_SERVICE_PORT}"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
@@ -193,8 +186,6 @@ services:
   auth-service:
     container_name: auth-service
     image: emirhantuygun/auth-service:latest
-    expose:
-      - "${AUTH_SERVICE_PORT}"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
@@ -213,8 +204,6 @@ services:
   user-service:
     container_name: user-service
     image: emirhantuygun/user-management-service:latest
-    expose:
-      - "${USER_SERVICE_PORT}"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:

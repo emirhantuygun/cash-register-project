@@ -29,17 +29,6 @@ public class JwtUtils {
 
     @Value("${jwt.authorities-key}")
     private String AUTHORITIES_KEY;
-
-    @Value("${database.url}")
-    private String URL;
-
-    @Value("${database.username}")
-    private String USERNAME;
-
-    @Value("${database.password}")
-    private String PASSWORD;
-
-//    private static final Logger logger = LogManager.getLogger(ApiGatewayApplication.class);
     private Jedis jedis;
 
     @Value("${redis.host}")
