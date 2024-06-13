@@ -30,6 +30,13 @@ services:
     restart: always
 
 
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin:2.23.16
+    ports:
+      - "9411:9411"
+
+
   postgres-product:
     container_name: postgres-product
     image: postgres:alpine
