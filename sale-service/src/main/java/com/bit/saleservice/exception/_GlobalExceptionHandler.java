@@ -112,6 +112,6 @@ public class _GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ProductServiceException.class)
     public ResponseEntity<String> handleProductServiceException(ProductServiceException ex) {
         logger.error("Product service exception: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(ex.getMessage());
     }
 }

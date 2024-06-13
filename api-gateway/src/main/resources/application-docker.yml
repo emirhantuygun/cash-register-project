@@ -6,3 +6,8 @@ eureka:
 redis:
   host: "redis"
   port: "6380"
+
+management:
+  zipkin:
+    tracing:
+      endpoint: "http://zipkin:9411/api/v2/spans"
