@@ -32,9 +32,14 @@ services:
 
   zipkin:
     container_name: zipkin
-    image: openzipkin/zipkin:2.23.16
+    image: openzipkin/zipkin:latest
+    expose:
+      - "${ZIPKIN_PORT}"
     ports:
-      - "9411:9411"
+      - "${ZIPKIN_PORT}:${ZIPKIN_PORT}"
+    networks:
+      - zipkin
+    restart: always
 
 
   postgres-product:
@@ -123,8 +128,11 @@ services:
       - "${SERVICE_REGISTRY_PORT}"
     networks:
       - registry
+      - zipkin
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - zipkin
 
 
   api-gateway:
@@ -139,9 +147,11 @@ services:
     networks:
       - registry
       - redis
+      - zipkin
     depends_on:
       - service-registry
       - redis
+      - zipkin
 
 
   product-service:
@@ -153,11 +163,13 @@ services:
       - registry
       - postgres-product
       - rabbitmq-stock
+      - zipkin
     depends_on:
       - service-registry
       - api-gateway
       - postgres-product
       - rabbitmq
+      - zipkin
 
 
   sale-service:
@@ -169,12 +181,14 @@ services:
       - registry
       - postgres-sale
       - rabbitmq-stock
+      - zipkin
     depends_on:
       - service-registry
       - api-gateway
       - postgres-sale
       - product-service
       - rabbitmq
+      - zipkin
 
 
   report-service:
@@ -184,10 +198,12 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
       - registry
+      - zipkin
     depends_on:
       - service-registry
       - api-gateway
       - sale-service
+      - zipkin
 
 
   auth-service:
@@ -200,12 +216,14 @@ services:
       - postgres-auth
       - redis
       - rabbitmq-user
+      - zipkin
     depends_on:
       - service-registry
       - api-gateway
       - postgres-auth
       - redis
       - rabbitmq
+      - zipkin
 
 
   user-service:
@@ -217,12 +235,14 @@ services:
       - registry
       - postgres-user
       - rabbitmq-user
+      - zipkin
     depends_on:
       - service-registry
       - api-gateway
       - postgres-user
       - auth-service
       - rabbitmq
+      - zipkin
 
 
 networks:
@@ -234,6 +254,7 @@ networks:
   redis:
   rabbitmq-user:
   rabbitmq-stock:
+  zipkin:
 
 
 
