@@ -1,6 +1,9 @@
 spring:
   application:
     name: API-GATEWAY
+  mvc:
+    problem-details:
+      enabled: true
 
 server:
   port: 8080
@@ -31,8 +34,11 @@ management:
   endpoints:
     web:
       exposure:
-        include=*
+        include: "*"
   endpoint:
-    health.show-details=always
-  tracing.sampling.probability=1.0
-  spring.mvc.problemdetails.enabled=true
+    health:
+      show-details: always
+  tracing:
+    sampling:
+      probability: 1.0
+

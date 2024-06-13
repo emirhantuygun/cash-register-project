@@ -1,6 +1,9 @@
 spring:
   application:
     name: SERVICE-REGISTRY
+  mvc:
+    problem-details:
+      enabled: true
 
 eureka:
   client:
@@ -9,3 +12,15 @@ eureka:
 
 server:
   port: 8761
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  tracing:
+    sampling:
+      probability: 1.0
