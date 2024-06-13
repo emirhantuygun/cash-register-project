@@ -29,40 +29,47 @@ services:
       - rabbitmq-stock
     restart: always
 
+
   elasticsearch:
-    image: elasticsearch:7.17.10
     container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
     environment:
       - discovery.type=single-node
       - ES_JAVA_OPTS=-Xms512m -Xmx512m
     ports:
       - "9200:9200"
+    volumes:
+      - ./elasticsearch-data:/usr/share/elasticsearch/data
     networks:
-      - elk
+      - elk-stack
+    restart: always
 
   logstash:
-    image: logstash:7.17.10
     container_name: logstash
+    image: docker.elastic.co/logstash/logstash-oss:7.10.2
     volumes:
       - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
     ports:
       - "5044:5044"
     networks:
-      - elk
+      - elk-stack
     depends_on:
       - elasticsearch
+    restart: always
 
   kibana:
-    image: kibana:7.17.10
     container_name: kibana
+    image: docker.elastic.co/kibana/kibana-oss:7.10.2
     environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     ports:
       - "5601:5601"
     networks:
-      - elk
+      - elk-stack
     depends_on:
       - elasticsearch
+    restart: always
 
 
   postgres-product:
@@ -262,6 +269,7 @@ networks:
   redis:
   rabbitmq-user:
   rabbitmq-stock:
+  elk-stack:
 
 
 
