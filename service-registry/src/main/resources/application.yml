@@ -1,9 +1,9 @@
 spring:
   application:
     name: SERVICE-REGISTRY
-  mvc:
-    problem-details:
-      enabled: true
+#  mvc:
+#    problem-details:
+#      enabled: true
 
 eureka:
   client:
