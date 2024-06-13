@@ -34,8 +34,3 @@ rabbitmq:
     delete: user.delete
     deletePermanent: user.delete.permanent
     restore: user.restore
-
-management:
-  tracing:
-    sampling:
-      probability: 1.0

@@ -10,3 +10,8 @@ eureka:
 gateway:
   host: api-gateway
   port: 8080
+
+management:
+  zipkin:
+    tracing:
+      endpoint: "http://zipkin:9411/api/v2/spans"

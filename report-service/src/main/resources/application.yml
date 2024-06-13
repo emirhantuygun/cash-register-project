@@ -15,8 +15,3 @@ eureka:
 gateway:
   host: localhost
   port: 8080
-
-management:
-  tracing:
-    sampling:
-      probability: 1.0
