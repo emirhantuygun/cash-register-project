@@ -26,3 +26,13 @@ route:
 redis:
   host: "localhost"
   port: "6379"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include=*
+  endpoint:
+    health.show-details=always
+  tracing.sampling.probability=1.0
+  spring.mvc.problemdetails.enabled=true
