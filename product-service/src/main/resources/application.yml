@@ -21,15 +21,3 @@ rabbitmq:
   exchange: reduce-stock-exchange
   queue: reduce-stock-queue
   routingKey: reduce.stock
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  endpoint:
-    health:
-      show-details: always
-  tracing:
-    sampling:
-      probability: 1.0

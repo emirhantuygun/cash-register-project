@@ -40,15 +40,3 @@ rabbitmq:
     delete: user.delete
     deletePermanent: user.delete.permanent
     restore: user.restore
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  endpoint:
-    health:
-      show-details: always
-  tracing:
-    sampling:
-      probability: 1.0

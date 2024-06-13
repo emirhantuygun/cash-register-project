@@ -22,7 +22,7 @@ public class Resilience4JConfig {
                         .waitDurationInOpenState(Duration.ofSeconds(1)) // Shorter wait duration
                         .build())
                 .timeLimiterConfig(TimeLimiterConfig.custom()
-                        .timeoutDuration(Duration.ofSeconds(10))
+                        .timeoutDuration(Duration.ofSeconds(30))
                         .build())
                 .build());
     }

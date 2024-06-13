@@ -1,9 +1,9 @@
 spring:
   application:
     name: API-GATEWAY
-#  mvc:
-#    problem-details:
-#      enabled: true
+  mvc:
+    problem-details:
+      enabled: true
 
 server:
   port: 8080
