@@ -41,5 +41,9 @@ public class _GlobalExceptionHandler {
     public ResponseEntity<String> handleUsernameExtractionException(UsernameExtractionException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    @ExceptionHandler(RedisOperationException.class)
+    public ResponseEntity<String> handleRedisOperationException(RedisOperationException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
 }

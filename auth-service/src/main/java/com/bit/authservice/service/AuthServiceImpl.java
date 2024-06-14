@@ -5,10 +5,7 @@ import com.bit.authservice.dto.AuthUserRequest;
 import com.bit.authservice.entity.AppUser;
 import com.bit.authservice.entity.Role;
 import com.bit.authservice.entity.Token;
-import com.bit.authservice.exception.AuthenticationFailedException;
-import com.bit.authservice.exception.InvalidRefreshTokenException;
-import com.bit.authservice.exception.UserNotFoundException;
-import com.bit.authservice.exception.UsernameExtractionException;
+import com.bit.authservice.exception.*;
 import com.bit.authservice.repository.RoleRepository;
 import com.bit.authservice.repository.TokenRepository;
 import com.bit.authservice.repository.UserRepository;
@@ -64,7 +61,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public List<String> login(AuthRequest authRequest) {
+    public List<String> login(AuthRequest authRequest) throws RedisOperationException {
         try {
             var authToken = new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword());
             authenticationManager.authenticate(authToken);
@@ -85,7 +82,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public List<String> refreshToken(HttpServletRequest request) throws InvalidRefreshTokenException, UsernameExtractionException, UserNotFoundException {
+    public List<String> refreshToken(HttpServletRequest request) throws InvalidRefreshTokenException, UsernameExtractionException, UserNotFoundException, RedisOperationException {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -137,7 +134,8 @@ public class AuthServiceImpl implements AuthService {
         Long id = updateUserMessage.getId();
         AuthUserRequest authUserRequest = updateUserMessage.getAuthUserRequest();
 
-        AppUser existingUser = userRepository.findById(id).orElseThrow();
+        AppUser existingUser = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         var encodedPassword = passwordEncoder.encode(authUserRequest.getPassword());
 
         existingUser.setUsername(authUserRequest.getUsername());
@@ -163,8 +161,7 @@ public class AuthServiceImpl implements AuthService {
         userRepository.deletePermanently(id);
     }
 
-    private void saveUserToken(AppUser user, String jwtToken) {
-
+    private void saveUserToken(AppUser user, String jwtToken) throws RedisOperationException {
         var token = Token.builder()
                 .token(jwtToken)
                 .user(user)
@@ -175,9 +172,8 @@ public class AuthServiceImpl implements AuthService {
         try {
             jedis.set("token:" + token.getId() + ":is_logged_out", "false");
             jedis.set(jwtToken, String.valueOf(token.getId()));
-
         } catch (JedisException e) {
-            throw new RuntimeException("Failed to set token status in Redis", e);
+            throw new RedisOperationException("Failed to set token status in Redis", e);
         }
     }
 
