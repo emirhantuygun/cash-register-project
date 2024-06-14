@@ -1,6 +1,6 @@
 package com.bit.apigateway.util;
 
-import com.bit.apigateway.exception.InvalidJwtTokenException;
+import com.bit.apigateway.exception.InvalidTokenException;
 import com.bit.apigateway.exception.TokenNotFoundException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -24,13 +24,13 @@ public class JwtUtils {
 
     @Value("${jwt.authorities-key}")
     private String AUTHORITIES_KEY;
-    private Jedis jedis;
 
     @Value("${redis.host}")
     private String redisHost;
 
     @Value("${redis.port}")
     private String redisPort;
+    private Jedis jedis;
     @PostConstruct
     public void init() {
         this.jedis = new Jedis(redisHost, Integer.parseInt(redisPort));
@@ -41,8 +41,8 @@ public class JwtUtils {
             return Jwts.parser().verifyWith(getSignInKey()).build().parseSignedClaims(token).getPayload();
 
         } catch (JwtException | IllegalArgumentException e) {
-            log.error("Invalid JWT token: {}", e.getMessage());
-            throw new InvalidJwtTokenException("Invalid JWT Token");
+
+            throw new InvalidTokenException("Invalid token");
         }
     }
 
@@ -51,12 +51,11 @@ public class JwtUtils {
         String tokenIdStr = jedis.get(token);
         if (tokenIdStr == null) {
             throw new TokenNotFoundException("Token not found in Redis");
-            //logged out exceptionn gerekli
         }
 
-        // Retrieve is_logged_out status using the token ID
         long tokenId = Long.parseLong(tokenIdStr);
         String key = "token:" + tokenId + ":is_logged_out";
+
         String value = jedis.get(key);
         if (value == null) {
             throw new TokenNotFoundException("Token's logout status information not found in Redis");

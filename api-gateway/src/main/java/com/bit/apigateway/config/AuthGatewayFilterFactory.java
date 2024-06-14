@@ -1,20 +1,13 @@
 package com.bit.apigateway.config;
 
-import com.bit.apigateway.ApiGatewayApplication;
 import com.bit.apigateway.exception.*;
 import com.bit.apigateway.util.JwtUtils;
 import io.jsonwebtoken.Claims;
 import lombok.Getter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
-
 import java.util.List;
 import java.util.Map;
 

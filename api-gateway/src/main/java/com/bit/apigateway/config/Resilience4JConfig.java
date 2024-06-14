@@ -17,9 +17,9 @@ public class Resilience4JConfig {
     public Customizer<ReactiveResilience4JCircuitBreakerFactory> defaultCustomizer(){
         return factory -> factory.configureDefault(id -> new Resilience4JConfigBuilder(id)
                 .circuitBreakerConfig(CircuitBreakerConfig.custom()
-                        .failureRateThreshold(50) // Example threshold, adjust as needed
-                        .slidingWindowSize(10)   // Example window size, adjust as needed
-                        .waitDurationInOpenState(Duration.ofSeconds(1)) // Shorter wait duration
+                        .failureRateThreshold(50)
+                        .slidingWindowSize(10)
+                        .waitDurationInOpenState(Duration.ofSeconds(1))
                         .build())
                 .timeLimiterConfig(TimeLimiterConfig.custom()
                         .timeoutDuration(Duration.ofSeconds(30))
