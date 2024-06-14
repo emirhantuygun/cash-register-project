@@ -114,7 +114,6 @@ public class SaleController {
     }
 
 
-
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteSale(@PathVariable Long id){
         logger.info("Received request to delete sale with ID: {}", id);

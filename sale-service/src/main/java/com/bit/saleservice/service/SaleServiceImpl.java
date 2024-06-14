@@ -258,6 +258,7 @@ public class SaleServiceImpl implements SaleService {
     public void cancelSale(Long id){
         Sale existingSale = saleRepository.findById(id)
                 .orElseThrow(() -> new SaleNotFoundException("Sale doesn't exist with id " + id));
+
         List<Product> oldProducts = existingSale.getProducts();
         oldProducts.forEach(product -> {
             ProductStockReturnRequest productStockReturnRequest = new ProductStockReturnRequest(product.getProductId(), product.getQuantity());
