@@ -1,11 +1,14 @@
 package com.bit.authservice.service;
 
-import com.bit.authservice.AuthServiceApplication;
 import com.bit.authservice.dto.AuthRequest;
 import com.bit.authservice.dto.AuthUserRequest;
 import com.bit.authservice.entity.AppUser;
 import com.bit.authservice.entity.Role;
 import com.bit.authservice.entity.Token;
+import com.bit.authservice.exception.AuthenticationFailedException;
+import com.bit.authservice.exception.InvalidRefreshTokenException;
+import com.bit.authservice.exception.UserNotFoundException;
+import com.bit.authservice.exception.UsernameExtractionException;
 import com.bit.authservice.repository.RoleRepository;
 import com.bit.authservice.repository.TokenRepository;
 import com.bit.authservice.repository.UserRepository;
@@ -14,8 +17,6 @@ import com.bit.authservice.wrapper.UpdateUserMessage;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -36,6 +37,12 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
+    @Value("${redis.host}")
+    private String redisHost;
+
+    @Value("${redis.port}")
+    private String redisPort;
+
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
@@ -43,34 +50,31 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtils jwtUtils;
     private final TokenRepository tokenRepository;
     private final UserDetailsService userDetailsService;
-    private static final Logger logger = LogManager.getLogger(AuthServiceApplication.class);
     private Jedis jedis;
 
-    @Value("${redis.host}")
-    private String redisHost;
-
-    @Value("${redis.port}")
-    private String redisPort;
 
     @PostConstruct
     public void init() {
         this.jedis = new Jedis(redisHost, Integer.parseInt(redisPort));
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            // Remove all keys from Redis
-            jedis.flushAll();
-            // Close the Redis connection
-            jedis.close();
+            jedis.flushAll();        // Remove all keys from Redis
+            jedis.close();           // Close the Redis connection
         }));
     }
 
     @Override
     public List<String> login(AuthRequest authRequest) {
-        var authToken = new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword());
+        try {
+            var authToken = new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword());
+            authenticationManager.authenticate(authToken);
+        } catch (Exception e) {
+            throw new AuthenticationFailedException("Authentication failed");
+        }
 
-        authenticationManager.authenticate(authToken);
+        AppUser appUser = userRepository.findByUsername(authRequest.getUsername())
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        AppUser appUser = userRepository.findByUsername(authRequest.getUsername()).orElseThrow();
         String accessToken = jwtUtils.generateAccessToken(authRequest.getUsername(), getRolesAsString(appUser.getRoles()));
         String refreshToken = jwtUtils.generateRefreshToken(authRequest.getUsername());
 
@@ -81,8 +85,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public List<String> refreshToken(HttpServletRequest request) {
-
+    public List<String> refreshToken(HttpServletRequest request) throws InvalidRefreshTokenException, UsernameExtractionException, UserNotFoundException {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -93,22 +96,26 @@ public class AuthServiceImpl implements AuthService {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                 if (userDetails != null && jwtUtils.isValid(refreshToken, userDetails)) {
+                    AppUser appUser = userRepository.findByUsername(username)
+                            .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-                    var appUser = userRepository.findByUsername(username).orElseThrow();
-                    var accessToken = jwtUtils.generateAccessToken(username, getRolesAsString(appUser.getRoles()));
+                    String accessToken = jwtUtils.generateAccessToken(username, getRolesAsString(appUser.getRoles()));
 
                     revokeAllTokenByUser(appUser.getId());
                     saveUserToken(appUser, accessToken);
 
                     return Arrays.asList(accessToken, refreshToken);
+                } else {
+                    throw new UserNotFoundException("User not found");
                 }
-                throw new RuntimeException("User not found or invalid token!");
+            } else {
+                throw new UsernameExtractionException("Username extraction failed");
             }
+        } else {
+            throw new InvalidRefreshTokenException("Invalid refresh token");
         }
-        throw new RuntimeException("Invalid refresh token!");
     }
 
-    @Override
     @RabbitListener(queues = "${rabbitmq.queue.create}")
     public void createUser(AuthUserRequest authUserRequest) {
 
@@ -123,19 +130,7 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(appUser);
     }
 
-    @Override
-    public void updateUser(Long id, AuthUserRequest authUserRequest) {
-        AppUser existingUser = userRepository.findById(id).orElseThrow();
-        var encodedPassword = passwordEncoder.encode(authUserRequest.getPassword());
 
-        existingUser.setUsername(authUserRequest.getUsername());
-        existingUser.setPassword(encodedPassword);
-        existingUser.setRoles(getRolesAsRole(authUserRequest.getRoles()));
-
-        userRepository.save(existingUser);
-    }
-
-    @Override
     @RabbitListener(queues = "${rabbitmq.queue.update}")
     public void updateUserWrapped(UpdateUserMessage updateUserMessage) {
 
@@ -152,19 +147,16 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(existingUser);
     }
 
-    @Override
     @RabbitListener(queues = "${rabbitmq.queue.restore}")
     public void restoreUser(Long id) {
         userRepository.restoreUser(id);
     }
 
-    @Override
     @RabbitListener(queues = "${rabbitmq.queue.delete}")
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
 
-    @Override
     @RabbitListener(queues = "${rabbitmq.queue.deletePermanent}")
     public void deleteUserPermanently(Long id) {
         userRepository.deleteRolesForUser(id);
@@ -219,10 +211,7 @@ public class AuthServiceImpl implements AuthService {
         List<Role> rolesList = new ArrayList<>();
         roles.forEach(roleName -> {
             Role role = roleRepository.findByRoleName(roleName)
-                    .orElseThrow(() -> {
-                        logger.error("Role {} not found", roleName);
-                        return new RuntimeException("Role " + roleName + " not found");
-                    });
+                    .orElseThrow(() -> new RuntimeException("Role " + roleName + " not found"));
             rolesList.add(role);
         });
         return rolesList;

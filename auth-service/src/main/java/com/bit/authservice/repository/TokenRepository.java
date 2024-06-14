@@ -1,6 +1,5 @@
 package com.bit.authservice.repository;
 
-
 import com.bit.authservice.entity.Token;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,5 +20,4 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
 
     Optional<Token> findByToken(String token);
 
-    void deleteByUserId(Long userId);
 }

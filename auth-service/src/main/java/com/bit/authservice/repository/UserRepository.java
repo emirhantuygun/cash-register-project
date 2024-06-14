@@ -1,6 +1,5 @@
 package com.bit.authservice.repository;
 
-
 import com.bit.authservice.entity.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
