@@ -3,7 +3,6 @@ package com.bit.authservice.controller;
 import com.bit.authservice.dto.AuthRequest;
 import com.bit.authservice.dto.AuthResponse;
 import com.bit.authservice.dto.AuthStatus;
-import com.bit.authservice.dto.AuthUserRequest;
 import com.bit.authservice.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -58,50 +57,4 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<String> createUser(@RequestBody AuthUserRequest authUserRequest) {
-        try {
-            authService.createUser(authUserRequest);
-
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body("User created successfully!");
-
-        } catch (Exception e) {
-
-            return ResponseEntity
-                    .status(HttpStatus.CONFLICT)
-                    .body("User not created!");
-        }
-    }
-
-    @PutMapping("/update/{id}")
-    public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody AuthUserRequest authUserRequest) {
-        authService.updateUser(id, authUserRequest);
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body("User updated successfully!");
-    }
-
-    @PutMapping("/restore/{id}")
-    public ResponseEntity<String> restoreUser(@PathVariable Long id){
-        authService.restoreUser(id);
-
-        return new ResponseEntity<>("User restored successfully!", HttpStatus.OK);
-    }
-
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id){
-        authService.deleteUser(id);
-
-        return new ResponseEntity<>("User soft deleted successfully!", HttpStatus.OK);
-    }
-
-    @DeleteMapping("/delete/permanent/{id}")
-    public ResponseEntity<String> deleteUserPermanently(@PathVariable Long id){
-        authService.deleteUserPermanently(id);
-
-        return new ResponseEntity<>("User deleted permanently!", HttpStatus.OK);
-    }
 }

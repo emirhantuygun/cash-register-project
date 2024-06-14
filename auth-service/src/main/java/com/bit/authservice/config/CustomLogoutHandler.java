@@ -1,6 +1,9 @@
 package com.bit.authservice.config;
 
 import com.bit.authservice.entity.Token;
+import com.bit.authservice.exception.InvalidAuthorizationHeaderException;
+import com.bit.authservice.exception.MissingAuthorizationHeaderException;
+import com.bit.authservice.exception.TokenNotFoundException;
 import com.bit.authservice.repository.TokenRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,6 +28,7 @@ public class CustomLogoutHandler implements LogoutHandler {
 
     @Value("${redis.port}")
     private String redisPort;
+
     @PostConstruct
     public void init() {
         this.jedis = new Jedis(redisHost, Integer.parseInt(redisPort));
@@ -36,17 +40,23 @@ public class CustomLogoutHandler implements LogoutHandler {
                        Authentication authentication) {
         String authHeader = request.getHeader("Authorization");
 
-        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return;
+        if (authHeader == null) {
+            throw new MissingAuthorizationHeaderException("Authorization header is missing");
+        }
+
+        if (!authHeader.startsWith("Bearer ")) {
+            throw new InvalidAuthorizationHeaderException("Invalid Authorization header format");
         }
 
         String token = authHeader.substring(7);
         Token storedToken = tokenRepository.findByToken(token).orElse(null);
 
-        if(storedToken != null) {
-            storedToken.setLoggedOut(true);
-            tokenRepository.save(storedToken);
-            jedis.set("token:" + storedToken.getId() + ":is_logged_out", "true");
+        if (storedToken == null) {
+            throw new TokenNotFoundException("Token not found");
         }
+
+        storedToken.setLoggedOut(true);
+        tokenRepository.save(storedToken);
+        jedis.set("token:" + storedToken.getId() + ":is_logged_out", "true");
     }
 }
