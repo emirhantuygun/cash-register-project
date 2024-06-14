@@ -114,7 +114,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @RabbitListener(queues = "${rabbitmq.queue.create}")
-    public void createUser(AuthUserRequest authUserRequest) {
+    public void createUser(AuthUserRequest authUserRequest) throws RoleNotFoundException {
 
         var encodedPassword = passwordEncoder.encode(authUserRequest.getPassword());
 
@@ -129,7 +129,7 @@ public class AuthServiceImpl implements AuthService {
 
 
     @RabbitListener(queues = "${rabbitmq.queue.update}")
-    public void updateUserWrapped(UpdateUserMessage updateUserMessage) {
+    public void updateUserWrapped(UpdateUserMessage updateUserMessage) throws RoleNotFoundException {
 
         Long id = updateUserMessage.getId();
         AuthUserRequest authUserRequest = updateUserMessage.getAuthUserRequest();
@@ -177,22 +177,20 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    private void revokeAllTokenByUser(long id) {
+    private void revokeAllTokenByUser(long id) throws RedisOperationException {
         List<Token> validTokens = tokenRepository.findAllTokensByUser(id);
-
         if (validTokens.isEmpty()) {
             return;
         }
 
-        validTokens.forEach(t -> {
-            t.setLoggedOut(true);
+        for (Token token : validTokens) {
+            token.setLoggedOut(true);
             try {
-                jedis.set("token:" + t.getId() + ":is_logged_out", "true");
-
+                jedis.set("token:" + token.getId() + ":is_logged_out", "true");
             } catch (JedisException e) {
-                throw new RuntimeException("Failed to set token status in Redis", e);
+                throw new RedisOperationException("Failed to set token status in Redis", e);
             }
-        });
+        }
 
         tokenRepository.saveAll(validTokens);
     }
@@ -203,13 +201,13 @@ public class AuthServiceImpl implements AuthService {
                 .collect(Collectors.toList());
     }
 
-    private List<Role> getRolesAsRole(List<String> roles) {
+    private List<Role> getRolesAsRole(List<String> roles) throws RoleNotFoundException {
         List<Role> rolesList = new ArrayList<>();
-        roles.forEach(roleName -> {
+        for (String roleName : roles) {
             Role role = roleRepository.findByRoleName(roleName)
-                    .orElseThrow(() -> new RuntimeException("Role " + roleName + " not found"));
+                    .orElseThrow(() -> new RoleNotFoundException("Role " + roleName + " not found"));
             rolesList.add(role);
-        });
+        }
         return rolesList;
     }
 
