@@ -162,8 +162,8 @@ public class ProductServiceImpl implements ProductService {
     @RabbitListener(queues = "${rabbitmq.queue}")
     @Override
     public void reduceProductStock(ProductStockReduceRequest request) {
-        Product product = productRepository.findByName(request.getName())
-                .orElseThrow(() -> new ProductNotFoundException("Product not found with name " + request.getName()));
+        Product product = productRepository.findById(request.getId())
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + request.getId()));
 
         product.setStockQuantity(product.getStockQuantity() - request.getRequestedQuantity());
         productRepository.save(product);
@@ -171,8 +171,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void returnProducts(ProductStockReturnRequest request) {
-        Product product = productRepository.findByName(request.getName())
-                .orElseThrow(() -> new ProductNotFoundException("Product not found with name " + request.getName()));
+        Product product = productRepository.findById(request.getId())
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + request.getId()));
 
         product.setStockQuantity(product.getStockQuantity() + request.getReturnedQuantity());
         productRepository.save(product);

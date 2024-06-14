@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 public class ProductResponse {
 
     private Long id;
+    private Long productId;
     private String name;
     private String barcodeNumber;
     private Integer quantity;

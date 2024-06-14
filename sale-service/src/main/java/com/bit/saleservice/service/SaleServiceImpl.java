@@ -197,7 +197,7 @@ public class SaleServiceImpl implements SaleService {
 
         List<Product> oldProducts = existingSale.getProducts();
         oldProducts.forEach(product -> {
-            ProductStockReturnRequest productStockReturnRequest = new ProductStockReturnRequest(product.getName(), product.getQuantity());
+            ProductStockReturnRequest productStockReturnRequest = new ProductStockReturnRequest(product.getProductId(), product.getQuantity());
             gatewayService.returnProducts(productStockReturnRequest);
         });
 
@@ -260,7 +260,7 @@ public class SaleServiceImpl implements SaleService {
                 .orElseThrow(() -> new SaleNotFoundException("Sale doesn't exist with id " + id));
         List<Product> oldProducts = existingSale.getProducts();
         oldProducts.forEach(product -> {
-            ProductStockReturnRequest productStockReturnRequest = new ProductStockReturnRequest(product.getName(), product.getQuantity());
+            ProductStockReturnRequest productStockReturnRequest = new ProductStockReturnRequest(product.getProductId(), product.getQuantity());
             gatewayService.returnProducts(productStockReturnRequest);
         });
 
@@ -318,6 +318,7 @@ public class SaleServiceImpl implements SaleService {
                     if (areEnoughProductsInStock) {
                         BigDecimal totalPrice = productServiceResponse.getPrice().multiply(BigDecimal.valueOf(productRequest.getQuantity()));
                         products.add(Product.builder()
+                                .productId(productServiceResponse.getId())
                                 .name(productServiceResponse.getName())
                                 .barcodeNumber(productServiceResponse.getBarcodeNumber())
                                 .price(productServiceResponse.getPrice())
@@ -368,6 +369,7 @@ public class SaleServiceImpl implements SaleService {
         return products.stream()
                 .map(product -> ProductResponse.builder()
                         .id(product.getId())
+                        .productId(product.getProductId())
                         .name(product.getName())
                         .barcodeNumber(product.getBarcodeNumber())
                         .price(product.getPrice())
@@ -425,7 +427,7 @@ public class SaleServiceImpl implements SaleService {
 
     private void reduceStocks(List<Product> products) {
         products.forEach(product -> {
-            ProductStockReduceRequest productStockReduceRequest = new ProductStockReduceRequest(product.getName(), product.getQuantity());
+            ProductStockReduceRequest productStockReduceRequest = new ProductStockReduceRequest(product.getProductId(), product.getQuantity());
             rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY, productStockReduceRequest);
         });
     }

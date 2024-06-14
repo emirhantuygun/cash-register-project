@@ -35,5 +35,4 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query(value = "DELETE FROM products WHERE id = :id", nativeQuery = true)
     void deletePermanently(@Param("id") Long id);
 
-    Optional<Product> findByName(String name);
 }

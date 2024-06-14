@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 public class ProductStockReturnRequest {
 
     @NotNull
-    private String name;
+    private Long id;
 
     @Min(1)
     private int returnedQuantity;
