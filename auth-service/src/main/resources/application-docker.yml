@@ -8,12 +8,17 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://service-registry:8761/eureka
+  instance:
+    hostname: auth-service
 
 redis:
   host: "redis"
   port: "6380"
 
-management:
-  zipkin:
-    tracing:
-      endpoint: "http://zipkin:9411/api/v2/spans"
+#management:
+#  zipkin:
+#    tracing:
+#      endpoint: "http://zipkin:9411/api/v2/spans"
+#  tracing:
+#    sampling:
+#      probability: 1.0

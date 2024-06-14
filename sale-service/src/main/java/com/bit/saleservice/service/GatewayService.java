@@ -76,7 +76,7 @@ public class GatewayService {
                 throw new ProductNotFoundException("Product not found with id: " + id);
             }
 
-            throw new ProductServiceException("HTTP error: " + statusCode.value());
+            throw new ProductServiceException("HTTP error: " + statusCode.value() + ". Product Service is temporarily unavailable. Please try again later.");
         } catch (RestClientException e) {
             throw new ProductServiceException("REST client error: " + e.getMessage());
         }

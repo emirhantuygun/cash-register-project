@@ -9,3 +9,10 @@ eureka:
 
 server:
   port: 8761
+
+management:
+  tracing:
+    enabled: false
+
+
+

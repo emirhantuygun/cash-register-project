@@ -16,7 +16,7 @@ services:
 
   rabbitmq:
     container_name: rabbitmq
-#    image: rabbitmq:3.12.14-management
+#    image: rabbitmq:3.13.3-management-alpine
     image: rabbitmq:alpine
     expose:
       - "${RABBITMQ_PORT_1}"
