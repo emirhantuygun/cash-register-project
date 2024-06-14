@@ -14,10 +14,31 @@ public class _GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
 
-    @ExceptionHandler(InvalidJwtTokenException.class)
-    public ResponseEntity<String> handleInvalidJwtTokenException(InvalidJwtTokenException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<String> handleInvalidTokenException(InvalidTokenException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
+
+    @ExceptionHandler(LoggedOutTokenException.class)
+    public ResponseEntity<String> handleLoggedOutTokenException(LoggedOutTokenException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(MissingRolesException.class)
+    public ResponseEntity<String> handleMissingRolesException(MissingRolesException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(InsufficientRolesException.class)
+    public ResponseEntity<String> handleInsufficientRolesException(InsufficientRolesException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(MissingAuthorizationHeaderException.class)
+    public ResponseEntity<String> handleMissingAuthorizationHeaderException(MissingAuthorizationHeaderException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
 
     @ExceptionHandler(AuthServiceUnavailableException.class)
     public ResponseEntity<String> handleAuthServiceUnavailableException(AuthServiceUnavailableException ex) {

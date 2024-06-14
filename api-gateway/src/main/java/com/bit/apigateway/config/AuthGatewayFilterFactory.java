@@ -1,6 +1,7 @@
 package com.bit.apigateway.config;
 
 import com.bit.apigateway.ApiGatewayApplication;
+import com.bit.apigateway.exception.*;
 import com.bit.apigateway.util.JwtUtils;
 import io.jsonwebtoken.Claims;
 import lombok.Getter;
@@ -45,18 +46,18 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
                     Claims claims = jwtUtils.getClaimsAndValidate(token);
 
                     if (claims == null) {
-                        return completeResponse(exchange, HttpStatus.UNAUTHORIZED);
+                        throw new InvalidTokenException("Invalid token");
                     }
 
                     if (jwtUtils.isLoggedOut(token)) {
-                        return completeResponse(exchange, HttpStatus.UNAUTHORIZED);
+                        throw new LoggedOutTokenException("Token is logged out");
                     }
 
                     if (routeValidator.isRoleBasedAuthorizationNeeded.test(request)) {
                         List<String> roles = jwtUtils.getRoles(claims);
 
                         if (roles == null || roles.isEmpty()) {
-                            return completeResponse(exchange, HttpStatus.UNAUTHORIZED);
+                            throw new MissingRolesException("No roles found in token");
                         }
 
                         String fullPath = request.getPath().toString();
@@ -64,14 +65,14 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
                         List<String> requiredRoles = config.getRoleMapping().get("/" + basePath);
 
                         if (roles.stream().noneMatch(requiredRoles::contains)) {
-                            return completeResponse(exchange, HttpStatus.FORBIDDEN);
+                            throw new InsufficientRolesException("Insufficient roles");
                         }
                     }
 
                     return chain.filter(exchange);
 
                 } else {
-                    return completeResponse(exchange, HttpStatus.UNAUTHORIZED);
+                    throw new MissingAuthorizationHeaderException("Missing or invalid Authorization header");
                 }
             } else {
                 return chain.filter(exchange);
@@ -79,10 +80,6 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
         };
     }
 
-    private Mono<Void> completeResponse(ServerWebExchange exchange, HttpStatus httpStatus) {
-        exchange.getResponse().setStatusCode(httpStatus);
-        return exchange.getResponse().setComplete();
-    }
 
     @Getter
     public static class Config {
