@@ -29,7 +29,6 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,9 +39,6 @@ public class SaleServiceImpl implements SaleService {
 
     @Value("${rabbitmq.exchange}")
     private String EXCHANGE;
-
-    @Value("${rabbitmq.queue}")
-    private String QUEUE;
 
     @Value("${rabbitmq.routingKey}")
     private String ROUTING_KEY;
@@ -196,10 +192,7 @@ public class SaleServiceImpl implements SaleService {
             throw new PaymentMethodUpdateNotAllowedException("Payment method update not allowed");
 
         List<Product> oldProducts = existingSale.getProducts();
-        oldProducts.forEach(product -> {
-            ProductStockReturnRequest productStockReturnRequest = new ProductStockReturnRequest(product.getProductId(), product.getQuantity());
-            gatewayService.returnProducts(productStockReturnRequest);
-        });
+        returnProducts(oldProducts);
 
         try {
             List<Product> products = getProducts(saleRequest.getProducts());
@@ -260,10 +253,7 @@ public class SaleServiceImpl implements SaleService {
                 .orElseThrow(() -> new SaleNotFoundException("Sale doesn't exist with id " + id));
 
         List<Product> oldProducts = existingSale.getProducts();
-        oldProducts.forEach(product -> {
-            ProductStockReturnRequest productStockReturnRequest = new ProductStockReturnRequest(product.getProductId(), product.getQuantity());
-            gatewayService.returnProducts(productStockReturnRequest);
-        });
+        returnProducts(oldProducts);
 
         existingSale.setCancelled(true);
         saleRepository.save(existingSale);
@@ -430,6 +420,13 @@ public class SaleServiceImpl implements SaleService {
         products.forEach(product -> {
             ProductStockReduceRequest productStockReduceRequest = new ProductStockReduceRequest(product.getProductId(), product.getQuantity());
             rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY, productStockReduceRequest);
+        });
+    }
+
+    private void returnProducts(List<Product> products) {
+        products.forEach(product -> {
+            ProductStockReturnRequest productStockReturnRequest = new ProductStockReturnRequest(product.getProductId(), product.getQuantity());
+            gatewayService.returnProducts(productStockReturnRequest);
         });
     }
 
