@@ -262,6 +262,9 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     public SaleResponse restoreSale(Long id) {
+        if (!saleRepository.existsById(id))
+            throw new SaleNotFoundException("Sale not found with id " + id);
+
         if (!saleRepository.isSaleSoftDeleted(id)) {
             throw new SaleNotSoftDeletedException("Sale with id " + id + " is not soft-deleted and cannot be restored.");
         }

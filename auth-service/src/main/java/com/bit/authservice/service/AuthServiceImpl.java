@@ -75,7 +75,7 @@ public class AuthServiceImpl implements AuthService {
         String accessToken = jwtUtils.generateAccessToken(authRequest.getUsername(), getRolesAsString(appUser.getRoles()));
         String refreshToken = jwtUtils.generateRefreshToken(authRequest.getUsername());
 
-        revokeAllTokenByUser(appUser.getId());
+        revokeAllTokensByUser(appUser.getId());
         saveUserToken(appUser, accessToken);
 
         return Arrays.asList(accessToken, refreshToken);
@@ -98,7 +98,7 @@ public class AuthServiceImpl implements AuthService {
 
                     String accessToken = jwtUtils.generateAccessToken(username, getRolesAsString(appUser.getRoles()));
 
-                    revokeAllTokenByUser(appUser.getId());
+                    revokeAllTokensByUser(appUser.getId());
                     saveUserToken(appUser, accessToken);
 
                     return Arrays.asList(accessToken, refreshToken);
@@ -177,7 +177,7 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    private void revokeAllTokenByUser(long id) throws RedisOperationException {
+    private void revokeAllTokensByUser(long id) throws RedisOperationException {
         List<Token> validTokens = tokenRepository.findAllTokensByUser(id);
         if (validTokens.isEmpty()) {
             return;
