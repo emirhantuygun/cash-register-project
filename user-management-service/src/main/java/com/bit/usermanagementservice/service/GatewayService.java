@@ -21,18 +21,27 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @RequiredArgsConstructor
 public class GatewayService {
 
+    @Value("${endpoint.auth-service.create}")
+    private String CREATE_ENDPOINT;
+
+    @Value("${endpoint.auth-service.update}")
+    private String UPDATE_ENDPOINT;
+
+    @Value("${endpoint.auth-service.restore}")
+    private String RESTORE_ENDPOINT;
+
+    @Value("${endpoint.auth-service.delete}")
+    private String DELETE_ENDPOINT;
+
+    @Value("${endpoint.auth-service.delete-permanently}")
+    private String DELETE_PERMANENTLY_ENDPOINT;
+
     @Value("${gateway.host}")
     private String GATEWAY_HOST;
+
     @Value("${gateway.port}")
     private String GATEWAY_PORT;
     private String GATEWAY_URL;
-    private final String CREATE_ENDPOINT = "auth/create";
-    private final String UPDATE_ENDPOINT = "auth/update/{id}";
-    private final String RESTORE_ENDPOINT = "auth/restore/{id}";
-    private final String DELETE_ENDPOINT = "auth/delete/{id}";
-    private final String DELETE_PERMANENTLY_ENDPOINT = "auth/delete/permanent/{id}";
-
-
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
