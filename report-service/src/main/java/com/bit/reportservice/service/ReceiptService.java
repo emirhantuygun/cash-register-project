@@ -3,23 +3,36 @@ package com.bit.reportservice.service;
 import com.bit.reportservice.dto.ProductResponse;
 import com.bit.reportservice.dto.SaleResponse;
 import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.*;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 @Service
 public class ReceiptService {
-    private final String FONT_PATH = "fonts/scoreboard.ttf";
-    private final String IMAGE_PATH = "/static/images/32bit.png";
-    private final String LOCATION = "KEMALPASA, ESENTEPE CAMPUS, 54050";
-    private final String PHONE_NUMBER = "0264 295 54 54";
-    private final String CITY = "SERDIVAN/SAKARYA";
+
+    @Value("${receipt.font-path}")
+    private String FONT_PATH;
+
+    @Value("${receipt.image-path}")
+    private String IMAGE_PATH;
+
+    @Value("${receipt.location}")
+    private String LOCATION;
+
+    @Value("${receipt.city}")
+    private String CITY;
+
+    @Value("${receipt.phone-number}")
+    private String PHONE_NUMBER;
 
 
     public byte[] generateReceipt(SaleResponse sale) {
@@ -77,6 +90,7 @@ public class ReceiptService {
 
             document.add(new Paragraph("\n", space));
             document.add(new Paragraph("\n", space));
+
 
             // SALE NO. CASHIER, PAYMENT. DATE, TIME
 
@@ -140,6 +154,7 @@ public class ReceiptService {
 
             document.add(new Paragraph("\n", space));
             document.add(hyphens);
+
 
             // PRODUCTS
 
@@ -222,6 +237,7 @@ public class ReceiptService {
 
             document.add(hyphens);
 
+
             // CAMPAIGNS
 
             if (sale.getCampaignNames() != null && !sale.getCampaignNames().isEmpty()) {
@@ -236,6 +252,7 @@ public class ReceiptService {
                 }
                 document.add(hyphens);
             }
+
 
             // TOTAL
 
