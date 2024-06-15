@@ -119,4 +119,14 @@ public class _GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<String> handleHeaderProcessingException(HeaderProcessingException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(ProductReturnException.class)
+    public ResponseEntity<String> handleProductReturnException(ProductReturnException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(SaleUpdateException.class)
+    public ResponseEntity<?> handleSaleUpdateException(SaleUpdateException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

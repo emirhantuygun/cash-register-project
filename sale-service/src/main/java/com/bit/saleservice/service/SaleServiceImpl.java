@@ -136,7 +136,7 @@ public class SaleServiceImpl implements SaleService {
         List<Long> campaignIds = saleRequest.getCampaignIds();
         List<Campaign> campaigns = null;
         BigDecimal cash = null;
-        BigDecimal change = null;
+        BigDecimal change;
         MixedPayment mixedPayment = null;
 
         if (campaignIds != null && !campaignIds.isEmpty()) {
@@ -155,7 +155,7 @@ public class SaleServiceImpl implements SaleService {
                 mixedPayment = saleRequest.getMixedPayment();
                 yield processMixedPayment(mixedPayment, totalWithCampaign);
             }
-            default -> change;
+            default -> null;
         };
 
         Sale sale = Sale.builder()
@@ -182,7 +182,7 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     @Transactional
-    public SaleResponse updateSale(Long id, SaleRequest saleRequest) throws HeaderProcessingException {
+    public SaleResponse updateSale(Long id, SaleRequest saleRequest) {
         logger.info("Updating sale with ID {}: {}", id, saleRequest);
         Sale existingSale = saleRepository.findById(id)
                 .orElseThrow(() -> new SaleNotFoundException("Sale doesn't exist with id " + id));
@@ -201,7 +201,7 @@ public class SaleServiceImpl implements SaleService {
             List<Long> campaignIds = saleRequest.getCampaignIds();
             List<Campaign> campaigns = null;
             BigDecimal cash = null;
-            BigDecimal change = null;
+            BigDecimal change;
             MixedPayment mixedPayment = null;
 
             if (campaignIds != null && !campaignIds.isEmpty()) {
@@ -220,7 +220,7 @@ public class SaleServiceImpl implements SaleService {
                     mixedPayment = saleRequest.getMixedPayment();
                     yield processMixedPayment(mixedPayment, totalWithCampaign);
                 }
-                default -> change;
+                default -> null;
             };
 
             existingSale.setCashier(saleRequest.getCashier());
@@ -240,10 +240,10 @@ public class SaleServiceImpl implements SaleService {
 
             existingSale.setProducts(products);
             return mapToSaleResponse(existingSale);
-        } catch (Exception e) {
 
+        } catch (Exception e) {
             reduceStocks(oldProducts);
-            throw e; // Re-throw the exception to ensure transaction rollback
+            throw new SaleUpdateException("Failed to update the sale with ID " + id, e);
         }
     }
 
@@ -339,18 +339,15 @@ public class SaleServiceImpl implements SaleService {
     }
 
     private CampaignProcessResult processCampaigns(List<Long> campaignIds, List<Product> products, BigDecimal total) {
-        List<Campaign> campaigns = null;
-        BigDecimal totalWithCampaign = total;
-
         CampaignProcessRequest campaignProcessRequest = CampaignProcessRequest.builder()
                 .campaignIds(campaignIds)
                 .products(products)
                 .total(total).build();
         CampaignProcessResponse campaignProcessResponse = campaignProcessService.processCampaigns(campaignProcessRequest);
 
-        campaigns = campaignProcessService.getCampaigns(campaignIds);
+        List<Campaign> campaigns = campaignProcessService.getCampaigns(campaignIds);
         products = campaignProcessResponse.getProducts();
-        totalWithCampaign = campaignProcessResponse.getTotal();
+        BigDecimal totalWithCampaign = campaignProcessResponse.getTotal();
 
 
         return new CampaignProcessResult(campaigns, products, totalWithCampaign);
@@ -425,11 +422,11 @@ public class SaleServiceImpl implements SaleService {
 
     private void returnProducts(List<Product> products) {
         products.forEach(product -> {
-            ProductStockReturnRequest productStockReturnRequest = new ProductStockReturnRequest(product.getProductId(), product.getQuantity());
             try {
+            ProductStockReturnRequest productStockReturnRequest = new ProductStockReturnRequest(product.getProductId(), product.getQuantity());
                 gatewayService.returnProducts(productStockReturnRequest);
             } catch (HeaderProcessingException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to return products");
             }
         });
     }
