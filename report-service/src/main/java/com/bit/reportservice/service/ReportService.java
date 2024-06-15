@@ -2,6 +2,7 @@ package com.bit.reportservice.service;
 
 import com.bit.reportservice.dto.SaleResponse;
 import com.bit.reportservice.exception.HeaderProcessingException;
+import com.bit.reportservice.exception.ReceiptGenerationException;
 import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
@@ -19,6 +20,6 @@ public interface ReportService {
                                                     BigDecimal minPrice, BigDecimal maxPrice,
                                                     String startDate, String endDate) throws HeaderProcessingException;
 
-    byte[] getReceipt(Long id) throws HeaderProcessingException;
+    byte[] getReceipt(Long id) throws HeaderProcessingException, ReceiptGenerationException;
 
 }

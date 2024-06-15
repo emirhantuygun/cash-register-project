@@ -3,6 +3,7 @@ package com.bit.reportservice.service;
 import com.bit.reportservice.ReportServiceApplication;
 import com.bit.reportservice.dto.SaleResponse;
 import com.bit.reportservice.exception.HeaderProcessingException;
+import com.bit.reportservice.exception.ReceiptGenerationException;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,7 +47,7 @@ public class ReportServiceImpl implements ReportService{
     }
 
     @Override
-    public byte[] getReceipt(Long id) throws HeaderProcessingException {
+    public byte[] getReceipt(Long id) throws HeaderProcessingException, ReceiptGenerationException {
         SaleResponse saleResponse = getSale(id);
         return receiptService.generateReceipt(saleResponse);
     }

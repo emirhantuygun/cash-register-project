@@ -2,6 +2,7 @@ package com.bit.reportservice.service;
 
 import com.bit.reportservice.dto.ProductResponse;
 import com.bit.reportservice.dto.SaleResponse;
+import com.bit.reportservice.exception.ReceiptGenerationException;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -35,7 +36,7 @@ public class ReceiptService {
     private String PHONE_NUMBER;
 
 
-    public byte[] generateReceipt(SaleResponse sale) {
+    public byte[] generateReceipt(SaleResponse sale) throws ReceiptGenerationException {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             Document document = new Document();
@@ -357,8 +358,7 @@ public class ReceiptService {
             return baos.toByteArray();
 
         } catch (DocumentException | IOException e) {
-            System.err.println("Error generating receipt: " + e.getMessage());
-            return null;
+            throw new ReceiptGenerationException("Error generating receipt: " + e.getMessage(), e);
         }
     }
 }

@@ -3,6 +3,7 @@ package com.bit.reportservice.controller;
 import com.bit.reportservice.ReportServiceApplication;
 import com.bit.reportservice.dto.SaleResponse;
 import com.bit.reportservice.exception.HeaderProcessingException;
+import com.bit.reportservice.exception.ReceiptGenerationException;
 import com.bit.reportservice.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -78,7 +79,7 @@ public class ReportController {
     }
 
     @GetMapping("/receipt/{id}")
-    public ResponseEntity<byte[]> getReceipt(@PathVariable("id") Long id) throws HeaderProcessingException {
+    public ResponseEntity<byte[]> getReceipt(@PathVariable("id") Long id) throws HeaderProcessingException, ReceiptGenerationException {
         logger.info("Received request to generate receipt for sale with ID: {}", id);
         byte[] pdfBytes = reportService.getReceipt(id);
 
