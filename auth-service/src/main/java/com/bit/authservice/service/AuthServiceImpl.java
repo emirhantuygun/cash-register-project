@@ -66,7 +66,7 @@ public class AuthServiceImpl implements AuthService {
             var authToken = new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword());
             authenticationManager.authenticate(authToken);
         } catch (Exception e) {
-            throw new AuthenticationFailedException("Authentication failed");
+            throw new AuthenticationFailedException("Authentication failed: Wrong username or password");
         }
 
         AppUser appUser = userRepository.findByUsername(authRequest.getUsername())

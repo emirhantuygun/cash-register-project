@@ -182,7 +182,7 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     @Transactional
-    public SaleResponse updateSale(Long id, SaleRequest saleRequest) {
+    public SaleResponse updateSale(Long id, SaleRequest saleRequest) throws HeaderProcessingException {
         logger.info("Updating sale with ID {}: {}", id, saleRequest);
         Sale existingSale = saleRepository.findById(id)
                 .orElseThrow(() -> new SaleNotFoundException("Sale doesn't exist with id " + id));
@@ -243,7 +243,7 @@ public class SaleServiceImpl implements SaleService {
 
         } catch (Exception e) {
             reduceStocks(oldProducts);
-            throw new SaleUpdateException("Failed to update the sale with ID " + id, e);
+            throw e;
         }
     }
 
