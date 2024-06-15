@@ -22,6 +22,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Page<Product> findAll(Specification<Product> spec, Pageable pageable);
 
+    @Query(value = "SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END FROM products p WHERE p.id = :id AND p.deleted = true", nativeQuery = true)
+    boolean existsByIdAndDeletedTrue(@Param("id") Long id);
+
     @Query(value = "SELECT CASE WHEN deleted = true THEN true ELSE false END FROM products WHERE id = :id", nativeQuery = true)
     boolean isProductSoftDeleted(@Param("id") Long id);
 

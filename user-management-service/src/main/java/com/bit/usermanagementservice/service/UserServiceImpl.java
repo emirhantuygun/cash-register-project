@@ -187,7 +187,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse restoreUser(Long id) {
-        if(!userRepository.existsById(id))
+        if(!userRepository.existsByIdAndDeletedTrue(id))
             throw new UserNotFoundException("User not found with id " + id);
 
         if (!userRepository.isUserSoftDeleted(id)) {
