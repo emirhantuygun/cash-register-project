@@ -23,9 +23,6 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
     @Query(value = "SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END FROM sales s WHERE s.id = :id AND s.deleted = true", nativeQuery = true)
     boolean existsByIdAndDeletedTrue(@Param("id") Long id);
 
-    @Query(value = "SELECT CASE WHEN deleted = true THEN true ELSE false END FROM sales WHERE id = :id", nativeQuery = true)
-    boolean isSaleSoftDeleted(@Param("id") Long id);
-
     @Transactional
     @Modifying
     @Query(value = "UPDATE sales SET deleted = true WHERE id = :id", nativeQuery = true)

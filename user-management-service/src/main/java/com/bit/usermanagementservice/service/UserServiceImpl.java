@@ -188,11 +188,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponse restoreUser(Long id) {
         if(!userRepository.existsByIdAndDeletedTrue(id))
-            throw new UserNotFoundException("User not found with id " + id);
-
-        if (!userRepository.isUserSoftDeleted(id)) {
             throw new UserNotSoftDeletedException("User with id " + id + " is not soft-deleted and cannot be restored.");
-        }
 
         try {
             rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_RESTORE, id);

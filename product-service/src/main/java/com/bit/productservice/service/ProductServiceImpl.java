@@ -127,11 +127,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse restoreProduct(Long id) {
         if (!productRepository.existsByIdAndDeletedTrue(id))
-            throw new ProductNotFoundException("Product not found with id " + id);
-
-        if (!productRepository.isProductSoftDeleted(id)) {
             throw new ProductNotSoftDeletedException("Product with id " + id + " is not soft-deleted and cannot be restored.");
-        }
+
         productRepository.restoreProduct(id);
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Couldn't restore the product with id " + id));

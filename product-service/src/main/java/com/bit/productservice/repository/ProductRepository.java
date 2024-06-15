@@ -25,9 +25,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query(value = "SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END FROM products p WHERE p.id = :id AND p.deleted = true", nativeQuery = true)
     boolean existsByIdAndDeletedTrue(@Param("id") Long id);
 
-    @Query(value = "SELECT CASE WHEN deleted = true THEN true ELSE false END FROM products WHERE id = :id", nativeQuery = true)
-    boolean isProductSoftDeleted(@Param("id") Long id);
-
     @Transactional
     @Modifying
     @Query(value = "UPDATE products SET deleted = false WHERE id = :id", nativeQuery = true)
