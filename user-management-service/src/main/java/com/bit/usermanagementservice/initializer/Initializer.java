@@ -28,6 +28,9 @@ public class Initializer implements CommandLineRunner {
     @Transactional
     public void run(String... args) {
         initializeRoles();
+        initializeCashierUser();
+        initializeManagerUser();
+        initializeAdminUser();
         initializeSuperUser();
         initializeUsers();
     }
@@ -38,6 +41,42 @@ public class Initializer implements CommandLineRunner {
                 roleRepository.save(new Role(roleName));
             }
         }
+    }
+
+    private void initializeCashierUser() {
+
+        Role cashierRole = roleRepository.findByRoleName("CASHIER").orElseThrow();
+
+        userRepository.save(AppUser.builder()
+                .name("Cashier")
+                .username("cashier")
+                .email("cashier@gmail.com")
+                .password("cashier")
+                .roles(List.of(cashierRole)).build());
+    }
+
+    private void initializeManagerUser() {
+
+        Role managerRole = roleRepository.findByRoleName("MANAGER").orElseThrow();
+
+        userRepository.save(AppUser.builder()
+                .name("Manager")
+                .username("manager")
+                .email("manager@gmail.com")
+                .password("manager")
+                .roles(List.of(managerRole)).build());
+    }
+
+    private void initializeAdminUser() {
+
+        Role adminRole = roleRepository.findByRoleName("ADMIN").orElseThrow();
+
+        userRepository.save(AppUser.builder()
+                .name("Admin")
+                .username("admin")
+                .email("admin@gmail.com")
+                .password("admin")
+                .roles(List.of(adminRole)).build());
     }
 
     private void initializeSuperUser() {
@@ -56,7 +95,7 @@ public class Initializer implements CommandLineRunner {
 
     private void initializeUsers() {
 
-        for (int i = 2; i <= 20; i++) {
+        for (int i = 5; i <= 20; i++) {
             String name = String.format("User %d", i);
             String username = String.format("user%d", i);
             String email = String.format("user%d@gmail.com", i);
