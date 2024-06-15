@@ -35,21 +35,22 @@ public class AuthGatewayFilterFactoryTest {
     @Mock
     private RouteValidator routeValidator;
 
+    @InjectMocks
+    private AuthGatewayFilterFactory authGatewayFilterFactory;
+
     @Mock
     private Predicate<ServerHttpRequest> isOpenEndpoint;
 
     @Mock
     private Predicate<ServerHttpRequest> isRoleBasedAuthorizationNeeded;
 
-    @InjectMocks
-    private AuthGatewayFilterFactory authGatewayFilterFactory;
-
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        when(routeValidator.isOpenEndpoint).thenReturn(isOpenEndpoint);
-        when(routeValidator.isRoleBasedAuthorizationNeeded).thenReturn(isRoleBasedAuthorizationNeeded);
+        when(routeValidator.isOpenEndpoint.test(any(ServerHttpRequest.class))).thenReturn(true);
+        when(routeValidator.isRoleBasedAuthorizationNeeded.test(any(ServerHttpRequest.class))).thenReturn(true);
     }
+
 
     @Test
     public void testFilterOpenEndpointWithValidToken() {
