@@ -2,6 +2,7 @@ package com.bit.reportservice.controller;
 
 import com.bit.reportservice.ReportServiceApplication;
 import com.bit.reportservice.dto.SaleResponse;
+import com.bit.reportservice.exception.HeaderProcessingException;
 import com.bit.reportservice.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -29,7 +30,7 @@ public class ReportController {
     private final ReportService reportService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<SaleResponse> getSale(@PathVariable("id") Long id) {
+    public ResponseEntity<SaleResponse> getSale(@PathVariable("id") Long id) throws HeaderProcessingException {
         logger.info("Received request to fetch sale with ID: {}", id);
         SaleResponse saleResponse = reportService.getSale(id);
 
@@ -38,7 +39,7 @@ public class ReportController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<SaleResponse>> getAllSales() {
+    public ResponseEntity<List<SaleResponse>> getAllSales() throws HeaderProcessingException {
         logger.info("Received request to fetch all sales");
         List<SaleResponse> saleResponses = reportService.getAllSales();
 
@@ -47,7 +48,7 @@ public class ReportController {
     }
 
     @GetMapping("/deleted")
-    public ResponseEntity<List<SaleResponse>> getDeletedSales() {
+    public ResponseEntity<List<SaleResponse>> getDeletedSales() throws HeaderProcessingException {
         logger.info("Received request to fetch all deleted sales");
         List<SaleResponse> deletedSaleResponses = reportService.getDeletedSales();
 
@@ -67,7 +68,7 @@ public class ReportController {
             @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate
-    ) {
+    ) throws HeaderProcessingException {
         logger.info("Received request to fetch all sales with filters and sorting: page={}, size={}, sortBy={}, direction={}, cashier={}, paymentMethod={}, minPrice={}, maxPrice={}, startDate={}, endDate={}",
                 page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate);
         Page<SaleResponse> saleResponses = reportService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate);
@@ -77,7 +78,7 @@ public class ReportController {
     }
 
     @GetMapping("/receipt/{id}")
-    public ResponseEntity<byte[]> getReceipt(@PathVariable("id") Long id) {
+    public ResponseEntity<byte[]> getReceipt(@PathVariable("id") Long id) throws HeaderProcessingException {
         logger.info("Received request to generate receipt for sale with ID: {}", id);
         byte[] pdfBytes = reportService.getReceipt(id);
 

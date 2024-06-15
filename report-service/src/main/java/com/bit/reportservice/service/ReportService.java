@@ -2,7 +2,6 @@ package com.bit.reportservice.service;
 
 import com.bit.reportservice.dto.SaleResponse;
 import com.bit.reportservice.exception.HeaderProcessingException;
-import com.itextpdf.text.pdf.PdfWriter;
 import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
