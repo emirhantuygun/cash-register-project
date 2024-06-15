@@ -1,5 +1,6 @@
 package com.bit.saleservice.dto;
 
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,5 +15,7 @@ import java.math.BigDecimal;
 public class ProductRequest {
 
     private Long id;
+
+    @PositiveOrZero(message = "Quantity must be a positive number!")
     private Integer quantity;
 }
