@@ -129,4 +129,8 @@ public class _GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<String> handleSaleUpdateException(SaleUpdateException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    @ExceptionHandler(RabbitMQException.class)
+    public ResponseEntity<String> handleRabbitMQException(RabbitMQException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

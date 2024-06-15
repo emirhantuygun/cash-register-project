@@ -14,6 +14,7 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -419,7 +420,11 @@ public class SaleServiceImpl implements SaleService {
     private void reduceStocks(List<Product> products) {
         products.forEach(product -> {
             ProductStockReduceRequest productStockReduceRequest = new ProductStockReduceRequest(product.getProductId(), product.getQuantity());
-            rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY, productStockReduceRequest);
+            try {
+                rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY, productStockReduceRequest);
+            } catch (Exception e) {
+                throw new RabbitMQException("Failed to send reduce message to RabbitMQ", e);
+            }
         });
     }
 
@@ -428,8 +433,8 @@ public class SaleServiceImpl implements SaleService {
             try {
             ProductStockReturnRequest productStockReturnRequest = new ProductStockReturnRequest(product.getProductId(), product.getQuantity());
                 gatewayService.returnProducts(productStockReturnRequest);
-            } catch (HeaderProcessingException e) {
-                throw new RuntimeException("Failed to return products");
+            } catch (Exception e) {
+                throw new RabbitMQException("Failed to send return message to RabbitMQ", e);
             }
         });
     }
