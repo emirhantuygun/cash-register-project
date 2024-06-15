@@ -17,21 +17,6 @@ import java.util.List;
 public class _GlobalExceptionHandler {
 
     private final Logger logger = LogManager.getLogger(ProductServiceApplication.class);
-
-    @ExceptionHandler(ProductNotFoundException.class)
-    @ResponseBody
-    public ResponseEntity<String> handleProductNotFoundException(ProductNotFoundException ex) {
-        logger.error("Product not found: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-    }
-
-    @ExceptionHandler(ProductNotSoftDeletedException.class)
-    @ResponseBody
-    public ResponseEntity<String> handleProductNotSoftDeletedException(ProductNotSoftDeletedException ex) {
-        logger.error("Product not soft-deleted: " + ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-    }
-
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseBody
     public ResponseEntity<String> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
@@ -53,4 +38,24 @@ public class _GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
     }
+
+    @ExceptionHandler(AlgorithmNotFoundException.class)
+    public ResponseEntity<String> handleAlgorithmNotFoundException(AlgorithmNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    @ResponseBody
+    public ResponseEntity<String> handleProductNotFoundException(ProductNotFoundException ex) {
+        logger.error("Product not found: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(ProductNotSoftDeletedException.class)
+    @ResponseBody
+    public ResponseEntity<String> handleProductNotSoftDeletedException(ProductNotSoftDeletedException ex) {
+        logger.error("Product not soft-deleted: " + ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
 }

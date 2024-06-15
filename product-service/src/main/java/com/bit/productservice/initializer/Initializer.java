@@ -1,6 +1,7 @@
 package com.bit.productservice.initializer;
 
 import com.bit.productservice.entity.Product;
+import com.bit.productservice.exception.AlgorithmNotFoundException;
 import com.bit.productservice.repository.ProductRepository;
 import com.bit.productservice.service.BarcodeService;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +19,11 @@ public class Initializer implements CommandLineRunner {
 
     @Override
     @Transactional
-    public void run(String... args) {
+    public void run(String... args) throws AlgorithmNotFoundException {
         initializeProducts();
     }
 
-    private void initializeProducts() {
+    private void initializeProducts() throws AlgorithmNotFoundException {
 
         for (int i = 1; i <= 20; i++) {
             String name = String.format("Product %d", i);

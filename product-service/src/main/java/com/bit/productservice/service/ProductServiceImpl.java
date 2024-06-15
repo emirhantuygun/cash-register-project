@@ -3,6 +3,7 @@ package com.bit.productservice.service;
 import com.bit.productservice.ProductServiceApplication;
 import com.bit.productservice.dto.ProductRequest;
 import com.bit.productservice.dto.ProductResponse;
+import com.bit.productservice.exception.AlgorithmNotFoundException;
 import com.bit.productservice.exception.ProductNotFoundException;
 import com.bit.productservice.exception.ProductNotSoftDeletedException;
 import com.bit.productservice.entity.Product;
@@ -90,7 +91,7 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public ProductResponse createProduct(ProductRequest productRequest) {
+    public ProductResponse createProduct(ProductRequest productRequest) throws AlgorithmNotFoundException {
         logger.info("Creating product: {}", productRequest);
         Product product = Product.builder()
                 .name(productRequest.getName())
@@ -106,7 +107,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse updateProduct(Long id, ProductRequest productRequest) {
+    public ProductResponse updateProduct(Long id, ProductRequest productRequest) throws AlgorithmNotFoundException {
         logger.info("Updating product with ID {}: {}", id, productRequest);
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product doesn't exist with id " + id));
@@ -160,7 +161,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @RabbitListener(queues = "${rabbitmq.queue}")
-    @Override
     public void reduceProductStock(ProductStockReduceRequest request) {
         Product product = productRepository.findById(request.getId())
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + request.getId()));
