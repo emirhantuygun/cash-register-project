@@ -5,6 +5,7 @@ import com.bit.usermanagementservice.dto.AuthUserRequest;
 import com.bit.usermanagementservice.dto.UserRequest;
 import com.bit.usermanagementservice.dto.UserResponse;
 import com.bit.usermanagementservice.exception.InvalidRoleException;
+import com.bit.usermanagementservice.exception.RabbitMQException;
 import com.bit.usermanagementservice.exception.UserNotFoundException;
 import com.bit.usermanagementservice.exception.UserNotSoftDeletedException;
 import com.bit.usermanagementservice.entity.AppUser;
@@ -17,6 +18,7 @@ import jakarta.persistence.criteria.JoinType;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -135,8 +137,13 @@ public class UserServiceImpl implements UserService {
                 .roles(getRolesAsRole(userRequest.getRoles()))
                 .build();
 
-        AuthUserRequest authUserRequest = mapToAuthUserRequest(userRequest);
-        rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_CREATE, authUserRequest);
+
+        try {
+            AuthUserRequest authUserRequest = mapToAuthUserRequest(userRequest);
+            rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_CREATE, authUserRequest);
+        } catch (Exception e) {
+            throw new RabbitMQException("Failed to send create message to RabbitMQ", e);
+        }
 
         userRepository.save(user);
 
@@ -163,9 +170,13 @@ public class UserServiceImpl implements UserService {
         existingUser.setPassword(userRequest.getPassword());
         existingUser.setRoles(getRolesAsRole(userRequest.getRoles()));
 
-        AuthUserRequest authUserRequest = mapToAuthUserRequest(userRequest);
-        UpdateUserMessage updateUserMessage = new UpdateUserMessage(id, authUserRequest);
-        rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_UPDATE, updateUserMessage);
+        try {
+            AuthUserRequest authUserRequest = mapToAuthUserRequest(userRequest);
+            UpdateUserMessage updateUserMessage = new UpdateUserMessage(id, authUserRequest);
+            rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_UPDATE, updateUserMessage);
+        } catch (Exception e) {
+            throw new RabbitMQException("Failed to send update message to RabbitMQ", e);
+        }
 
         userRepository.save(existingUser);
 
@@ -180,7 +191,12 @@ public class UserServiceImpl implements UserService {
             throw new UserNotSoftDeletedException("User with id " + id + " is not soft-deleted and cannot be restored.");
         }
 
-        rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_RESTORE, id);
+        try {
+            rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_RESTORE, id);
+        } catch (Exception e) {
+            throw new RabbitMQException("Failed to send restore message to RabbitMQ", e);
+        }
+
         userRepository.restoreUser(id);
         AppUser user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("Couldn't restore the user with id " + id));
@@ -196,7 +212,12 @@ public class UserServiceImpl implements UserService {
         if(!userRepository.existsById(id))
            throw new UserNotFoundException("User not found with id " + id);
 
-        rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_DELETE, id);
+        try {
+            rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_DELETE, id);
+        } catch (Exception e) {
+            throw new RabbitMQException("Failed to send delete message to RabbitMQ", e);
+        }
+
         userRepository.deleteById(id);
 
         logger.info("User soft-deleted");
@@ -207,9 +228,14 @@ public class UserServiceImpl implements UserService {
     public void deleteUserPermanently(Long id) {
         if(!userRepository.existsById(id))
             throw new UserNotFoundException("User not found with id " + id);
-        
+
+        try {
+            rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_DELETE_PERMANENT, id);
+        } catch (Exception e) {
+            throw new RabbitMQException("Failed to send delete-permanent message to RabbitMQ", e);
+        }
+
         userRepository.deleteRolesForUser(id);
-        rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_DELETE_PERMANENT, id);
         userRepository.deletePermanently(id);
     }
 

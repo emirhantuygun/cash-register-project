@@ -126,7 +126,7 @@ public class _GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(SaleUpdateException.class)
-    public ResponseEntity<?> handleSaleUpdateException(SaleUpdateException ex) {
+    public ResponseEntity<String> handleSaleUpdateException(SaleUpdateException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -76,4 +76,9 @@ public class _GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
     }
+
+    @ExceptionHandler(RabbitMQException.class)
+    public ResponseEntity<String> handleRabbitMQException(RabbitMQException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
