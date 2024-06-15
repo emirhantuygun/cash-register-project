@@ -1,6 +1,7 @@
 package com.bit.reportservice.service;
 
 import com.bit.reportservice.dto.SaleResponse;
+import com.bit.reportservice.exception.HeaderProcessingException;
 import com.bit.reportservice.exception.SaleServiceException;
 import com.bit.reportservice.wrapper.PageWrapper;
 import jakarta.annotation.PostConstruct;
@@ -28,17 +29,24 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GatewayService {
 
+    @Value("${endpoint.sale-service.get-sale}")
+    private String GET_SALE_ENDPOINT;
+
+    @Value("${endpoint.sale-service.get-all-sales}")
+    private String GET_ALL_SALES_ENDPOINT;
+
+    @Value("${endpoint.sale-service.get-deleted-sales}")
+    private String GET_DELETED_SALES_ENDPOINT;
+
+    @Value("${endpoint.sale-service.get-all-sales-filtered-and-sorted}")
+    private String GET_ALL_SALES_FILTERED_AND_SORTED_ENDPOINT;
+
     @Value("${gateway.host}")
     private String GATEWAY_HOST;
 
     @Value("${gateway.port}")
     private String GATEWAY_PORT;
     private String GATEWAY_URL;
-    private final String GET_SALE_ENDPOINT = "sales/{id}";
-    private final String GET_ALL_SALES_ENDPOINT = "sales";
-    private final String GET_DELETED_SALES_ENDPOINT = "sales/deleted";
-    private final String GET_ALL_SALES_FILTERED_AND_SORTED_ENDPOINT = "sales/filteredAndSorted";
-
     private final RestTemplate restTemplate;
 
     @PostConstruct
@@ -46,7 +54,7 @@ public class GatewayService {
         GATEWAY_URL = "http://" + GATEWAY_HOST + ":" + GATEWAY_PORT + "/";
     }
 
-    protected SaleResponse getSale(Long id) {
+    protected SaleResponse getSale(Long id) throws HeaderProcessingException {
         try {
             String getUrl = GATEWAY_URL + GET_SALE_ENDPOINT;
 
@@ -69,14 +77,14 @@ public class GatewayService {
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             HttpStatusCode statusCode = e.getStatusCode();
-            throw new SaleServiceException("HTTP error: " + statusCode);
+            throw new SaleServiceException("HTTP error: " + statusCode + " for sale service");
 
         } catch (RestClientException e) {
-            throw new SaleServiceException("REST client error: " + e.getMessage());
+            throw new SaleServiceException("REST client error: " + e.getMessage() + " for sale service");
         }
     }
 
-    protected List<SaleResponse> getAllSales() {
+    protected List<SaleResponse> getAllSales() throws HeaderProcessingException {
         try {
             String getUrl = GATEWAY_URL + GET_ALL_SALES_ENDPOINT;
 
@@ -99,14 +107,14 @@ public class GatewayService {
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             HttpStatusCode statusCode = e.getStatusCode();
-            throw new SaleServiceException("HTTP error: " + statusCode);
+            throw new SaleServiceException("HTTP error: " + statusCode + " for sale service");
 
         } catch (RestClientException e) {
-            throw new SaleServiceException("REST client error: " + e.getMessage());
+            throw new SaleServiceException("REST client error: " + e.getMessage() + " for sale service");
         }
     }
 
-    protected List<SaleResponse> getDeletedSales() {
+    protected List<SaleResponse> getDeletedSales() throws HeaderProcessingException {
         try {
             String getUrl = GATEWAY_URL + GET_DELETED_SALES_ENDPOINT;
 
@@ -129,14 +137,14 @@ public class GatewayService {
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             HttpStatusCode statusCode = e.getStatusCode();
-            throw new SaleServiceException("HTTP error: " + statusCode);
+            throw new SaleServiceException("HTTP error: " + statusCode + " for sale service");
 
         } catch (RestClientException e) {
-            throw new SaleServiceException("REST client error: " + e.getMessage());
+            throw new SaleServiceException("REST client error: " + e.getMessage() + " for sale service");
         }
     }
 
-    protected Page<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction, String cashier, String paymentMethod, BigDecimal minPrice, BigDecimal maxPrice, String startDate, String endDate) {
+    protected Page<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction, String cashier, String paymentMethod, BigDecimal minPrice, BigDecimal maxPrice, String startDate, String endDate) throws HeaderProcessingException {
         try {
             String getUrl = GATEWAY_URL + GET_ALL_SALES_FILTERED_AND_SORTED_ENDPOINT;
 
@@ -176,24 +184,31 @@ public class GatewayService {
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             HttpStatusCode statusCode = e.getStatusCode();
-            throw new SaleServiceException("HTTP error: " + statusCode);
+            throw new SaleServiceException("HTTP error: " + statusCode + " for sale service");
 
         } catch (RestClientException e) {
-            throw new SaleServiceException("REST client error: " + e.getMessage());
+            throw new SaleServiceException("REST client error: " + e.getMessage() + " for sale service");
         }
     }
 
 
-    private HttpHeaders getHttpHeaders() {
+    private HttpHeaders getHttpHeaders() throws HeaderProcessingException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attributes != null) {
-            HttpServletRequest httpServletRequest = attributes.getRequest();
-            String token = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
-            headers.set(HttpHeaders.AUTHORIZATION, token);
+        try {
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attributes != null) {
+                HttpServletRequest httpServletRequest = attributes.getRequest();
+                String token = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
+                headers.set(HttpHeaders.AUTHORIZATION, token);
+            } else {
+                throw new HeaderProcessingException("No request attributes found");
+            }
+        } catch (Exception e) {
+            throw new HeaderProcessingException("Failed to process HTTP headers", e);
         }
+
         return headers;
     }
 }

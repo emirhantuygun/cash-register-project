@@ -13,3 +13,10 @@ eureka:
 gateway:
   host: localhost
   port: 8080
+
+endpoint:
+  sale-service:
+    get-sale: "sales/{id}"
+    get-all-sales: "sales"
+    get-deleted-sales: "sales/deleted"
+    get-all-sales-filtered-and-sorted: "sales/filteredAndSorted"

@@ -2,6 +2,7 @@ package com.bit.reportservice.service;
 
 import com.bit.reportservice.ReportServiceApplication;
 import com.bit.reportservice.dto.SaleResponse;
+import com.bit.reportservice.exception.HeaderProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,31 +22,31 @@ public class ReportServiceImpl implements ReportService{
 
 
     @Override
-    public SaleResponse getSale(Long id) {
+    public SaleResponse getSale(Long id) throws HeaderProcessingException {
         logger.info("Fetching sale with ID: {}", id);
         return gatewayService.getSale(id);
     }
 
     @Override
-    public List<SaleResponse> getAllSales() {
+    public List<SaleResponse> getAllSales() throws HeaderProcessingException {
         logger.info("Fetching all sales");
         return gatewayService.getAllSales();
     }
 
     @Override
-    public List<SaleResponse> getDeletedSales() {
+    public List<SaleResponse> getDeletedSales() throws HeaderProcessingException {
         logger.info("Fetching all deleted sales");
         return gatewayService.getDeletedSales();
     }
 
     @Override
-    public Page<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction, String cashier, String paymentMethod, BigDecimal minPrice, BigDecimal maxPrice, String startDate, String endDate) {
+    public Page<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction, String cashier, String paymentMethod, BigDecimal minPrice, BigDecimal maxPrice, String startDate, String endDate) throws HeaderProcessingException {
         logger.info("Fetching all deleted sales");
         return gatewayService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate);
     }
 
     @Override
-    public byte[] getReceipt(Long id) {
+    public byte[] getReceipt(Long id) throws HeaderProcessingException {
         SaleResponse saleResponse = getSale(id);
         return receiptService.generateReceipt(saleResponse);
     }

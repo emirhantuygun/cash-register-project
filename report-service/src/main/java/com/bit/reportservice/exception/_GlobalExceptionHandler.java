@@ -19,4 +19,9 @@ public class _GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         logger.error("Sale service exception: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
     }
+
+    @ExceptionHandler(HeaderProcessingException.class)
+    public ResponseEntity<String> handleHeaderProcessingException(HeaderProcessingException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }
