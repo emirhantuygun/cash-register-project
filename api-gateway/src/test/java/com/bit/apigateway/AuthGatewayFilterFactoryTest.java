@@ -35,14 +35,20 @@ public class AuthGatewayFilterFactoryTest {
     @Mock
     private RouteValidator routeValidator;
 
+    @Mock
+    private Predicate<ServerHttpRequest> isOpenEndpoint;
+
+    @Mock
+    private Predicate<ServerHttpRequest> isRoleBasedAuthorizationNeeded;
+
     @InjectMocks
     private AuthGatewayFilterFactory authGatewayFilterFactory;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        when(routeValidator.isOpenEndpoint).thenReturn(mock(Predicate.class));
-        when(routeValidator.isRoleBasedAuthorizationNeeded).thenReturn(mock(Predicate.class));
+        when(routeValidator.isOpenEndpoint).thenReturn(isOpenEndpoint);
+        when(routeValidator.isRoleBasedAuthorizationNeeded).thenReturn(isRoleBasedAuthorizationNeeded);
     }
 
     @Test
@@ -52,14 +58,14 @@ public class AuthGatewayFilterFactoryTest {
                 .build();
         ServerWebExchange exchange = MockServerWebExchange.builder(request).build();
 
-        when(routeValidator.isOpenEndpoint.test(any(ServerHttpRequest.class))).thenReturn(true);
+        when(isOpenEndpoint.test(any(ServerHttpRequest.class))).thenReturn(true);
         when(jwtUtils.getClaimsAndValidate(anyString())).thenReturn(mock(Claims.class));
         when(jwtUtils.isLoggedOut(anyString())).thenReturn(false);
 
         GatewayFilter filter = authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config());
         filter.filter(exchange, exchange1 -> Mono.empty()).subscribe();
 
-        verify(routeValidator.isOpenEndpoint).test(any(ServerHttpRequest.class));
+        verify(isOpenEndpoint).test(any(ServerHttpRequest.class));
         verify(jwtUtils).getClaimsAndValidate(anyString());
         verify(jwtUtils).isLoggedOut(anyString());
     }
@@ -71,14 +77,14 @@ public class AuthGatewayFilterFactoryTest {
                 .build();
         ServerWebExchange exchange = MockServerWebExchange.builder(request).build();
 
-        when(routeValidator.isOpenEndpoint.test(any(ServerHttpRequest.class))).thenReturn(true);
+        when(isOpenEndpoint.test(any(ServerHttpRequest.class))).thenReturn(true);
         when(jwtUtils.getClaimsAndValidate(anyString())).thenReturn(null);
 
         GatewayFilter filter = authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config());
 
         assertThrows(InvalidTokenException.class, () -> filter.filter(exchange, exchange1 -> Mono.empty()).block());
 
-        verify(routeValidator.isOpenEndpoint).test(any(ServerHttpRequest.class));
+        verify(isOpenEndpoint).test(any(ServerHttpRequest.class));
         verify(jwtUtils).getClaimsAndValidate(anyString());
     }
 
@@ -89,7 +95,7 @@ public class AuthGatewayFilterFactoryTest {
                 .build();
         ServerWebExchange exchange = MockServerWebExchange.builder(request).build();
 
-        when(routeValidator.isOpenEndpoint.test(any(ServerHttpRequest.class))).thenReturn(true);
+        when(isOpenEndpoint.test(any(ServerHttpRequest.class))).thenReturn(true);
         when(jwtUtils.getClaimsAndValidate(anyString())).thenReturn(mock(Claims.class));
         when(jwtUtils.isLoggedOut(anyString())).thenReturn(true);
 
@@ -97,7 +103,7 @@ public class AuthGatewayFilterFactoryTest {
 
         assertThrows(LoggedOutTokenException.class, () -> filter.filter(exchange, exchange1 -> Mono.empty()).block());
 
-        verify(routeValidator.isOpenEndpoint).test(any(ServerHttpRequest.class));
+        verify(isOpenEndpoint).test(any(ServerHttpRequest.class));
         verify(jwtUtils).getClaimsAndValidate(anyString());
         verify(jwtUtils).isLoggedOut(anyString());
     }
@@ -107,13 +113,13 @@ public class AuthGatewayFilterFactoryTest {
         MockServerHttpRequest request = MockServerHttpRequest.get("/open-endpoint").build();
         ServerWebExchange exchange = MockServerWebExchange.builder(request).build();
 
-        when(routeValidator.isOpenEndpoint.test(any(ServerHttpRequest.class))).thenReturn(true);
+        when(isOpenEndpoint.test(any(ServerHttpRequest.class))).thenReturn(true);
 
         GatewayFilter filter = authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config());
 
         assertThrows(MissingAuthorizationHeaderException.class, () -> filter.filter(exchange, exchange1 -> Mono.empty()).block());
 
-        verify(routeValidator.isOpenEndpoint).test(any(ServerHttpRequest.class));
+        verify(isOpenEndpoint).test(any(ServerHttpRequest.class));
     }
 
     @Test
@@ -126,10 +132,10 @@ public class AuthGatewayFilterFactoryTest {
         Claims claims = mock(Claims.class);
         List<String> roles = Collections.singletonList("USER");
 
-        when(routeValidator.isOpenEndpoint.test(any(ServerHttpRequest.class))).thenReturn(true);
+        when(isOpenEndpoint.test(any(ServerHttpRequest.class))).thenReturn(true);
         when(jwtUtils.getClaimsAndValidate(anyString())).thenReturn(claims);
         when(jwtUtils.isLoggedOut(anyString())).thenReturn(false);
-        when(routeValidator.isRoleBasedAuthorizationNeeded.test(any(ServerHttpRequest.class))).thenReturn(true);
+        when(isRoleBasedAuthorizationNeeded.test(any(ServerHttpRequest.class))).thenReturn(true);
         when(jwtUtils.getRoles(any(Claims.class))).thenReturn(roles);
 
         AuthGatewayFilterFactory.Config config = new AuthGatewayFilterFactory.Config();
@@ -139,10 +145,10 @@ public class AuthGatewayFilterFactoryTest {
 
         filter.filter(exchange, exchange1 -> Mono.empty()).subscribe();
 
-        verify(routeValidator.isOpenEndpoint).test(any(ServerHttpRequest.class));
+        verify(isOpenEndpoint).test(any(ServerHttpRequest.class));
         verify(jwtUtils).getClaimsAndValidate(anyString());
         verify(jwtUtils).isLoggedOut(anyString());
-        verify(routeValidator.isRoleBasedAuthorizationNeeded).test(any(ServerHttpRequest.class));
+        verify(isRoleBasedAuthorizationNeeded).test(any(ServerHttpRequest.class));
         verify(jwtUtils).getRoles(any(Claims.class));
     }
 
@@ -156,10 +162,10 @@ public class AuthGatewayFilterFactoryTest {
         Claims claims = mock(Claims.class);
         List<String> roles = Collections.singletonList("USER");
 
-        when(routeValidator.isOpenEndpoint.test(any(ServerHttpRequest.class))).thenReturn(true);
+        when(isOpenEndpoint.test(any(ServerHttpRequest.class))).thenReturn(true);
         when(jwtUtils.getClaimsAndValidate(anyString())).thenReturn(claims);
         when(jwtUtils.isLoggedOut(anyString())).thenReturn(false);
-        when(routeValidator.isRoleBasedAuthorizationNeeded.test(any(ServerHttpRequest.class))).thenReturn(true);
+        when(isRoleBasedAuthorizationNeeded.test(any(ServerHttpRequest.class))).thenReturn(true);
         when(jwtUtils.getRoles(any(Claims.class))).thenReturn(roles);
 
         AuthGatewayFilterFactory.Config config = new AuthGatewayFilterFactory.Config();
@@ -169,10 +175,10 @@ public class AuthGatewayFilterFactoryTest {
 
         assertThrows(InsufficientRolesException.class, () -> filter.filter(exchange, exchange1 -> Mono.empty()).block());
 
-        verify(routeValidator.isOpenEndpoint).test(any(ServerHttpRequest.class));
+        verify(isOpenEndpoint).test(any(ServerHttpRequest.class));
         verify(jwtUtils).getClaimsAndValidate(anyString());
         verify(jwtUtils).isLoggedOut(anyString());
-        verify(routeValidator.isRoleBasedAuthorizationNeeded).test(any(ServerHttpRequest.class));
+        verify(isRoleBasedAuthorizationNeeded).test(any(ServerHttpRequest.class));
         verify(jwtUtils).getRoles(any(Claims.class));
     }
 }
