@@ -14,18 +14,6 @@ eureka:
 
 default-roles: CASHIER, MANAGER, ADMIN
 
-endpoint:
-  auth-service:
-    create: "auth/create"
-    update: "auth/update/{id}"
-    restore: "auth/restore/{id}"
-    delete: "auth/delete/{id}"
-    delete-permanently: "auth/delete/permanent/{id}"
-
-gateway:
-  host: localhost
-  port: 8080
-
 rabbitmq:
   exchange: user-exchange
   queue:

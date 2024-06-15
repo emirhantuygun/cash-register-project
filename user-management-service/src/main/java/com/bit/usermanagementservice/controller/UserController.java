@@ -4,18 +4,15 @@ import com.bit.usermanagementservice.UserManagementServiceApplication;
 import com.bit.usermanagementservice.dto.UserRequest;
 import com.bit.usermanagementservice.dto.UserResponse;
 import com.bit.usermanagementservice.service.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
 import java.util.List;
 

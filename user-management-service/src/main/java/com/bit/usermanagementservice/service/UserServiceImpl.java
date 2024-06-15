@@ -42,7 +42,6 @@ public class UserServiceImpl implements UserService {
     private static final Logger logger = LogManager.getLogger(UserManagementServiceApplication.class);
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final GatewayService gatewayService;
     private final RabbitTemplate rabbitTemplate;
 
     @Value("${rabbitmq.exchange}")
@@ -136,7 +135,6 @@ public class UserServiceImpl implements UserService {
                 .roles(getRolesAsRole(userRequest.getRoles()))
                 .build();
 
-//        gatewayService.createUser(mapToAuthUserRequest(userRequest));
         AuthUserRequest authUserRequest = mapToAuthUserRequest(userRequest);
         rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_CREATE, authUserRequest);
 
@@ -165,7 +163,6 @@ public class UserServiceImpl implements UserService {
         existingUser.setPassword(userRequest.getPassword());
         existingUser.setRoles(getRolesAsRole(userRequest.getRoles()));
 
-//        gatewayService.updateUser(id, mapToAuthUserRequest(userRequest));
         AuthUserRequest authUserRequest = mapToAuthUserRequest(userRequest);
         UpdateUserMessage updateUserMessage = new UpdateUserMessage(id, authUserRequest);
         rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_UPDATE, updateUserMessage);
@@ -183,7 +180,6 @@ public class UserServiceImpl implements UserService {
             throw new UserNotSoftDeletedException("User with id " + id + " is not soft-deleted and cannot be restored.");
         }
 
-//        gatewayService.restoreUser(id);
         rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_RESTORE, id);
         userRepository.restoreUser(id);
         AppUser user = userRepository.findById(id)
@@ -200,7 +196,6 @@ public class UserServiceImpl implements UserService {
         if(!userRepository.existsById(id))
            throw new UserNotFoundException("User not found with id " + id);
 
-//        gatewayService.deleteUser(id);
         rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_DELETE, id);
         userRepository.deleteById(id);
 
@@ -214,7 +209,6 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException("User not found with id " + id);
         
         userRepository.deleteRolesForUser(id);
-//        gatewayService.deleteUserPermanently(id);
         rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_DELETE_PERMANENT, id);
         userRepository.deletePermanently(id);
     }
