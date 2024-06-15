@@ -2,13 +2,14 @@ package com.bit.saleservice.service;
 
 import com.bit.saleservice.dto.SaleRequest;
 import com.bit.saleservice.dto.SaleResponse;
+import com.bit.saleservice.exception.HeaderProcessingException;
 import org.springframework.data.domain.Page;
 import java.math.BigDecimal;
 import java.util.List;
 
 public interface SaleService {
 
-    SaleResponse createSale(SaleRequest saleRequest);
+    SaleResponse createSale(SaleRequest saleRequest) throws HeaderProcessingException;
 
     SaleResponse getSale(Long id);
 
@@ -21,7 +22,7 @@ public interface SaleService {
                                                     BigDecimal minTotal, BigDecimal maxTotal,
                                                     String startDate, String endDate);
 
-    SaleResponse updateSale(Long id, SaleRequest saleRequest);
+    SaleResponse updateSale(Long id, SaleRequest saleRequest) throws HeaderProcessingException;
 
     void cancelSale(Long id);
 

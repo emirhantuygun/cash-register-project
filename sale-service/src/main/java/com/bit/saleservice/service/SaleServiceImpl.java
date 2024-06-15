@@ -127,7 +127,7 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     @Transactional
-    public SaleResponse createSale(SaleRequest saleRequest) {
+    public SaleResponse createSale(SaleRequest saleRequest) throws HeaderProcessingException {
 
         List<Product> products = getProducts(saleRequest.getProducts());
         Payment paymentMethod = getPaymentMethod(saleRequest.getPaymentMethod());
@@ -182,7 +182,7 @@ public class SaleServiceImpl implements SaleService {
 
     @Override
     @Transactional
-    public SaleResponse updateSale(Long id, SaleRequest saleRequest) {
+    public SaleResponse updateSale(Long id, SaleRequest saleRequest) throws HeaderProcessingException {
         logger.info("Updating sale with ID {}: {}", id, saleRequest);
         Sale existingSale = saleRepository.findById(id)
                 .orElseThrow(() -> new SaleNotFoundException("Sale doesn't exist with id " + id));
@@ -294,7 +294,7 @@ public class SaleServiceImpl implements SaleService {
     }
 
 
-    private List<Product> getProducts(List<ProductRequest> productRequests) {
+    private List<Product> getProducts(List<ProductRequest> productRequests) throws HeaderProcessingException {
 
         List<Product> products = new ArrayList<>();
 
@@ -426,7 +426,11 @@ public class SaleServiceImpl implements SaleService {
     private void returnProducts(List<Product> products) {
         products.forEach(product -> {
             ProductStockReturnRequest productStockReturnRequest = new ProductStockReturnRequest(product.getProductId(), product.getQuantity());
-            gatewayService.returnProducts(productStockReturnRequest);
+            try {
+                gatewayService.returnProducts(productStockReturnRequest);
+            } catch (HeaderProcessingException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 

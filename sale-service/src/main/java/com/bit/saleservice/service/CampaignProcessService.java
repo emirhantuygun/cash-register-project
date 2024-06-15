@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Optional;
 
-
 @Service
 @RequiredArgsConstructor
 public class CampaignProcessService {

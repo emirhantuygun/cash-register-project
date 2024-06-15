@@ -49,7 +49,7 @@ public class GatewayService {
     }
 
 
-    protected ProductServiceResponse getProduct(Long id) {
+    protected ProductServiceResponse getProduct(Long id) throws HeaderProcessingException {
         try {
             String getUrl = GATEWAY_URL + GET_PRODUCT_ENDPOINT;
 
@@ -82,10 +82,11 @@ public class GatewayService {
         }
     }
 
-    protected Mono<Boolean> checkEnoughProductsInStock(ProductStockCheckRequest request) {
+    protected Mono<Boolean> checkEnoughProductsInStock(ProductStockCheckRequest request) throws HeaderProcessingException {
+        HttpHeaders headers = getHttpHeaders();
         return webClient.post()
                 .uri(GATEWAY_URL + CHECK_STOCK_ENDPOINT)
-                .headers(httpHeaders -> httpHeaders.addAll(getHttpHeaders()))
+                .headers(httpHeaders -> httpHeaders.addAll(headers))
                 .body(BodyInserters.fromValue(request))
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
@@ -110,7 +111,7 @@ public class GatewayService {
     }
 
 
-    protected void returnProducts(ProductStockReturnRequest request) {
+    protected void returnProducts(ProductStockReturnRequest request) throws HeaderProcessingException {
         try {
             String returnUrl = GATEWAY_URL + RETURN_PRODUCTS_ENDPOINT;
 
@@ -131,7 +132,7 @@ public class GatewayService {
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             HttpStatusCode statusCode = e.getStatusCode();
             if (statusCode == HttpStatus.NOT_FOUND) {
-                throw new ProductNotFoundException("Product not found with name: " + request.getName());
+                throw new ProductNotFoundException("Product not found with id: " + request.getId());
             }
 
             throw new ProductServiceException("HTTP error: " + statusCode.value() + ". Product Service is temporarily unavailable. Please try again later.");
@@ -140,16 +141,23 @@ public class GatewayService {
         }
     }
 
-    private HttpHeaders getHttpHeaders() {
+    private HttpHeaders getHttpHeaders() throws HeaderProcessingException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attributes != null) {
-            HttpServletRequest httpServletRequest = attributes.getRequest();
-            String token = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
-            headers.set(HttpHeaders.AUTHORIZATION, token);
+        try {
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attributes != null) {
+                HttpServletRequest httpServletRequest = attributes.getRequest();
+                String token = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
+                headers.set(HttpHeaders.AUTHORIZATION, token);
+            } else {
+                throw new HeaderProcessingException("No request attributes found");
+            }
+        } catch (Exception e) {
+            throw new HeaderProcessingException("Failed to process HTTP headers", e);
         }
+
         return headers;
     }
 }

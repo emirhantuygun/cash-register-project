@@ -1,10 +1,8 @@
 package com.bit.saleservice.service;
 
 import com.bit.saleservice.dto.CampaignResponse;
-import com.bit.saleservice.entity.Campaign;
 import org.springframework.data.domain.Page;
 
-import java.util.Date;
 import java.util.List;
 
 public interface CampaignService {

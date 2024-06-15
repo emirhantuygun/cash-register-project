@@ -114,4 +114,9 @@ public class _GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         logger.error("Product service exception: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(ex.getMessage());
     }
+
+    @ExceptionHandler(HeaderProcessingException.class)
+    public ResponseEntity<String> handleHeaderProcessingException(HeaderProcessingException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

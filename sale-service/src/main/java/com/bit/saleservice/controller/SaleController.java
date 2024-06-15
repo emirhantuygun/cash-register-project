@@ -3,6 +3,7 @@ package com.bit.saleservice.controller;
 import com.bit.saleservice.SaleServiceApplication;
 import com.bit.saleservice.dto.SaleRequest;
 import com.bit.saleservice.dto.SaleResponse;
+import com.bit.saleservice.exception.HeaderProcessingException;
 import com.bit.saleservice.service.SaleService;
 import com.bit.saleservice.wrapper.PageWrapper;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -80,7 +80,7 @@ public class SaleController {
     }
 
     @PostMapping()
-    public ResponseEntity<SaleResponse> createSale(@RequestBody SaleRequest saleRequest){
+    public ResponseEntity<SaleResponse> createSale(@RequestBody SaleRequest saleRequest) throws HeaderProcessingException {
         logger.info("Received request to create sale: {}", saleRequest);
          SaleResponse saleResponse = saleService.createSale(saleRequest);
 
@@ -90,7 +90,7 @@ public class SaleController {
 
     @PutMapping("{id}")
     public ResponseEntity<SaleResponse> updateSale(@PathVariable Long id,
-                                                         @RequestBody @Valid SaleRequest saleRequest){
+                                                         @RequestBody @Valid SaleRequest saleRequest) throws HeaderProcessingException {
         logger.info("Received request to update sale with ID {}: {}", id, saleRequest);
         SaleResponse saleResponse = saleService.updateSale(id, saleRequest);
 
