@@ -19,6 +19,8 @@ public class ProductRequest {
     @NotBlank(message = "Product name is required and should not be blank!")
     private String name;
     private String description;
+
+    @PositiveOrZero(message = "Stock Quantity must be a positive number!")
     private Integer stockQuantity;
 
     @NotNull(message = "Price is required")
