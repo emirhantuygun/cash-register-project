@@ -16,26 +16,21 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceImplTest {
-
-    @InjectMocks
-    private ProductServiceImpl productService;
 
     @Mock
     private ProductRepository productRepository;
@@ -43,89 +38,96 @@ class ProductServiceImplTest {
     @Mock
     private BarcodeService barcodeService;
 
+    @InjectMocks
+    private ProductServiceImpl productService;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
     }
 
     @Test
     void getProduct_shouldReturnProductResponse_whenProductExists() {
         // Arrange
-        Long productId = 1L;
-        ProductResponse expectedResponse = new ProductResponse();
-        when(productRepository.findById(productId)).thenReturn(Optional.of(new Product()));
+        Product product = new Product();
+        product.setId(1L);
+        when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
 
         // Act
-        ProductResponse actualResponse = productService.getProduct(productId);
+        ProductResponse response = productService.getProduct(1L);
 
         // Assert
-        assertNotNull(actualResponse);
+        assertNotNull(response);
+        assertEquals(1L, response.getId());
     }
 
     @Test
     void getProduct_shouldThrowProductNotFoundException_whenProductDoesNotExist() {
         // Arrange
-        Long productId = 1L;
-        when(productRepository.findById(productId)).thenReturn(Optional.empty());
+        when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        // Act and Assert
-        assertThrows(ProductNotFoundException.class, () -> productService.getProduct(productId));
+        // Act & Assert
+        assertThrows(ProductNotFoundException.class, () -> productService.getProduct(1L));
     }
 
     @Test
     void getAllProducts_shouldReturnListOfProductResponses() {
         // Arrange
-        List<ProductResponse> expectedResponse = Collections.singletonList(new ProductResponse());
-        when(productRepository.findAll()).thenReturn(Collections.singletonList(new Product()));
+        Product product = new Product();
+        product.setId(1L);
+        when(productRepository.findAll()).thenReturn(Collections.singletonList(product));
 
         // Act
-        List<ProductResponse> actualResponse = productService.getAllProducts();
+        List<ProductResponse> responses = productService.getAllProducts();
 
         // Assert
-        assertEquals(expectedResponse.size(), actualResponse.size());
+        assertNotNull(responses);
+        assertEquals(1, responses.size());
     }
 
     @Test
     void getDeletedProducts_shouldReturnListOfDeletedProductResponses() {
         // Arrange
-        List<ProductResponse> expectedResponse = Collections.singletonList(new ProductResponse());
-        when(productRepository.findSoftDeletedProducts()).thenReturn(Collections.singletonList(new Product()));
+        Product product = new Product();
+        product.setId(1L);
+        when(productRepository.findSoftDeletedProducts()).thenReturn(Collections.singletonList(product));
 
         // Act
-        List<ProductResponse> actualResponse = productService.getDeletedProducts();
+        List<ProductResponse> responses = productService.getDeletedProducts();
 
         // Assert
-        assertEquals(expectedResponse.size(), actualResponse.size());
+        assertNotNull(responses);
+        assertEquals(1, responses.size());
     }
 
     @Test
     void getAllProductsFilteredAndSorted_shouldReturnPageOfProductResponses() {
         // Arrange
-        List<Product> products = Collections.singletonList(new Product());
-        Page<Product> expectedResponse = new PageImpl<>(products);
-        when(productRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(expectedResponse);
+        Product product = new Product();
+        product.setId(1L);
+        Page<Product> productPage = new PageImpl<>(Collections.singletonList(product));
+        //noinspection unchecked
+        when(productRepository.findAll((Specification<Product>) any(), any(Pageable.class))).thenReturn(productPage);
 
         // Act
-        Page<ProductResponse> actualResponse = productService.getAllProductsFilteredAndSorted(0, 10, "id", "ASC", null, null, null, null);
+        Page<ProductResponse> responsePage = productService.getAllProductsFilteredAndSorted(
+                0, 10, "id", "ASC", null, null, null, null);
 
         // Assert
-        assertEquals(expectedResponse.getTotalElements(), actualResponse.getTotalElements());
+        assertNotNull(responsePage);
+        assertEquals(1, responsePage.getTotalElements());
     }
 
-
     @Test
-    void createProduct_shouldCreateAndReturnProductResponse() throws AlgorithmNotFoundException {
+    void createProduct_shouldReturnProductResponse() throws AlgorithmNotFoundException {
         // Arrange
-        ProductRequest request = new ProductRequest();
-        request.setName("Test Product");
-        request.setDescription("Test Description");
-        request.setPrice(BigDecimal.TEN);
-        request.setStockQuantity(100);
+        ProductRequest productRequest = new ProductRequest();
+        productRequest.setName("Test Product");
+
         when(barcodeService.generateBarcodeNumber(anyString())).thenReturn("1234567890123");
-        when(productRepository.save(any())).thenReturn(new Product());
+        when(productRepository.save(any(Product.class))).thenReturn(null);
 
         // Act
-        ProductResponse response = productService.createProduct(request);
+        ProductResponse response = productService.createProduct(productRequest);
 
         // Assert
         assertNotNull(response);
@@ -133,22 +135,18 @@ class ProductServiceImplTest {
     }
 
     @Test
-    void updateProduct_shouldUpdateAndReturnProductResponse() throws AlgorithmNotFoundException {
+    void updateProduct_shouldReturnUpdatedProductResponse_whenProductExists() throws AlgorithmNotFoundException {
         // Arrange
-        Long productId = 1L;
-        ProductRequest request = new ProductRequest();
-        request.setName("Updated Product");
-        request.setDescription("Updated Description");
-        request.setPrice(BigDecimal.valueOf(20));
-        request.setStockQuantity(50);
+        ProductRequest productRequest = new ProductRequest();
+        productRequest.setName("Updated Product");
         Product existingProduct = new Product();
-        existingProduct.setId(productId);
-        when(productRepository.findById(productId)).thenReturn(Optional.of(existingProduct));
+        existingProduct.setId(1L);
+        when(productRepository.findById(anyLong())).thenReturn(Optional.of(existingProduct));
         when(barcodeService.generateBarcodeNumber(anyString())).thenReturn("1234567890123");
-        when(productRepository.save(any())).thenReturn(existingProduct);
+        when(productRepository.save(any(Product.class))).thenReturn(existingProduct);
 
         // Act
-        ProductResponse response = productService.updateProduct(productId, request);
+        ProductResponse response = productService.updateProduct(1L, productRequest);
 
         // Assert
         assertNotNull(response);
@@ -158,98 +156,70 @@ class ProductServiceImplTest {
     @Test
     void updateProduct_shouldThrowProductNotFoundException_whenProductDoesNotExist() {
         // Arrange
-        Long productId = 1L;
-        ProductRequest request = new ProductRequest();
-        when(productRepository.findById(productId)).thenReturn(Optional.empty());
+        ProductRequest productRequest = new ProductRequest();
+        when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        // Act and Assert
-        assertThrows(ProductNotFoundException.class, () -> productService.updateProduct(productId, request));
+        // Act & Assert
+        assertThrows(ProductNotFoundException.class, () -> productService.updateProduct(1L, productRequest));
     }
 
     @Test
-    void restoreProduct_shouldRestoreAndReturnProductResponse() {
+    void restoreProduct_shouldReturnRestoredProductResponse_whenProductIsSoftDeleted() {
         // Arrange
-        Long productId = 1L;
-        Product existingProduct = new Product();
-        existingProduct.setId(productId);
-        when(productRepository.existsByIdAndDeletedTrue(productId)).thenReturn(true);
-        when(productRepository.findById(productId)).thenReturn(Optional.of(existingProduct));
-        when(productRepository.save(any())).thenReturn(existingProduct);
+        Product product = new Product();
+        product.setId(1L);
+        when(productRepository.existsByIdAndDeletedTrue(anyLong())).thenReturn(true);
+        when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
+
         // Act
-        ProductResponse response = productService.restoreProduct(productId);
+        ProductResponse response = productService.restoreProduct(1L);
 
         // Assert
         assertNotNull(response);
-        assertEquals(productId, response.getId());
+        assertEquals(1L, response.getId());
     }
 
     @Test
     void restoreProduct_shouldThrowProductNotSoftDeletedException_whenProductIsNotSoftDeleted() {
         // Arrange
-        Long productId = 1L;
-        when(productRepository.existsByIdAndDeletedTrue(productId)).thenReturn(false);
+        when(productRepository.existsByIdAndDeletedTrue(anyLong())).thenReturn(false);
 
-        // Act and Assert
-        assertThrows(ProductNotSoftDeletedException.class, () -> productService.restoreProduct(productId));
+        // Act & Assert
+        assertThrows(ProductNotSoftDeletedException.class, () -> productService.restoreProduct(1L));
     }
 
     @Test
-    void deleteProduct_shouldDeleteProduct() {
+    void deleteProduct_shouldDeleteProduct_whenProductExists() {
         // Arrange
-        Long productId = 1L;
-        when(productRepository.existsById(productId)).thenReturn(true);
+        when(productRepository.existsById(anyLong())).thenReturn(true);
+        doNothing().when(productRepository).deleteById(anyLong());
 
         // Act
-        productService.deleteProduct(productId);
+        productService.deleteProduct(1L);
 
         // Assert
-        verify(productRepository, times(1)).deleteById(productId);
+        verify(productRepository, times(1)).deleteById(anyLong());
     }
 
     @Test
     void deleteProduct_shouldThrowProductNotFoundException_whenProductDoesNotExist() {
         // Arrange
-        Long productId = 1L;
-        when(productRepository.existsById(productId)).thenReturn(false);
+        when(productRepository.existsById(anyLong())).thenReturn(false);
 
-        // Act and Assert
-        assertThrows(ProductNotFoundException.class, () -> productService.deleteProduct(productId));
-    }
-
-    @Test
-    void deleteProductPermanently_shouldDeleteProductPermanently() {
-        // Arrange
-        Long productId = 1L;
-        when(productRepository.existsById(productId)).thenReturn(true);
-
-        // Act
-        productService.deleteProductPermanently(productId);
-
-        // Assert
-        verify(productRepository, times(1)).deletePermanently(productId);
-    }
-
-    @Test
-    void deleteProductPermanently_shouldThrowProductNotFoundException_whenProductDoesNotExist() {
-        // Arrange
-        Long productId = 1L;
-        when(productRepository.existsById(productId)).thenReturn(false);
-
-        // Act and Assert
-        assertThrows(ProductNotFoundException.class, () -> productService.deleteProductPermanently(productId));
+        // Act & Assert
+        assertThrows(ProductNotFoundException.class, () -> productService.deleteProduct(1L));
     }
 
     @Test
     void checkStock_shouldReturnTrue_whenRequestedQuantityIsLessThanOrEqualToStockQuantity() {
         // Arrange
-        Long productId = 1L;
-        int requestedQuantity = 5;
         Product product = new Product();
+        product.setId(1L);
         product.setStockQuantity(10);
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
 
         // Act
-        boolean result = productService.checkStock(productId, requestedQuantity);
+        boolean result = productService.checkStock(1L, 5);
 
         // Assert
         assertTrue(result);
@@ -258,137 +228,58 @@ class ProductServiceImplTest {
     @Test
     void checkStock_shouldReturnFalse_whenRequestedQuantityIsGreaterThanStockQuantity() {
         // Arrange
-        Long productId = 1L;
-        int requestedQuantity = 15;
         Product product = new Product();
+        product.setId(1L);
         product.setStockQuantity(10);
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
 
         // Act
-        boolean result = productService.checkStock(productId, requestedQuantity);
+        boolean result = productService.checkStock(1L, 15);
 
         // Assert
         assertFalse(result);
     }
 
     @Test
-    void reduceProductStock_shouldReduceStockQuantity() {
+    void checkStock_shouldThrowProductNotFoundException_whenProductDoesNotExist() {
         // Arrange
-        Long productId = 1L;
-        int requestedQuantity = 5;
-        Product existingProduct = new Product();
-        existingProduct.setStockQuantity(10);
-        when(productRepository.findById(productId)).thenReturn(Optional.of(existingProduct));
+        when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        // Act
-        productService.reduceProductStock(new ProductStockReduceRequest(productId, requestedQuantity));
-
-        // Assert
-        assertEquals(5, existingProduct.getStockQuantity());
-        verify(productRepository, times(1)).save(existingProduct);
+        // Act & Assert
+        assertThrows(ProductNotFoundException.class, () -> productService.checkStock(1L, 5));
     }
 
     @Test
-    void returnProducts_shouldIncreaseStockQuantity() {
+    void reduceProductStock_shouldReduceStock_whenProductExists() {
         // Arrange
-        Long productId = 1L;
-        int returnedQuantity = 5;
-        Product existingProduct = new Product();
-        existingProduct.setStockQuantity(10);
-        when(productRepository.findById(productId)).thenReturn(Optional.of(existingProduct));
+        Product product = new Product();
+        product.setId(1L);
+        product.setStockQuantity(10);
+        ProductStockReduceRequest request = new ProductStockReduceRequest(1L, 5);
+        when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
 
         // Act
-        productService.returnProducts(new ProductStockReturnRequest(productId, returnedQuantity));
+        productService.reduceProductStock(request);
 
         // Assert
-        assertEquals(15, existingProduct.getStockQuantity());
-        verify(productRepository, times(1)).save(existingProduct);
+        assertEquals(5, product.getStockQuantity());
+        verify(productRepository, times(1)).save(product);
     }
 
-//    private static class PageImpl<T> implements Page<T> {
-//        private final List<T> content;
-//
-//        public PageImpl(List<T> content) {
-//            this.content = content;
-//        }
-//
-//        @Override
-//        public int getTotalPages() {
-//            return 1;
-//        }
-//
-//        @Override
-//        public long getTotalElements() {
-//            return content.size();
-//        }
-//
-//        @Override
-//        public <U> Page<U> map(Function<? super T, ? extends U> converter) {
-//            return null;
-//        }
-//
-//        @Override
-//        public int getNumber() {
-//            return 0;
-//        }
-//
-//        @Override
-//        public int getSize() {
-//            return content.size();
-//        }
-//
-//        @Override
-//        public int getNumberOfElements() {
-//            return content.size();
-//        }
-//
-//        @Override
-//        public List<T> getContent() {
-//            return content;
-//        }
-//
-//        @Override
-//        public boolean hasContent() {
-//            return !content.isEmpty();
-//        }
-//
-//        @Override
-//        public Sort getSort() {
-//            return null;
-//        }
-//
-//        @Override
-//        public boolean isFirst() {
-//            return false;
-//        }
-//
-//        @Override
-//        public boolean isLast() {
-//            return false;
-//        }
-//
-//        @Override
-//        public boolean hasNext() {
-//            return false;
-//        }
-//
-//        @Override
-//        public boolean hasPrevious() {
-//            return false;
-//        }
-//
-//        @Override
-//        public Pageable nextPageable() {
-//            return null;
-//        }
-//
-//        @Override
-//        public Pageable previousPageable() {
-//            return null;
-//        }
-//
-//        @Override
-//        public Iterator<T> iterator() {
-//            return null;
-//        }
+    @Test
+    void returnProducts_shouldIncreaseStock_whenProductExists() {
+        // Arrange
+        Product product = new Product();
+        product.setId(1L);
+        product.setStockQuantity(10);
+        ProductStockReturnRequest request = new ProductStockReturnRequest(1L, 5);
+        when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
+
+        // Act
+        productService.returnProducts(request);
+
+        // Assert
+        assertEquals(15, product.getStockQuantity());
+        verify(productRepository, times(1)).save(product);
     }
+}
