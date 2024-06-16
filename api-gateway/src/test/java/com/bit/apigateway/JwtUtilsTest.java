@@ -6,6 +6,8 @@ import com.bit.apigateway.util.JwtUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,13 +16,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import redis.clients.jedis.Jedis;
-
 import javax.crypto.SecretKey;
 import java.util.Collections;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class JwtUtilsTest {
@@ -31,13 +32,17 @@ class JwtUtilsTest {
     @Mock
     private Jedis jedis;
 
+    private SecretKey secretKey;
+
     @BeforeEach
     void setUp() {
         // Set private fields using ReflectionTestUtils
-        ReflectionTestUtils.setField(jwtUtils, "SIGNER_KEY", "base64encodedSignerKey");
+        ReflectionTestUtils.setField(jwtUtils, "SIGNER_KEY", "0eO7YVb4+3d57d6XdAfZ2ZCfJdl6QrXb8XE7/c4HyIs="); // base64 encoded key
         ReflectionTestUtils.setField(jwtUtils, "AUTHORITIES_KEY", "authorities");
         ReflectionTestUtils.setField(jwtUtils, "redisHost", "localhost");
         ReflectionTestUtils.setField(jwtUtils, "redisPort", "6379");
+
+        secretKey = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode("0eO7YVb4+3d57d6XdAfZ2ZCfJdl6QrXb8XE7/c4HyIs="));
 
         jwtUtils.init();
     }
@@ -47,7 +52,7 @@ class JwtUtilsTest {
         // Arrange
         String token = "validToken";
         Claims claims = mock(Claims.class);
-        when(Jwts.parser().verifyWith(any(SecretKey.class)).build().parseSignedClaims(token).getPayload()).thenReturn(claims);
+        when(Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()).thenReturn(claims);
 
         // Act
         Claims result = jwtUtils.getClaimsAndValidate(token);
@@ -60,7 +65,7 @@ class JwtUtilsTest {
     void getClaimsAndValidate_whenTokenIsInvalid_shouldThrowInvalidTokenException() {
         // Arrange
         String token = "invalidToken";
-        when(Jwts.parser().verifyWith(any(SecretKey.class)).build().parseSignedClaims(token).getPayload()).thenThrow(JwtException.class);
+        when(Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()).thenThrow(JwtException.class);
 
         // Act & Assert
         assertThrows(InvalidTokenException.class, () -> jwtUtils.getClaimsAndValidate(token));
