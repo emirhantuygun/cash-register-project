@@ -1,5 +1,6 @@
 package com.bit.productservice;
 
+
 import com.bit.productservice.controller.ProductController;
 import com.bit.productservice.dto.ProductRequest;
 import com.bit.productservice.dto.ProductResponse;
@@ -7,23 +8,24 @@ import com.bit.productservice.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
 import java.util.Collections;
+
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
 @WebMvcTest(ProductController.class)
 class ProductControllerTest {
 
@@ -33,17 +35,19 @@ class ProductControllerTest {
     @MockBean
     private ProductService productService;
 
+    private ProductResponse productResponse;
+    private Page<ProductResponse> pagedResponse;
+
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(new ProductController(productService)).build();
+        productResponse = new ProductResponse();
+        productResponse.setId(1L);
+
+        pagedResponse = new PageImpl<>(Collections.singletonList(productResponse), PageRequest.of(0, 10), 1);
     }
 
     @Test
     void getProduct_shouldReturnProduct() throws Exception {
-        ProductResponse productResponse = new ProductResponse();
-        productResponse.setId(1L);
-
         when(productService.getProduct(anyLong())).thenReturn(productResponse);
 
         mockMvc.perform(get("/products/1"))
@@ -53,9 +57,6 @@ class ProductControllerTest {
 
     @Test
     void getAllProducts_shouldReturnProductList() throws Exception {
-        ProductResponse productResponse = new ProductResponse();
-        productResponse.setId(1L);
-
         when(productService.getAllProducts()).thenReturn(Collections.singletonList(productResponse));
 
         mockMvc.perform(get("/products"))
@@ -65,9 +66,6 @@ class ProductControllerTest {
 
     @Test
     void getDeletedProducts_shouldReturnDeletedProductList() throws Exception {
-        ProductResponse productResponse = new ProductResponse();
-        productResponse.setId(1L);
-
         when(productService.getDeletedProducts()).thenReturn(Collections.singletonList(productResponse));
 
         mockMvc.perform(get("/products/deleted"))
@@ -77,12 +75,8 @@ class ProductControllerTest {
 
     @Test
     void getAllProductsFilteredAndSorted_shouldReturnPagedProducts() throws Exception {
-        ProductResponse productResponse = new ProductResponse();
-        productResponse.setId(1L);
-
-        Page<ProductResponse> pagedResponse = new PageImpl<>(Collections.singletonList(productResponse));
-
-        when(productService.getAllProductsFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any())).thenReturn(pagedResponse);
+        when(productService.getAllProductsFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any()))
+                .thenReturn(pagedResponse);
 
         mockMvc.perform(get("/products/filteredAndSorted")
                         .param("page", "0")
@@ -95,10 +89,6 @@ class ProductControllerTest {
 
     @Test
     void createProduct_shouldReturnCreatedProduct() throws Exception {
-        ProductRequest productRequest = new ProductRequest();
-        ProductResponse productResponse = new ProductResponse();
-        productResponse.setId(1L);
-
         when(productService.createProduct(any(ProductRequest.class))).thenReturn(productResponse);
 
         mockMvc.perform(post("/products")
@@ -110,10 +100,6 @@ class ProductControllerTest {
 
     @Test
     void updateProduct_shouldReturnUpdatedProduct() throws Exception {
-        ProductRequest productRequest = new ProductRequest();
-        ProductResponse productResponse = new ProductResponse();
-        productResponse.setId(1L);
-
         when(productService.updateProduct(anyLong(), any(ProductRequest.class))).thenReturn(productResponse);
 
         mockMvc.perform(put("/products/1")
@@ -125,9 +111,6 @@ class ProductControllerTest {
 
     @Test
     void restoreProduct_shouldReturnRestoredProduct() throws Exception {
-        ProductResponse productResponse = new ProductResponse();
-        productResponse.setId(1L);
-
         when(productService.restoreProduct(anyLong())).thenReturn(productResponse);
 
         mockMvc.perform(put("/products/restore/1"))
