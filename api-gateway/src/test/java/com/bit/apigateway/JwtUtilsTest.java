@@ -4,8 +4,11 @@ import com.bit.apigateway.exception.InvalidTokenException;
 import com.bit.apigateway.exception.TokenNotFoundException;
 import com.bit.apigateway.util.JwtUtils;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.impl.DefaultJwtParser;
+import io.jsonwebtoken.impl.DefaultJwtParserBuilder;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,12 +19,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import redis.clients.jedis.Jedis;
+
 import javax.crypto.SecretKey;
 import java.util.Collections;
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class JwtUtilsTest {
@@ -36,13 +40,12 @@ class JwtUtilsTest {
 
     @BeforeEach
     void setUp() {
-        // Set private fields using ReflectionTestUtils
-        ReflectionTestUtils.setField(jwtUtils, "SIGNER_KEY", "0eO7YVb4+3d57d6XdAfZ2ZCfJdl6QrXb8XE7/c4HyIs="); // base64 encoded key
+        ReflectionTestUtils.setField(jwtUtils, "SIGNER_KEY", "0eO7YVb453d57d6XdAfZ2ZCfJdl6QrXb8XE7/c4HyIs=");
         ReflectionTestUtils.setField(jwtUtils, "AUTHORITIES_KEY", "authorities");
         ReflectionTestUtils.setField(jwtUtils, "redisHost", "localhost");
         ReflectionTestUtils.setField(jwtUtils, "redisPort", "6379");
 
-        secretKey = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode("0eO7YVb4+3d57d6XdAfZ2ZCfJdl6QrXb8XE7/c4HyIs="));
+        secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode("0eO7YVb453d57d6XdAfZ2ZCfJdl6QrXb8XE7/c4HyIs="));
 
         jwtUtils.init();
     }
@@ -52,23 +55,45 @@ class JwtUtilsTest {
         // Arrange
         String token = "validToken";
         Claims claims = mock(Claims.class);
-        when(Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()).thenReturn(claims);
+        Jws jws = mock(Jws.class);
 
-        // Act
-        Claims result = jwtUtils.getClaimsAndValidate(token);
+        when(jws.getPayload()).thenReturn(claims);
 
-        // Assert
-        assertEquals(claims, result);
+        DefaultJwtParser parser = mock(DefaultJwtParser.class);
+        when(parser.parseClaimsJws(token)).thenReturn(jws);
+
+        DefaultJwtParserBuilder parserBuilder = mock(DefaultJwtParserBuilder.class);
+        when(parserBuilder.verifyWith(any(SecretKey.class))).thenReturn(parserBuilder);
+        when(parserBuilder.build()).thenReturn(parser);
+
+        try (var mockedStatic = mockStatic(Jwts.class)) {
+            when(Jwts.parser()).thenReturn(parserBuilder);
+
+            // Act
+            Claims result = jwtUtils.getClaimsAndValidate(token);
+
+            // Assert
+            assertEquals(claims, result);
+        }
     }
 
     @Test
     void getClaimsAndValidate_whenTokenIsInvalid_shouldThrowInvalidTokenException() {
         // Arrange
         String token = "invalidToken";
-        when(Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()).thenThrow(JwtException.class);
+        DefaultJwtParser parser = mock(DefaultJwtParser.class);
+        when(parser.parseClaimsJws(token)).thenThrow(JwtException.class);
 
-        // Act & Assert
-        assertThrows(InvalidTokenException.class, () -> jwtUtils.getClaimsAndValidate(token));
+        DefaultJwtParserBuilder parserBuilder = mock(DefaultJwtParserBuilder.class);
+        when(parserBuilder.verifyWith(any(SecretKey.class))).thenReturn(parserBuilder);
+        when(parserBuilder.build()).thenReturn(parser);
+
+        try (var mockedStatic = mockStatic(Jwts.class)) {
+            when(Jwts.parser()).thenReturn(parserBuilder);
+
+            // Act & Assert
+            assertThrows(InvalidTokenException.class, () -> jwtUtils.getClaimsAndValidate(token));
+        }
     }
 
     @Test
