@@ -1,0 +1,13 @@
+endpoint:
+  sale-service:
+    get-sale: "sales/{id}"
+    get-all-sales: "sales"
+    get-deleted-sales: "sales/deleted"
+    get-all-sales-filtered-and-sorted: "sales/filteredAndSorted"
+
+receipt:
+  font-path: "fonts/scoreboard.ttf"
+  image-path: "/static/images/32bit.png"
+  location: "KEMALPASA, ESENTEPE CAMPUS, 54050"
+  city: "SERDIVAN/SAKARYA"
+  phone-number: "0264 295 54 54"
