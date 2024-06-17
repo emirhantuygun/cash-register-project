@@ -9,10 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -43,7 +41,7 @@ public class BarcodeServiceTest {
     }
 
     @Test
-    public void givenProductNameAndNoAlgorithm_whenGenerateBarcodeNumber_thenThrowsAlgorithmNotFoundException() throws NoSuchAlgorithmException {
+    public void givenProductNameAndNoAlgorithm_whenGenerateBarcodeNumber_thenThrowsAlgorithmNotFoundException() {
         // Given
         String productName = "Product";
         try (MockedStatic<MessageDigest> mocked = mockStatic(MessageDigest.class)) {
