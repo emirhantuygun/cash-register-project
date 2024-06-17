@@ -54,7 +54,7 @@ public class GatewayService {
         GATEWAY_URL = "http://" + GATEWAY_HOST + ":" + GATEWAY_PORT + "/";
     }
 
-    protected SaleResponse getSale(Long id) throws HeaderProcessingException {
+    public SaleResponse getSale(Long id) throws HeaderProcessingException {
         try {
             String getUrl = GATEWAY_URL + GET_SALE_ENDPOINT;
 
@@ -84,7 +84,7 @@ public class GatewayService {
         }
     }
 
-    protected List<SaleResponse> getAllSales() throws HeaderProcessingException {
+    public List<SaleResponse> getAllSales() throws HeaderProcessingException {
         try {
             String getUrl = GATEWAY_URL + GET_ALL_SALES_ENDPOINT;
 
@@ -114,7 +114,7 @@ public class GatewayService {
         }
     }
 
-    protected List<SaleResponse> getDeletedSales() throws HeaderProcessingException {
+    public List<SaleResponse> getDeletedSales() throws HeaderProcessingException {
         try {
             String getUrl = GATEWAY_URL + GET_DELETED_SALES_ENDPOINT;
 
@@ -144,7 +144,7 @@ public class GatewayService {
         }
     }
 
-    protected Page<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction, String cashier, String paymentMethod, BigDecimal minPrice, BigDecimal maxPrice, String startDate, String endDate) throws HeaderProcessingException {
+    public Page<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction, String cashier, String paymentMethod, BigDecimal minPrice, BigDecimal maxPrice, String startDate, String endDate) throws HeaderProcessingException {
         try {
             String getUrl = GATEWAY_URL + GET_ALL_SALES_FILTERED_AND_SORTED_ENDPOINT;
 
@@ -192,7 +192,7 @@ public class GatewayService {
     }
 
 
-    private HttpHeaders getHttpHeaders() throws HeaderProcessingException {
+    public HttpHeaders getHttpHeaders() throws HeaderProcessingException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
