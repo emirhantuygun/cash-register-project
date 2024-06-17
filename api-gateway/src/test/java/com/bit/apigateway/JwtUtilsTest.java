@@ -4,7 +4,6 @@ import com.bit.apigateway.exception.InvalidTokenException;
 import com.bit.apigateway.exception.TokenNotFoundException;
 import com.bit.apigateway.util.JwtUtils;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.JwtParserBuilder;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,14 +15,11 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import redis.clients.jedis.Jedis;
-
 import javax.crypto.SecretKey;
 import java.util.Collections;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import io.jsonwebtoken.Jwts;
 
 
 @ExtendWith(MockitoExtension.class)
