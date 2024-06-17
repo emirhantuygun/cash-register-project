@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -91,9 +92,9 @@ public class ReportControllerTest {
         String startDate = "2022-01-01";
         String endDate = "2022-12-31";
 
-        Page<SaleResponse> saleResponses = new PageImpl<>(Collections.singletonList(new SaleResponse()));
+        Page<SaleResponse> saleResponses = new PageImpl<>(Collections.singletonList(new SaleResponse()), PageRequest.of(0, 10), 1);
         when(reportService.getAllSalesFilteredAndSorted(
-                page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate))
+                anyInt(), anyInt(), anyString(), anyString(), anyString(), anyString(), any(), any(), anyString(), anyString()))
                 .thenReturn(saleResponses);
 
         mockMvc.perform(get("/reports/filteredAndSorted")
@@ -113,7 +114,7 @@ public class ReportControllerTest {
                 .andExpect(jsonPath("$.content[0]").exists());
 
         verify(reportService, times(1)).getAllSalesFilteredAndSorted(
-                page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate);
+                eq(page), eq(size), eq(sortBy), eq(direction), eq(cashier), eq(paymentMethod), eq(minPrice), eq(maxPrice), eq(startDate), eq(endDate));
     }
 
     @Test
