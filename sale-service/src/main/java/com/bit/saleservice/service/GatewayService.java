@@ -49,7 +49,7 @@ public class GatewayService {
     }
 
 
-    protected ProductServiceResponse getProduct(Long id) throws HeaderProcessingException {
+    public ProductServiceResponse getProduct(Long id) throws HeaderProcessingException {
         try {
             String getUrl = GATEWAY_URL + GET_PRODUCT_ENDPOINT;
 
@@ -82,7 +82,7 @@ public class GatewayService {
         }
     }
 
-    protected Mono<Boolean> checkEnoughProductsInStock(ProductStockCheckRequest request) throws HeaderProcessingException {
+    public Mono<Boolean> checkEnoughProductsInStock(ProductStockCheckRequest request) throws HeaderProcessingException {
         HttpHeaders headers = getHttpHeaders();
         return webClient.post()
                 .uri(GATEWAY_URL + CHECK_STOCK_ENDPOINT)
@@ -111,7 +111,7 @@ public class GatewayService {
     }
 
 
-    protected void returnProducts(ProductStockReturnRequest request) throws HeaderProcessingException {
+    public void returnProducts(ProductStockReturnRequest request) throws HeaderProcessingException {
         try {
             String returnUrl = GATEWAY_URL + RETURN_PRODUCTS_ENDPOINT;
 

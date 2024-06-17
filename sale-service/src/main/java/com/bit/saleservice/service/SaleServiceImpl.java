@@ -249,7 +249,7 @@ public class SaleServiceImpl implements SaleService {
     }
 
     @Override
-    public void cancelSale(Long id){
+    public void cancelSale(Long id) {
         Sale existingSale = saleRepository.findById(id)
                 .orElseThrow(() -> new SaleNotFoundException("Sale doesn't exist with id " + id));
 
@@ -425,10 +425,10 @@ public class SaleServiceImpl implements SaleService {
         });
     }
 
-    private void returnProducts(List<Product> products) {
+    public void returnProducts(List<Product> products) {
         products.forEach(product -> {
             try {
-            ProductStockReturnRequest productStockReturnRequest = new ProductStockReturnRequest(product.getProductId(), product.getQuantity());
+                ProductStockReturnRequest productStockReturnRequest = new ProductStockReturnRequest(product.getProductId(), product.getQuantity());
                 gatewayService.returnProducts(productStockReturnRequest);
             } catch (Exception e) {
                 throw new RabbitMQException("Failed to send return message to RabbitMQ", e);
