@@ -58,19 +58,24 @@ class SaleServiceImplTest {
     @Mock
     private RabbitTemplate rabbitTemplate;
 
-//    @Test
-//    void testGetSale_ExistingSale_ReturnsSaleResponse() {
-//        // Arrange
-//        Long id = 1L;
-//        Sale sale = new Sale();
-//        when(saleRepository.findById(id)).thenReturn(Optional.of(sale));
-//
-//        // Act
-//        SaleResponse saleResponse = saleService.getSale(id);
-//
-//        // Assert
-//        assertEquals(sale, saleResponse.getSale());
-//    }
+    @Test
+    void testGetSale_ExistingSale_ReturnsSaleResponse() {
+        // Arrange
+        Long id = 1L;
+        Sale sale = new Sale();
+        sale.setId(id);
+        sale.setPaymentMethod(Payment.PAYPAL);
+        Product product = new Product();
+        product.setSale(sale);
+        sale.setProducts(List.of(product));
+        when(saleRepository.findById(id)).thenReturn(Optional.of(sale));
+
+        // Act
+        SaleResponse saleResponse = saleService.getSale(id);
+
+        // Assert
+        assertEquals(sale.getId(), saleResponse.getId());
+    }
 
     @Test
     void testGetSale_NonExistingSale_ThrowsSaleNotFoundException() {
