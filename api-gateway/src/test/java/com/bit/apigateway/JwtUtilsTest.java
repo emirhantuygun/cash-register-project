@@ -3,11 +3,10 @@ package com.bit.apigateway;
 import com.bit.apigateway.exception.InvalidTokenException;
 import com.bit.apigateway.exception.TokenNotFoundException;
 import com.bit.apigateway.util.JwtUtils;
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.impl.DefaultJwtParser;
-import io.jsonwebtoken.impl.DefaultJwtParserBuilder;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.JwtParserBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +23,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import io.jsonwebtoken.Jwts;
+
 
 @ExtendWith(MockitoExtension.class)
 public class JwtUtilsTest {
@@ -34,7 +35,6 @@ public class JwtUtilsTest {
     @Mock
     private Jedis jedis;
 
-    private SecretKey secretKey;
 
     @BeforeEach
     void setUp() {
@@ -45,27 +45,22 @@ public class JwtUtilsTest {
         // Arrange
         String token = "validToken";
         Claims claims = mock(Claims.class);
-        Jws jws = mock(Jws.class);
 
+        JwtParserBuilder parserBuilder = mock();
+        JwtParser parser = mock(JwtParser.class);
+        Jws<Claims> jws = mock();
+        Mockito.lenient().when(parserBuilder.verifyWith(any(SecretKey.class))).thenReturn(parserBuilder);
+        when(parserBuilder.build()).thenReturn(parser);
+        when(parser.parseSignedClaims(token)).thenReturn(jws);
         when(jws.getPayload()).thenReturn(claims);
 
-        DefaultJwtParser parser = mock(DefaultJwtParser.class);
-        when(parser.parseClaimsJws(token)).thenReturn(jws);
+        // Act
+        Claims result = jwtUtils.getClaimsAndValidate(token);
 
-        DefaultJwtParserBuilder parserBuilder = mock(DefaultJwtParserBuilder.class);
-        when(parserBuilder.verifyWith(any(SecretKey.class))).thenReturn(parserBuilder);
-        when(parserBuilder.build()).thenReturn(parser);
-
-        try (var mockedStatic = mockStatic(Jwts.class)) {
-            when(Jwts.parser()).thenReturn(parserBuilder);
-
-            // Act
-            Claims result = jwtUtils.getClaimsAndValidate(token);
-
-            // Assert
-            assertEquals(claims, result);
-        }
+        // Assert
+        assertEquals(claims, result);
     }
+
 
     @Test
     void getClaimsAndValidate_whenTokenIsInvalid_shouldThrowInvalidTokenException() {
