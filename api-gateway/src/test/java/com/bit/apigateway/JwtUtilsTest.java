@@ -31,7 +31,6 @@ public class JwtUtilsTest {
     @Mock
     private Jedis jedis;
 
-
     @BeforeEach
     void setUp() {
     }
