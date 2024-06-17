@@ -295,7 +295,7 @@ public class SaleServiceImpl implements SaleService {
     }
 
 
-    private List<Product> getProducts(List<ProductRequest> productRequests) throws HeaderProcessingException {
+    public List<Product> getProducts(List<ProductRequest> productRequests) throws HeaderProcessingException {
 
         List<Product> products = new ArrayList<>();
 
