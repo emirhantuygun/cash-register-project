@@ -6,8 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -24,8 +23,6 @@ public class BarcodeServiceTest {
     @InjectMocks
     private BarcodeService barcodeService;
 
-    @Mock
-    private MessageDigest messageDigest;
 
     @BeforeEach
     public void setUp() {
@@ -37,25 +34,24 @@ public class BarcodeServiceTest {
     public void givenProductName_whenGenerateBarcodeNumber_thenReturnsBarcodeNumber() throws AlgorithmNotFoundException {
         // Given
         String productName = "Product";
-        byte[] hashBytes = "hash".getBytes();
-        when(messageDigest.digest(any())).thenReturn(hashBytes);
-        String string = mock();
-        when(string.format(anyString(), anyLong())).thenReturn("0123456789");
 
-        // When
+        // Act
         String barcodeNumber = barcodeService.generateBarcodeNumber(productName);
 
         // Then
-        assertEquals("0123456789", barcodeNumber);
+        assertEquals("1223932356863", barcodeNumber);
     }
 
     @Test
     public void givenProductNameAndNoAlgorithm_whenGenerateBarcodeNumber_thenThrowsAlgorithmNotFoundException() throws NoSuchAlgorithmException {
         // Given
         String productName = "Product";
-        doThrow(new NoSuchAlgorithmException()).when(messageDigest).getInstance("SHA-256");
+        try (MockedStatic<MessageDigest> mocked = mockStatic(MessageDigest.class)) {
 
-        // Then
-        assertThrows(AlgorithmNotFoundException.class, () -> barcodeService.generateBarcodeNumber(productName));
+            // Mocking
+            mocked.when(() -> MessageDigest.getInstance("SHA-256")).thenThrow(NoSuchAlgorithmException.class);
+
+            assertThrows(AlgorithmNotFoundException.class, () -> barcodeService.generateBarcodeNumber(productName));
+        }
     }
 }

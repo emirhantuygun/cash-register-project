@@ -32,7 +32,6 @@ public class BarcodeService {
             if (firstDigit == 0) {
                 finalValue += 1000000000L;
             }
-
             return String.format("%013d", Math.abs(finalValue));
 
         } catch (NoSuchAlgorithmException e) {
