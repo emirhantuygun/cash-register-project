@@ -59,7 +59,7 @@ public class GatewayService {
             String getUrl = GATEWAY_URL + GET_SALE_ENDPOINT;
 
             HttpHeaders headers = getHttpHeaders();
-            HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+                HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
             ResponseEntity<SaleResponse> responseEntity = restTemplate.exchange(
                     getUrl,
