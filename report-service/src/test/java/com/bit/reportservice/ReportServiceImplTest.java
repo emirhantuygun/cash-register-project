@@ -34,7 +34,6 @@ public class ReportServiceImplTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
     }
 
     @Test
