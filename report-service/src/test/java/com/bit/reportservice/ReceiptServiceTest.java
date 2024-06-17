@@ -9,18 +9,12 @@ import com.itextpdf.text.pdf.PdfWriter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.io.ByteArrayOutputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mockStatic;
 
 @ExtendWith(MockitoExtension.class)
 public class ReceiptServiceTest {
@@ -28,10 +22,8 @@ public class ReceiptServiceTest {
     @InjectMocks
     private ReceiptService receiptService;
 
-    @Mock
-    private PdfWriter pdfWriter;
     @Test
-    public void generateReceipt_ShouldThrowReceiptGenerationException_WhenPdfWriterFails() throws Exception {
+    public void generateReceipt_ShouldThrowReceiptGenerationException_WhenPdfWriterFails() {
 
         try (MockedStatic<PdfWriter> mocked = mockStatic(PdfWriter.class)) {
             // Mocking
