@@ -32,8 +32,6 @@ public class ReceiptServiceTest {
     private PdfWriter pdfWriter;
     @Test
     public void generateReceipt_ShouldThrowReceiptGenerationException_WhenPdfWriterFails() throws Exception {
-        // Arrange
-        when(PdfWriter.getInstance(any(Document.class), any(ByteArrayOutputStream.class))).thenThrow(new DocumentException());
 
         try (MockedStatic<PdfWriter> mocked = mockStatic(PdfWriter.class)) {
             // Mocking
