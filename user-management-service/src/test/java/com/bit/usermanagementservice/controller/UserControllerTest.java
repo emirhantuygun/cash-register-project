@@ -38,6 +38,7 @@ public class UserControllerTest {
 
     @BeforeEach
     public void setUp() {
+
     }
 
     @Test

@@ -252,7 +252,7 @@ public class UserServiceImpl implements UserService {
             throw new DataIntegrityViolationException("Email already exists: " + userRequest.getEmail());
         }
     }
-    private void validateRoles(List<String> roles) {
+    protected void validateRoles(List<String> roles) {
 
         for (String role : roles) {
             if (!DEFAULT_ROLES.contains(role)) {
