@@ -153,29 +153,27 @@ class SaleServiceImplTest {
     }
 
 //    @Test
-//    void testUpdateSale_ValidSaleRequest_ReturnsSaleResponse() throws HeaderProcessingException {
+//    void testUpdateSale_ExistingSale_ReturnsUpdatedSaleResponse() throws HeaderProcessingException {
 //        // Arrange
 //        Long id = 1L;
 //        SaleRequest saleRequest = new SaleRequest();
+//        saleRequest.setCashier("New Cashier");
 //        saleRequest.setPaymentMethod("paypal");
 //        saleRequest.setProducts(List.of(new ProductRequest()));
-//        saleRequest.setCashier("John");
 //        Sale existingSale = new Sale();
 //        existingSale.setId(id);
+//        existingSale.setCashier("Old Cashier");
 //        existingSale.setPaymentMethod(Payment.PAYPAL);
-//        existingSale.setProducts(List.of(new Product()));
-//        existingSale.setCashier("Jake");
+//         = mock();
+//        doNothing().when(saleServiceMock).returnProducts(List.of(new Product()));
 //        when(saleRepository.findById(id)).thenReturn(Optional.of(existingSale));
-//        saleService = mock();
-//        doNothing().when(saleService).returnProducts(any(List.class));
-//        when(saleService.getProducts(anyList())).thenReturn(List.of(new Product()));
-//
 //
 //        // Act
 //        SaleResponse saleResponse = saleService.updateSale(id, saleRequest);
 //
 //        // Assert
-//        assertEquals(1L, saleResponse.getId());
+//        assertEquals("New Cashier", saleResponse.getCashier());
+//        verify(saleRepository).save(existingSale);
 //    }
 
     @Test
@@ -189,22 +187,23 @@ class SaleServiceImplTest {
         assertThrows(SaleNotFoundException.class, () -> saleService.updateSale(id, saleRequest));
     }
 
-//    @Test
-//    void testCancelSale_ExistingSale_CancelsSale() throws HeaderProcessingException {
-//        // Arrange
-//        Long id =1L;
-//        Sale existingSale = new Sale();
-//        existingSale.setProducts(List.of(new Product()));
-//        when(saleRepository.findById(id)).thenReturn(Optional.of(existingSale));
-//        ProductStockReturnRequest productStockReturnRequest = new ProductStockReturnRequest(1L, 1);
-//        when(gatewayService.returnProducts(productStockReturnRequest)).thenReturn(null);
-//
-//        // Act
-//        saleService.cancelSale(id);
-//
-//        // Assert
-//        verify(saleRepository).save(existingSale);
-//    }
+    @Test
+    void testCancelSale_ExistingSale_CancelsSale() throws HeaderProcessingException {
+        // Arrange
+        Long id =1L;
+        Sale existingSale = new Sale();
+        Product product = new Product();
+        product.setId(id);
+        product.setQuantity(1);
+        existingSale.setProducts(List.of(product));
+        when(saleRepository.findById(id)).thenReturn(Optional.of(existingSale));
+
+        // Act
+        saleService.cancelSale(id);
+
+        // Assert
+        verify(saleRepository).save(existingSale);
+    }
 
     @Test
     void testCancelSale_NonExistingSale_ThrowsSaleNotFoundException() {

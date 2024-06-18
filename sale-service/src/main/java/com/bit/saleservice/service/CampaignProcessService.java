@@ -21,7 +21,7 @@ public class CampaignProcessService {
 
     private final CampaignRepository campaignRepository;
 
-    protected List<Campaign> getCampaigns(List<Long> ids){
+    public List<Campaign> getCampaigns(List<Long> ids){
         return ids.stream()
                 .map(campaignRepository::findById)
                 .filter(Optional::isPresent)
@@ -29,7 +29,7 @@ public class CampaignProcessService {
                 .collect(Collectors.toList());
     }
 
-    protected CampaignProcessResponse processCampaigns(CampaignProcessRequest campaignProcessRequest) {
+    public CampaignProcessResponse processCampaigns(CampaignProcessRequest campaignProcessRequest) {
 
         List<Long> ids = campaignProcessRequest.getCampaignIds();
         boolean hasDuplicates = ids.stream().distinct().count() < ids.size();
@@ -64,7 +64,7 @@ public class CampaignProcessService {
     }
 
     // Spend $200, Save $50
-    private void campaign_1(CampaignProcessResponse campaignProcessResponse) {
+    public void campaign_1(CampaignProcessResponse campaignProcessResponse) {
 
         BigDecimal limitTotal = BigDecimal.valueOf(200);
         BigDecimal total = campaignProcessResponse.getTotal();
