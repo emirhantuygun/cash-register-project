@@ -295,7 +295,7 @@ public class SaleServiceImpl implements SaleService {
     }
 
 
-    public List<Product> getProducts(List<ProductRequest> productRequests) throws HeaderProcessingException {
+    private List<Product> getProducts(List<ProductRequest> productRequests) throws HeaderProcessingException {
 
         List<Product> products = new ArrayList<>();
 
@@ -425,7 +425,7 @@ public class SaleServiceImpl implements SaleService {
         });
     }
 
-    public void returnProducts(List<Product> products) {
+    private void returnProducts(List<Product> products) {
         products.forEach(product -> {
             try {
                 ProductStockReturnRequest productStockReturnRequest = new ProductStockReturnRequest(product.getProductId(), product.getQuantity());

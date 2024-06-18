@@ -14,21 +14,16 @@ import com.bit.saleservice.repository.SaleRepository;
 import com.bit.saleservice.service.CampaignProcessService;
 import com.bit.saleservice.service.GatewayService;
 import com.bit.saleservice.service.SaleServiceImpl;
-import com.bit.saleservice.wrapper.ProductStockReturnRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -152,29 +147,34 @@ class SaleServiceImplTest {
         assertEquals(saleRequest.getCashier(), saleResponse.getCashier());
     }
 
-//    @Test
-//    void testUpdateSale_ExistingSale_ReturnsUpdatedSaleResponse() throws HeaderProcessingException {
-//        // Arrange
-//        Long id = 1L;
-//        SaleRequest saleRequest = new SaleRequest();
-//        saleRequest.setCashier("New Cashier");
-//        saleRequest.setPaymentMethod("paypal");
-//        saleRequest.setProducts(List.of(new ProductRequest()));
-//        Sale existingSale = new Sale();
-//        existingSale.setId(id);
-//        existingSale.setCashier("Old Cashier");
-//        existingSale.setPaymentMethod(Payment.PAYPAL);
-//         = mock();
-//        doNothing().when(saleServiceMock).returnProducts(List.of(new Product()));
-//        when(saleRepository.findById(id)).thenReturn(Optional.of(existingSale));
-//
-//        // Act
-//        SaleResponse saleResponse = saleService.updateSale(id, saleRequest);
-//
-//        // Assert
-//        assertEquals("New Cashier", saleResponse.getCashier());
-//        verify(saleRepository).save(existingSale);
-//    }
+    @Test
+    void testUpdateSale_ExistingSale_ReturnsUpdatedSaleResponse() throws HeaderProcessingException {
+        // Arrange
+        Long id = 1L;
+        SaleRequest saleRequest = new SaleRequest();
+        saleRequest.setCashier("New Cashier");
+        saleRequest.setPaymentMethod("paypal");
+        ProductRequest productRequest = new ProductRequest();
+        productRequest.setId(id);
+        productRequest.setQuantity(1);
+        saleRequest.setProducts(List.of(productRequest));
+        Sale existingSale = new Sale();
+        existingSale.setId(id);
+        existingSale.setCashier("Old Cashier");
+        existingSale.setPaymentMethod(Payment.PAYPAL);
+        Product product = new Product();
+        product.setId(id);
+        product.setQuantity(1);
+        existingSale.setProducts(List.of(product));
+        when(saleRepository.findById(id)).thenReturn(Optional.of(existingSale));
+
+        // Act
+        SaleResponse saleResponse = saleService.updateSale(id, saleRequest);
+
+        // Assert
+        assertEquals("New Cashier", saleResponse.getCashier());
+        verify(saleRepository).save(existingSale);
+    }
 
     @Test
     void testUpdateSale_NonExistingSale_ThrowsSaleNotFoundException() {
