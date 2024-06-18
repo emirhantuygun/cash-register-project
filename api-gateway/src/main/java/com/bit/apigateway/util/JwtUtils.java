@@ -70,7 +70,7 @@ public class JwtUtils {
         return (List<String>) claims.get(AUTHORITIES_KEY);
     }
 
-    private SecretKey getSignInKey() {
+    protected SecretKey getSignInKey() {
         byte[] keyBytes = Decoders.BASE64URL.decode(SIGNER_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }

@@ -1,6 +1,5 @@
 package com.bit.apigateway.controller;
 
-import com.bit.apigateway.controller.FallbackController;
 import com.bit.apigateway.exception.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +7,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @WebMvcTest(FallbackController.class)
 public class FallbackControllerTest {

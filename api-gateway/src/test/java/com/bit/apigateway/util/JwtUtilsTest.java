@@ -2,9 +2,7 @@ package com.bit.apigateway.util;
 
 import com.bit.apigateway.exception.InvalidTokenException;
 import com.bit.apigateway.exception.TokenNotFoundException;
-import com.bit.apigateway.util.JwtUtils;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.JwtParserBuilder;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,46 +14,34 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import redis.clients.jedis.Jedis;
+
 import javax.crypto.SecretKey;
 import java.util.Collections;
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
 
 @ExtendWith(MockitoExtension.class)
 public class JwtUtilsTest {
 
+    @Mock
+    private Jedis jedis;
     @InjectMocks
     private JwtUtils jwtUtils;
 
-    @Mock
-    private Jedis jedis;
 
     @BeforeEach
     void setUp() {
+        ReflectionTestUtils.setField(jwtUtils, "SIGNER_KEY", "4bb6d1dfbafb64a681139d1586b6f1160d18159afd57c8c79136d7490630407c");
     }
 
+
     @Test
-    void getClaimsAndValidate_whenTokenIsValid_shouldReturnClaims() {
-        // Arrange
-        String token = "validToken";
+    void testGetClaimsAndValidate_ShouldThrowInvalidTokenException_WhenTokenIsNull() {
+        InvalidTokenException exception = assertThrows(InvalidTokenException.class, () -> jwtUtils.getClaimsAndValidate(null));
 
-        Claims claims = mock();
-        JwtParserBuilder parserBuilder = mock();
-        JwtParser parser = mock();
-        Jws<Claims> jws = mock();
-
-        lenient().when(parserBuilder.verifyWith(any(SecretKey.class))).thenReturn(parserBuilder);
-        when(parserBuilder.build()).thenReturn(parser);
-        when(parser.parseSignedClaims(anyString())).thenReturn(jws);
-        when(jws.getPayload()).thenReturn(claims);
-
-        // Act
-        Claims result = jwtUtils.getClaimsAndValidate(token);
-
-        // Assert
-        assertEquals(claims, result);
+        assertEquals("Invalid token", exception.getMessage());
     }
 
 
