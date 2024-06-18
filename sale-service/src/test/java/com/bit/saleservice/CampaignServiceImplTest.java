@@ -1,26 +1,27 @@
 package com.bit.saleservice;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import java.util.*;
-
 import com.bit.saleservice.dto.CampaignResponse;
 import com.bit.saleservice.entity.Campaign;
-import com.bit.saleservice.entity.Sale;
 import com.bit.saleservice.exception.CampaignNotFoundException;
 import com.bit.saleservice.repository.CampaignRepository;
 import com.bit.saleservice.service.CampaignServiceImpl;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.*;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
 public class CampaignServiceImplTest {
 
     @Mock
@@ -95,25 +96,4 @@ public class CampaignServiceImplTest {
         verify(campaignRepository).findAll((Specification<Campaign>) any(), any(Pageable.class));
     }
 
-//    @Test
-//    public void testMapToCampaignResponse_MapsCampaignToCampaignResponse() {
-//        Campaign campaign = new Campaign();
-//        campaign.setId(1L);
-//        campaign.setName("Test Campaign");
-//        campaign.setDetails("Details");
-//        campaign.setExpiration(new Date());
-//        Sale sale1 = new Sale();
-//        sale1.setId(1L);
-//        Sale sale2 = new Sale();
-//        sale2.setId(2L);
-//        campaign.setSales(Arrays.asList(sale1, sale2));
-//
-//        CampaignResponse response = campaignService.mapToCampaignResponse(campaign);
-//
-//        assertNotNull(response);
-//        assertEquals(1L, response.getId());
-//        assertEquals("Test Campaign", response.getName());
-//        assertEquals("Details", response.getDetails());
-//        assertEquals(2, response.getSaleIds().size());
-//    }
 }
