@@ -161,7 +161,7 @@ public class AuthServiceImpl implements AuthService {
         userRepository.deletePermanently(id);
     }
 
-    private void saveUserToken(AppUser user, String jwtToken) throws RedisOperationException {
+    protected void saveUserToken(AppUser user, String jwtToken) throws RedisOperationException {
         var token = Token.builder()
                 .token(jwtToken)
                 .user(user)
