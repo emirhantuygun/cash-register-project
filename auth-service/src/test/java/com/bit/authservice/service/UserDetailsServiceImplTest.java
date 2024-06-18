@@ -1,8 +1,5 @@
 package com.bit.authservice.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 import com.bit.authservice.entity.AppUser;
 import com.bit.authservice.entity.Role;
 import com.bit.authservice.repository.UserRepository;
@@ -13,15 +10,14 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 public class UserDetailsServiceImplTest {
 
@@ -69,9 +65,8 @@ public class UserDetailsServiceImplTest {
         when(userRepository.findByUsername("nonexistentuser")).thenReturn(Optional.empty());
 
         // Act & Assert
-        UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class, () -> {
-            userDetailsService.loadUserByUsername("nonexistentuser");
-        });
+        UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class, () ->
+                userDetailsService.loadUserByUsername("nonexistentuser"));
         assertEquals("User not found with username: nonexistentuser", exception.getMessage());
     }
 }
