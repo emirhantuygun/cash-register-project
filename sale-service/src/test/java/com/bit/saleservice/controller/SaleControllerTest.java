@@ -1,4 +1,4 @@
-package com.bit.saleservice;
+package com.bit.saleservice.controller;
 
 import com.bit.saleservice.controller.SaleController;
 import com.bit.saleservice.dto.SaleRequest;

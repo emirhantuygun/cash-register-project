@@ -1,4 +1,4 @@
-package com.bit.saleservice;
+package com.bit.saleservice.controller;
 
 import com.bit.saleservice.controller.CampaignController;
 import com.bit.saleservice.dto.CampaignResponse;
