@@ -1,4 +1,4 @@
-package com.bit.authservice;
+package com.bit.authservice.config;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
