@@ -1,6 +1,5 @@
-package com.bit.apigateway;
+package com.bit.apigateway.config;
 
-import com.bit.apigateway.config.RouteValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -20,13 +19,13 @@ public class RouteValidatorTest {
     @Test
     public void testIsOpenEndpointWithOpenEndpoint() {
         ServerHttpRequest request = MockServerHttpRequest.get("/auth").build();
-        assertFalse(routeValidator.isOpenEndpoint.test(request));
+        assertFalse(routeValidator.isSecured.test(request));
     }
 
     @Test
     public void testIsOpenEndpointWithNonOpenEndpoint() {
         ServerHttpRequest request = MockServerHttpRequest.get("/some-other-endpoint").build();
-        assertTrue(routeValidator.isOpenEndpoint.test(request));
+        assertTrue(routeValidator.isSecured.test(request));
     }
 
     @Test

@@ -1,4 +1,4 @@
-package com.bit.apigateway;
+package com.bit.apigateway.controller;
 
 import com.bit.apigateway.controller.FallbackController;
 import com.bit.apigateway.exception.*;

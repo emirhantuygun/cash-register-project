@@ -1,9 +1,10 @@
-package com.bit.apigateway;
+package com.bit.apigateway.util;
 
 import com.bit.apigateway.exception.InvalidTokenException;
 import com.bit.apigateway.exception.TokenNotFoundException;
 import com.bit.apigateway.util.JwtUtils;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.JwtParserBuilder;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,27 +36,27 @@ public class JwtUtilsTest {
     void setUp() {
     }
 
-//    @Test
-//    void getClaimsAndValidate_whenTokenIsValid_shouldReturnClaims() {
-//        // Arrange
-//        String token = "validToken";
-//
-//        Claims claims = mock();
-//        JwtParserBuilder parserBuilder = mock();
-//        JwtParser parser = mock();
-//        Jws<Claims> jws = mock();
-//
-//        Mockito.lenient().when(parserBuilder.verifyWith(any(SecretKey.class))).thenReturn(parserBuilder);
-//        when(parserBuilder.build()).thenReturn(parser);
-//        when(parser.parseSignedClaims(anyString())).thenReturn(jws);
-//        when(jws.getPayload()).thenReturn(claims);
-//
-//        // Act
-//        Claims result = jwtUtils.getClaimsAndValidate(token);
-//
-//        // Assert
-//        assertEquals(claims, result);
-//    }
+    @Test
+    void getClaimsAndValidate_whenTokenIsValid_shouldReturnClaims() {
+        // Arrange
+        String token = "validToken";
+
+        Claims claims = mock();
+        JwtParserBuilder parserBuilder = mock();
+        JwtParser parser = mock();
+        Jws<Claims> jws = mock();
+
+        lenient().when(parserBuilder.verifyWith(any(SecretKey.class))).thenReturn(parserBuilder);
+        when(parserBuilder.build()).thenReturn(parser);
+        when(parser.parseSignedClaims(anyString())).thenReturn(jws);
+        when(jws.getPayload()).thenReturn(claims);
+
+        // Act
+        Claims result = jwtUtils.getClaimsAndValidate(token);
+
+        // Assert
+        assertEquals(claims, result);
+    }
 
 
     @Test

@@ -29,7 +29,7 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
 
-            if (routeValidator.isOpenEndpoint.test(request)) {
+            if (routeValidator.isSecured.test(request)) {
 
                 String token = exchange.getRequest().getHeaders().getFirst("Authorization");
 
