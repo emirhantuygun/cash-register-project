@@ -105,7 +105,7 @@ public class CampaignProcessService {
         campaignProcessResponse.setTotal(newTotal);
     }
 
-    private void isCampaignValidAndNotExpired(Long id) {
+    void isCampaignValidAndNotExpired(Long id) {
         Campaign campaign = campaignRepository.findById(id)
                 .orElseThrow(() -> new CampaignNotFoundException("Campaign not found with id: " + id));
 
