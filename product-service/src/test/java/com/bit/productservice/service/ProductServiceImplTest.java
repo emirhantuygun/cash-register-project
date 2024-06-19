@@ -282,4 +282,27 @@ class ProductServiceImplTest {
         assertEquals(15, product.getStockQuantity());
         verify(productRepository, times(1)).save(product);
     }
+
+    @Test
+    void givenExistingProductId_whenDeleteProductPermanently_thenProductIsDeletedPermanently() {
+        // Arrange
+        Long productId = 1L;
+        when(productRepository.existsById(productId)).thenReturn(true);
+
+        // Act
+        productService.deleteProductPermanently(productId);
+
+        // Assert
+        verify(productRepository, times(1)).deletePermanently(productId);
+    }
+
+    @Test
+    void givenNonExistingProductId_whenDeleteProductPermanently_thenThrowsProductNotFoundException() {
+        // Arrange
+        Long productId = 1L;
+        when(productRepository.existsById(productId)).thenReturn(false);
+
+        // Act & Assert
+        assertThrows(ProductNotFoundException.class, () -> productService.deleteProductPermanently(productId));
+    }
 }
