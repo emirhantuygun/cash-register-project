@@ -8,5 +8,4 @@ import org.junit.platform.suite.api.Suite;
         "com.bit.reportservice.controller",
         "com.bit.reportservice.service"
 })
-public class ReportServiceSuite {
-}
+public class ReportServiceSuite {}

@@ -8,5 +8,4 @@ import org.junit.platform.suite.api.Suite;
         "com.bit.usermanagementservice.controller",
         "com.bit.usermanagementservice.service"
 })
-public class UserManagementServiceSuite {
-}
+public class UserManagementServiceSuite {}
