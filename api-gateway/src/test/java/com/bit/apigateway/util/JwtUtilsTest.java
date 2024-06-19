@@ -39,6 +39,8 @@ public class JwtUtilsTest {
 
     @Test
     void testGetClaimsAndValidate_ShouldThrowInvalidTokenException_WhenTokenIsNull() {
+
+        // Act & Assert
         InvalidTokenException exception = assertThrows(InvalidTokenException.class, () -> jwtUtils.getClaimsAndValidate(null));
 
         assertEquals("Invalid token", exception.getMessage());

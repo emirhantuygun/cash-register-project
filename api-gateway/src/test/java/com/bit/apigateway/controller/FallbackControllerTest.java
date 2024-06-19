@@ -16,6 +16,8 @@ public class FallbackControllerTest {
 
     @Test
     public void whenFallbackAuthEndpointIsCalled_thenAuthServiceUnavailableExceptionIsThrown() {
+
+        // Act & Assert
         Exception exception = assertThrows(AuthServiceUnavailableException.class,
                 () -> fallbackController.fallbackAuth());
 
@@ -24,6 +26,8 @@ public class FallbackControllerTest {
 
     @Test
     public void whenFallbackUserEndpointIsCalled_thenUserServiceUnavailableExceptionIsThrown() {
+
+        // Act & Assert
         Exception exception = assertThrows(UserServiceUnavailableException.class,
                 () -> fallbackController.fallbackUser());
 
@@ -32,6 +36,8 @@ public class FallbackControllerTest {
 
     @Test
     public void whenFallbackProductEndpointIsCalled_thenProductServiceUnavailableExceptionIsThrown() {
+
+        // Act & Assert
         Exception exception = assertThrows(ProductServiceUnavailableException.class,
                 () -> fallbackController.fallbackProduct());
 
@@ -40,6 +46,8 @@ public class FallbackControllerTest {
 
     @Test
     public void whenFallbackSaleEndpointIsCalled_thenSaleServiceUnavailableExceptionIsThrown() {
+
+        // Act & Assert
         Exception exception = assertThrows(SaleServiceUnavailableException.class,
                 () -> fallbackController.fallbackSale());
 
@@ -48,6 +56,8 @@ public class FallbackControllerTest {
 
     @Test
     public void whenFallbackReportEndpointIsCalled_thenReportServiceUnavailableExceptionIsThrown() {
+
+        // Act & Assert
         Exception exception = assertThrows(ReportServiceUnavailableException.class,
                 () -> fallbackController.fallbackReport());
 

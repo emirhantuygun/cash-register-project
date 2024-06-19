@@ -47,40 +47,50 @@ public class GatewayConfigTest {
 
     @Test
     void givenAuthServiceRoute_whenRoutesMethodIsCalled_thenRouteIsConfiguredCorrectly() {
+        // Act
         RouteLocator routeLocator = gatewayConfig.routes(routeLocatorBuilder, authGatewayFilterFactory);
 
+        // Assert
         assertNotNull(routeLocator);
         verify(routesBuilder, times(1)).route(eq("auth-service"), any());
     }
 
     @Test
     void givenUserServiceRoute_whenRoutesMethodIsCalled_thenRouteIsConfiguredCorrectly() {
+        // Act
         RouteLocator routeLocator = gatewayConfig.routes(routeLocatorBuilder, authGatewayFilterFactory);
 
+        // Assert
         assertNotNull(routeLocator);
         verify(routesBuilder, times(1)).route(eq("user-service"), any());
     }
 
     @Test
     void givenProductServiceRoute_whenRoutesMethodIsCalled_thenRouteIsConfiguredCorrectly() {
+        // Act
         RouteLocator routeLocator = gatewayConfig.routes(routeLocatorBuilder, authGatewayFilterFactory);
 
+        // Assert
         assertNotNull(routeLocator);
         verify(routesBuilder, times(1)).route(eq("product-service"), any());
     }
 
     @Test
     void givenSaleServiceRoute_whenRoutesMethodIsCalled_thenRouteIsConfiguredCorrectly() {
+        // Act
         RouteLocator routeLocator = gatewayConfig.routes(routeLocatorBuilder, authGatewayFilterFactory);
 
+        // Assert
         assertNotNull(routeLocator);
         verify(routesBuilder, times(1)).route(eq("sale-service"), any());
     }
 
     @Test
     void givenReportServiceRoute_whenRoutesMethodIsCalled_thenRouteIsConfiguredCorrectly() {
+        // Act
         RouteLocator routeLocator = gatewayConfig.routes(routeLocatorBuilder, authGatewayFilterFactory);
 
+        // Assert
         assertNotNull(routeLocator);
         verify(routesBuilder, times(1)).route(eq("report-service"), any());
     }
