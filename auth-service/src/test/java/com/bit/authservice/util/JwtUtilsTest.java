@@ -33,6 +33,7 @@ public class JwtUtilsTest {
         final String signerKey = "testsignerkeytestsignerkeytestsignerkeytestsignerkey";
         final String authoritiesKey = "roles";
         final long refreshTokenExpiration = 1000 * 60 * 60 * 24; // 24 hours
+
         ReflectionTestUtils.setField(jwtUtils, "SIGNER_KEY", signerKey);
         ReflectionTestUtils.setField(jwtUtils, "AUTHORITIES_KEY", authoritiesKey);
         ReflectionTestUtils.setField(jwtUtils, "ACCESS_TOKEN_EXPIRATION", accessTokenExpiration);
@@ -53,34 +54,12 @@ public class JwtUtilsTest {
         assertTrue(jwtUtils.isValid(token, userDetails));
     }
 
-//    @Test
-//    public void givenExpiredToken_whenIsTokenExpired_thenReturnsTrue() {
-//        String token = jwtUtils.generateAccessToken("user", Arrays.asList("ROLE_USER"));
-//        // Simulate token expiration by setting a past expiration time
-//        ReflectionTestUtils.setField(jwtUtils, "ACCESS_TOKEN_EXPIRATION", -1000);
-//        assertTrue(jwtUtils.isTokenExpired(token));
-//    }
-//
-//    @Test
-//    public void givenValidToken_whenExtractExpiration_thenCorrectExpirationDateIsExtracted() {
-//        String token = jwtUtils.generateAccessToken("user", Arrays.asList("ROLE_USER"));
-//        Date expiration = jwtUtils.extractExpiration(token);
-//        assertNotNull(expiration);
-//    }
-
     @Test
     public void givenValidToken_whenExtractClaim_thenCorrectClaimIsExtracted() {
         String token = jwtUtils.generateAccessToken("user", List.of("ROLE_USER"));
         String username = jwtUtils.extractClaim(token, Claims::getSubject);
         assertEquals("user", username);
     }
-
-//    @Test
-//    public void givenValidToken_whenExtractAllClaims_thenAllClaimsAreExtracted() {
-//        String token = jwtUtils.generateAccessToken("user", Arrays.asList("ROLE_USER"));
-//        Claims claims = jwtUtils.extractAllClaims(token);
-//        assertEquals("user", claims.getSubject());
-//    }
 
     @Test
     public void givenValidUserAndRoles_whenGenerateAccessToken_thenTokenIsGenerated() {
@@ -100,12 +79,6 @@ public class JwtUtilsTest {
         String token = jwtUtils.buildToken(claims, accessTokenExpiration);
         assertNotNull(token);
     }
-
-//    @Test
-//    public void givenValidSignerKey_whenGetSignInKey_thenKeyIsRetrieved() {
-//        SecretKey key = jwtUtils.getSignInKey();
-//        assertNotNull(key);
-//    }
 
     @Test
     public void givenInvalidToken_whenExtractUsername_thenThrowsException() {

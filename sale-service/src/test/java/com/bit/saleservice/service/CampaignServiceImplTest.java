@@ -4,7 +4,6 @@ import com.bit.saleservice.dto.CampaignResponse;
 import com.bit.saleservice.entity.Campaign;
 import com.bit.saleservice.exception.CampaignNotFoundException;
 import com.bit.saleservice.repository.CampaignRepository;
-import com.bit.saleservice.service.CampaignServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

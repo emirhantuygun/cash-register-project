@@ -5,20 +5,24 @@ import com.bit.authservice.entity.Role;
 import com.bit.authservice.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class UserDetailsServiceImplTest {
 
     @Mock
@@ -31,9 +35,6 @@ public class UserDetailsServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-
-        // Set up a sample AppUser for testing
         Role roleUser = new Role("USER");
         appUser = new AppUser();
         appUser.setUsername("testuser");
@@ -64,9 +65,11 @@ public class UserDetailsServiceImplTest {
         // Arrange
         when(userRepository.findByUsername("nonexistentuser")).thenReturn(Optional.empty());
 
-        // Act & Assert
+        // Act
         UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class, () ->
                 userDetailsService.loadUserByUsername("nonexistentuser"));
+
+        //Assert
         assertEquals("User not found with username: nonexistentuser", exception.getMessage());
     }
 }

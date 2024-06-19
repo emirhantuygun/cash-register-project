@@ -1,13 +1,5 @@
 package com.bit.usermanagementservice.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.util.Arrays;
-import java.util.List;
-
 import com.bit.usermanagementservice.dto.UserRequest;
 import com.bit.usermanagementservice.dto.UserResponse;
 import com.bit.usermanagementservice.service.UserService;
@@ -17,15 +9,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserControllerTest {
@@ -38,7 +32,6 @@ public class UserControllerTest {
 
     @BeforeEach
     public void setUp() {
-
     }
 
     @Test
@@ -125,7 +118,7 @@ public class UserControllerTest {
     @Test
     public void testUpdateUser_WithValidUserRequest_ReturnsUpdatedUserResponse() {
         Long userId = 8L;
-        UserRequest userRequest = UserRequest.builder().username("updatedUser").email("updated@domain.com").build();;
+        UserRequest userRequest = UserRequest.builder().username("updatedUser").email("updated@domain.com").build();
         UserResponse userResponse = UserResponse.builder().id(userId).username("updatedUser").email("updated@domain.com").build();
         when(userService.updateUser(eq(userId), any(UserRequest.class))).thenReturn(userResponse);
 

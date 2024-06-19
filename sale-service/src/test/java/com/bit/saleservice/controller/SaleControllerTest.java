@@ -1,6 +1,5 @@
 package com.bit.saleservice.controller;
 
-import com.bit.saleservice.controller.SaleController;
 import com.bit.saleservice.dto.SaleRequest;
 import com.bit.saleservice.dto.SaleResponse;
 import com.bit.saleservice.exception.HeaderProcessingException;

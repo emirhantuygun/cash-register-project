@@ -1,40 +1,33 @@
 package com.bit.authservice.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 import com.bit.authservice.dto.AuthRequest;
 import com.bit.authservice.dto.AuthUserRequest;
 import com.bit.authservice.entity.AppUser;
 import com.bit.authservice.entity.Role;
-import com.bit.authservice.entity.Token;
 import com.bit.authservice.exception.*;
 import com.bit.authservice.repository.RoleRepository;
 import com.bit.authservice.repository.TokenRepository;
 import com.bit.authservice.repository.UserRepository;
 import com.bit.authservice.util.JwtUtils;
 import com.bit.authservice.wrapper.UpdateUserMessage;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-
-import jakarta.servlet.http.HttpServletRequest;
-import redis.clients.jedis.exceptions.JedisException;
-
-import java.util.Arrays;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthServiceImplTest {
@@ -71,7 +64,6 @@ public class AuthServiceImplTest {
 
     private AuthRequest authRequest;
     private AppUser appUser;
-    private Token token;
 
     @BeforeEach
     void setUp() throws RedisOperationException {
@@ -82,13 +74,6 @@ public class AuthServiceImplTest {
                 .username("testUser")
                 .password("encodedPass")
                 .roles(List.of(new Role("ROLE_USER")))
-                .build();
-
-        token = Token.builder()
-                .id(1L)
-                .token("jwtToken")
-                .user(appUser)
-                .loggedOut(false)
                 .build();
 
         authService = spy(authService);
@@ -155,10 +140,6 @@ public class AuthServiceImplTest {
     @Test
     void refreshToken_WithInvalidRefreshToken_ShouldThrowInvalidRefreshTokenException() {
         when(request.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn("NotBearer invalidRefreshToken");
-//        when(jwtUtils.extractUsername(anyString())).thenReturn("username");
-//        when(userDetailsService.loadUserByUsername(anyString())).thenReturn(userDetails);
-//        when(jwtUtils.isValid(anyString(), any())).thenReturn(true);
-//        when(userRepository.findByUsername(anyString())).thenReturn(Optional.ofNullable(appUser));
 
         InvalidRefreshTokenException exception = assertThrows(InvalidRefreshTokenException.class,
                 () -> authService.refreshToken(request));
@@ -167,7 +148,7 @@ public class AuthServiceImplTest {
     }
 
     @Test
-    void refreshToken_WithNonExistentUser_ShouldThrowUserNotFoundException() throws Exception {
+    void refreshToken_WithNonExistentUser_ShouldThrowUserNotFoundException() {
         String refreshToken = "validRefreshToken";
         String username = "testUser";
 
@@ -182,7 +163,7 @@ public class AuthServiceImplTest {
     }
 
     @Test
-    void refreshToken_WithInvalidUserDetails_ShouldThrowUserNotFoundException() throws Exception {
+    void refreshToken_WithInvalidUserDetails_ShouldThrowUserNotFoundException() {
         String refreshToken = "validRefreshToken";
         String username = "testUser";
 
@@ -197,7 +178,7 @@ public class AuthServiceImplTest {
     }
 
     @Test
-    void refreshToken_WithUsernameExtractionFailure_ShouldThrowUsernameExtractionException() throws Exception {
+    void refreshToken_WithUsernameExtractionFailure_ShouldThrowUsernameExtractionException() {
         String refreshToken = "validRefreshToken";
 
         when(request.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn("Bearer " + refreshToken);
@@ -288,86 +269,4 @@ public class AuthServiceImplTest {
         verify(userRepository).deletePermanently(anyLong());
     }
 
-//    @Test
-//    void saveUserToken_WithValidToken_ShouldSaveTokenAndSetInRedis() throws RedisOperationException {
-//        when(tokenRepository.save(any(Token.class))).thenReturn(token);
-//
-//        authService.saveUserToken(appUser, "jwtToken");
-//
-//        verify(tokenRepository).save(any(Token.class));
-//        verify(jedis).set("token:1:is_logged_out", "false");
-//        verify(jedis).set("jwtToken", "1");
-//    }
-//
-//    @Test
-//    void saveUserToken_WithRedisException_ShouldThrowRedisOperationException() {
-//        when(tokenRepository.save(any(Token.class))).thenReturn(token);
-//        doThrow(new JedisException("Redis error")).when(jedis).set(anyString(), anyString());
-//
-//        RedisOperationException exception = assertThrows(RedisOperationException.class,
-//                () -> authService.saveUserToken(appUser, "jwtToken"));
-//
-//        assertEquals("Failed to set token status in Redis", exception.getMessage());
-//    }
-//
-//    @Test
-//    void revokeAllTokensByUser_WithValidTokens_ShouldSetTokensAsLoggedOutAndSaveInRedis() throws RedisOperationException {
-//        List<Token> tokens = List.of(token);
-//        when(tokenRepository.findAllTokensByUser(anyLong())).thenReturn(tokens);
-//
-//        authService.revokeAllTokensByUser(1L);
-//
-//        verify(tokenRepository).saveAll(tokens);
-//        verify(jedis).set("token:1:is_logged_out", "true");
-//    }
-//
-//    @Test
-//    void revokeAllTokensByUser_WithRedisException_ShouldThrowRedisOperationException() {
-//        List<Token> tokens = List.of(token);
-//        when(tokenRepository.findAllTokensByUser(anyLong())).thenReturn(tokens);
-//        doThrow(new JedisException("Redis error")).when(jedis).set(anyString(), anyString());
-//
-//        RedisOperationException exception = assertThrows(RedisOperationException.class,
-//                () -> authService.revokeAllTokensByUser(1L));
-//
-//        assertEquals("Failed to set token status in Redis", exception.getMessage());
-//    }
-//
-//    @Test
-//    void getRolesAsString_WithValidRoles_ShouldReturnRoleNamesAsList() {
-//        List<Role> roles = List.of(new Role("ROLE_USER"), new Role("ROLE_ADMIN"));
-//
-//        List<String> roleNames = authService.getRolesAsString(roles);
-//
-//        assertNotNull(roleNames);
-//        assertEquals(2, roleNames.size());
-//        assertTrue(roleNames.contains("ROLE_USER"));
-//        assertTrue(roleNames.contains("ROLE_ADMIN"));
-//    }
-//
-//    @Test
-//    void getRolesAsRole_WithValidRoleNames_ShouldReturnRolesAsList() throws RoleNotFoundException {
-//        when(roleRepository.findByRoleName("ROLE_USER")).thenReturn(Optional.of(new Role("ROLE_USER")));
-//        when(roleRepository.findByRoleName("ROLE_ADMIN")).thenReturn(Optional.of(new Role("ROLE_ADMIN")));
-//
-//        List<String> roleNames = List.of("ROLE_USER", "ROLE_ADMIN");
-//        List<Role> roles = authService.getRolesAsRole(roleNames);
-//
-//        assertNotNull(roles);
-//        assertEquals(2, roles.size());
-//        assertTrue(roles.stream().anyMatch(role -> role.getRoleName().equals("ROLE_USER")));
-//        assertTrue(roles.stream().anyMatch(role -> role.getRoleName().equals("ROLE_ADMIN")));
-//    }
-//
-//    @Test
-//    void getRolesAsRole_WithInvalidRoleName_ShouldThrowRoleNotFoundException() {
-//        when(roleRepository.findByRoleName("ROLE_INVALID")).thenReturn(Optional.empty());
-//
-//        List<String> roleNames = List.of("ROLE_INVALID");
-//
-//        RoleNotFoundException exception = assertThrows(RoleNotFoundException.class,
-//                () -> authService.getRolesAsRole(roleNames));
-//
-//        assertEquals("Role ROLE_INVALID not found", exception.getMessage());
-//    }
 }

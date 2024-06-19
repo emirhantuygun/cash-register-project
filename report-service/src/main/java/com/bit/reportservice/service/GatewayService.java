@@ -192,7 +192,7 @@ public class GatewayService {
     }
 
 
-    public HttpHeaders getHttpHeaders() throws HeaderProcessingException {
+    protected HttpHeaders getHttpHeaders() throws HeaderProcessingException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 

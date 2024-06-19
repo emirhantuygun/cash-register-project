@@ -1,4 +1,4 @@
-package com.bit.reportservice;
+package com.bit.reportservice.service;
 
 import com.bit.reportservice.dto.ProductResponse;
 import com.bit.reportservice.dto.SaleResponse;

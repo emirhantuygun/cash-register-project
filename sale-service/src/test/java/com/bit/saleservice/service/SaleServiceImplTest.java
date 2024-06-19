@@ -11,9 +11,6 @@ import com.bit.saleservice.exception.SaleNotFoundException;
 import com.bit.saleservice.exception.SaleNotSoftDeletedException;
 import com.bit.saleservice.repository.ProductRepository;
 import com.bit.saleservice.repository.SaleRepository;
-import com.bit.saleservice.service.CampaignProcessService;
-import com.bit.saleservice.service.GatewayService;
-import com.bit.saleservice.service.SaleServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class SaleServiceImplTest {
+public class SaleServiceImplTest {
 
     @InjectMocks
     private SaleServiceImpl saleService;
@@ -188,7 +185,7 @@ class SaleServiceImplTest {
     }
 
     @Test
-    void testCancelSale_ExistingSale_CancelsSale() throws HeaderProcessingException {
+    void testCancelSale_ExistingSale_CancelsSale() {
         // Arrange
         Long id =1L;
         Sale existingSale = new Sale();
@@ -214,21 +211,6 @@ class SaleServiceImplTest {
         // Act and Assert
         assertThrows(SaleNotFoundException.class, () -> saleService.cancelSale(id));
     }
-
-//    @Test
-//    void testRestoreSale_ExistingSoftDeletedSale_RestoresSale() {
-//        // Arrange
-//        Long id = 1L;
-//        Sale existingSale = new Sale();
-//        existingSale.setDeleted(true);
-//        when(saleRepository.findById(id)).thenReturn(Optional.of(existingSale));
-//
-//        // Act
-//        saleService.restoreSale(id);
-//
-//        // Assert
-//        verify(saleRepository).restoreSale(id);
-//    }
 
     @Test
     void testRestoreSale_NonExistingSoftDeletedSale_ThrowsSaleNotSoftDeletedException() {
@@ -270,7 +252,6 @@ class SaleServiceImplTest {
     void testDeleteSalePermanently_ExistingSale_DeletesSalePermanently() {
         // Arrange
         Long id = 1L;
-        Sale existingSale = new Sale();
         when(saleRepository.existsById(id)).thenReturn(true);
 
         // Act

@@ -1,4 +1,4 @@
-package com.bit.productservice;
+package com.bit.productservice.service;
 
 import com.bit.productservice.exception.AlgorithmNotFoundException;
 import com.bit.productservice.service.BarcodeService;

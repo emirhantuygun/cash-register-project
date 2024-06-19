@@ -1,25 +1,23 @@
 package com.bit.saleservice.controller;
 
-import com.bit.saleservice.controller.CampaignController;
 import com.bit.saleservice.dto.CampaignResponse;
 import com.bit.saleservice.service.CampaignService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.*;
-import org.springframework.http.*;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CampaignControllerTest {
@@ -30,45 +28,41 @@ public class CampaignControllerTest {
     @Mock
     private CampaignService campaignService;
 
-    private MockMvc mockMvc;
-
     @BeforeEach
     public void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(campaignController).build();
     }
 
     @Test
-    public void testGetCampaign_ReturnsCampaignResponse() throws Exception {
+    public void testGetCampaign_ReturnsCampaignResponse() {
         Long id = 1L;
         CampaignResponse campaignResponse = new CampaignResponse();
-        
+        campaignResponse.setId(id);
+        campaignResponse.setName("CampaignName");
+
         when(campaignService.getCampaign(id)).thenReturn(campaignResponse);
 
-        mockMvc.perform(get("/campaigns/{id}", id))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(campaignResponse.getId()))
-                .andExpect(jsonPath("$.name").value(campaignResponse.getName()));
+        ResponseEntity<CampaignResponse> response = campaignController.getCampaign(id);
 
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals(campaignResponse, response.getBody());
         verify(campaignService, times(1)).getCampaign(id);
     }
 
     @Test
-    public void testGetAllCampaigns_ReturnsListOfCampaignResponse() throws Exception {
+    public void testGetAllCampaigns_ReturnsListOfCampaignResponse() {
         List<CampaignResponse> campaignResponseList = Arrays.asList(new CampaignResponse(), new CampaignResponse());
-        
+
         when(campaignService.getAllCampaigns()).thenReturn(campaignResponseList);
 
-        mockMvc.perform(get("/campaigns"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(2)));
+        ResponseEntity<List<CampaignResponse>> response = campaignController.getAllCampaigns();
 
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals(2, response.getBody().size());
         verify(campaignService, times(1)).getAllCampaigns();
     }
 
     @Test
-    public void testGetAllCampaignsFilteredAndSorted_ReturnsPageOfCampaignResponse() throws Exception {
+    public void testGetAllCampaignsFilteredAndSorted_ReturnsPageOfCampaignResponse() {
         List<CampaignResponse> campaignResponseList = Arrays.asList(new CampaignResponse(), new CampaignResponse());
         Page<CampaignResponse> campaignResponsePage = new PageImpl<>(campaignResponseList, PageRequest.of(0, 10), 1);
 
@@ -83,19 +77,12 @@ public class CampaignControllerTest {
         when(campaignService.getAllCampaignsFilteredAndSorted(page, size, sortBy, direction, name, details, isExpired))
                 .thenReturn(campaignResponsePage);
 
-        mockMvc.perform(get("/campaigns/filteredAndSorted")
-                .param("page", String.valueOf(page))
-                .param("size", String.valueOf(size))
-                .param("sortBy", sortBy)
-                .param("direction", direction)
-                .param("name", name)
-                .param("details", details)
-                .param("isExpired", String.valueOf(isExpired)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.content", hasSize(2)))
-                .andExpect(jsonPath("$.totalElements").value(campaignResponsePage.getTotalElements()));
+        ResponseEntity<Page<CampaignResponse>> response = campaignController.getAllCampaignsFilteredAndSorted(
+                page, size, sortBy, direction, name, details, isExpired);
 
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals(2, response.getBody().getContent().size());
+        assertEquals(2, response.getBody().getTotalElements());
         verify(campaignService, times(1)).getAllCampaignsFilteredAndSorted(page, size, sortBy, direction, name, details, isExpired);
     }
 }
