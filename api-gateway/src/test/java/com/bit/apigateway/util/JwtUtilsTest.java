@@ -34,8 +34,28 @@ public class JwtUtilsTest {
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(jwtUtils, "SIGNER_KEY", "4bb6d1dfbafb64a681139d1586b6f1160d18159afd57c8c79136d7490630407c");
+        ReflectionTestUtils.setField(jwtUtils, "redisHost", "localhost");
+        ReflectionTestUtils.setField(jwtUtils, "redisPort", "6379");
     }
 
+    @Test
+    public void givenValidRedisHostAndPort_whenInitMethodIsCalled_thenJedisInstanceIsInitialized() {
+        // Act
+        jwtUtils.init();
+        Jedis jedis = (Jedis) ReflectionTestUtils.getField(jwtUtils, "jedis");
+
+        // Assert
+        assertNotNull(jedis, "Jedis instance should be initialized");
+    }
+
+    @Test
+    public void givenInvalidPort_whenInitMethodIsCalled_thenNumberFormatExceptionIsThrown() {
+        // Arrange
+        ReflectionTestUtils.setField(jwtUtils, "redisPort", "invalidPort");
+
+        // Act & Assert
+        assertThrows(NumberFormatException.class, () -> jwtUtils.init(), "Invalid port should throw NumberFormatException");
+    }
 
     @Test
     void testGetClaimsAndValidate_ShouldThrowInvalidTokenException_WhenTokenIsNull() {
