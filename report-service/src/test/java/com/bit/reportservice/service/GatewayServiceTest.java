@@ -45,56 +45,69 @@ public class GatewayServiceTest {
 
     @Test
     void getSale_Success_ReturnsSaleResponse() throws HeaderProcessingException {
+        // Arrange
         SaleResponse saleResponse = new SaleResponse();
         when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(SaleResponse.class), anyLong()))
                 .thenReturn(new ResponseEntity<>(saleResponse, HttpStatus.OK));
 
+        // Act
         SaleResponse result = gatewayService.getSale(1L);
 
+        // Assert
         assertNotNull(result);
         assertEquals(saleResponse, result);
     }
 
     @Test
     void getSale_HttpClientErrorException_ThrowsSaleServiceException() {
+        // Arrange
         when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(SaleResponse.class), anyLong()))
                 .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
 
+        // Act & Assert
         assertThrows(SaleServiceException.class, () -> gatewayService.getSale(1L));
     }
 
     @Test
     void getAllSales_Success_ReturnsListOfSaleResponse() throws HeaderProcessingException {
+        // Arrange
         List<SaleResponse> saleResponses = Arrays.asList(new SaleResponse(), new SaleResponse());
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class),
                 any(ParameterizedTypeReference.class)))
                 .thenReturn(new ResponseEntity<>(saleResponses, HttpStatus.OK));
 
+        // Act
         List<SaleResponse> result = gatewayService.getAllSales();
 
+        // Assert
         assertNotNull(result);
         assertEquals(saleResponses.size(), result.size());
     }
 
     @Test
     void getDeletedSales_Success_ReturnsListOfSaleResponse() throws HeaderProcessingException {
+        // Arrange
         List<SaleResponse> deletedSaleResponses = Collections.singletonList(new SaleResponse());
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class),
                 any(ParameterizedTypeReference.class)))
                 .thenReturn(new ResponseEntity<>(deletedSaleResponses, HttpStatus.OK));
 
+        // Act
         List<SaleResponse> result = gatewayService.getDeletedSales();
 
+        // Assert
         assertNotNull(result);
         assertEquals(deletedSaleResponses.size(), result.size());
     }
 
     @Test
     void getAllSalesFilteredAndSorted_RestClientException_ThrowsSaleServiceException() {
+        // Arrange
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class),
                 any(ParameterizedTypeReference.class)))
                 .thenThrow(new RestClientException("REST client error"));
 
+        // Act & Assert
         assertThrows(SaleServiceException.class, () ->
                 gatewayService.getAllSalesFilteredAndSorted(0, 10, "id", "ASC", "cashier", "credit",
                         BigDecimal.TEN, BigDecimal.valueOf(100), "2022-01-01", "2022-12-31"));
@@ -102,6 +115,7 @@ public class GatewayServiceTest {
 
     @Test
     void getAllSalesFilteredAndSorted_Success_ReturnsPageOfSaleResponse() throws HeaderProcessingException {
+        // Arrange
         List<SaleResponse> saleResponses = Arrays.asList(new SaleResponse(), new SaleResponse());
         PageWrapper<SaleResponse> pageWrapper = new PageWrapper<>(saleResponses, 2, 10, 10L);
 
@@ -109,11 +123,12 @@ public class GatewayServiceTest {
                 eq(new ParameterizedTypeReference<PageWrapper<SaleResponse>>() {})))
                 .thenReturn(new ResponseEntity<>(pageWrapper, HttpStatus.OK));
 
+        // Act
         Page<SaleResponse> result = gatewayService.getAllSalesFilteredAndSorted(0, 10, "id", "ASC", "cashier", "credit",
                 BigDecimal.TEN, BigDecimal.valueOf(100), "2022-01-01", "2022-12-31");
 
+        // Assert
         assertNotNull(result);
         assertEquals(saleResponses.size(), result.getContent().size());
     }
-
 }

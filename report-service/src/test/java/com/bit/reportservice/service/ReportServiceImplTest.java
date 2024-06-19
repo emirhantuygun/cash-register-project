@@ -3,18 +3,17 @@ package com.bit.reportservice.service;
 import com.bit.reportservice.dto.SaleResponse;
 import com.bit.reportservice.exception.HeaderProcessingException;
 import com.bit.reportservice.exception.ReceiptGenerationException;
-import com.bit.reportservice.service.GatewayService;
-import com.bit.reportservice.service.ReceiptService;
-import com.bit.reportservice.service.ReportServiceImpl;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -32,49 +31,53 @@ public class ReportServiceImplTest {
     @Mock
     private ReceiptService receiptService;
 
-    @BeforeEach
-    public void setUp() {
-    }
-
     @Test
     public void testGetSale_ReturnsSaleResponse() throws HeaderProcessingException {
+        // Arrange
         Long id = 1L;
         SaleResponse saleResponse = new SaleResponse();
-        
         when(gatewayService.getSale(id)).thenReturn(saleResponse);
 
+        // Act
         SaleResponse result = reportService.getSale(id);
 
+
+        // Assert
         assertThat(result).isEqualTo(saleResponse);
         verify(gatewayService, times(1)).getSale(id);
     }
 
     @Test
     public void testGetAllSales_ReturnsListOfSaleResponse() throws HeaderProcessingException {
+        // Arrange
         List<SaleResponse> saleResponseList = Collections.singletonList(new SaleResponse());
-        
         when(gatewayService.getAllSales()).thenReturn(saleResponseList);
 
+        // Act
         List<SaleResponse> result = reportService.getAllSales();
 
+        // Assert
         assertThat(result).isEqualTo(saleResponseList);
         verify(gatewayService, times(1)).getAllSales();
     }
 
     @Test
     public void testGetDeletedSales_ReturnsListOfSaleResponse() throws HeaderProcessingException {
+        // Arrange
         List<SaleResponse> saleResponseList = Collections.singletonList(new SaleResponse());
-        
         when(gatewayService.getDeletedSales()).thenReturn(saleResponseList);
 
+        // Act
         List<SaleResponse> result = reportService.getDeletedSales();
 
+        // Assert
         assertThat(result).isEqualTo(saleResponseList);
         verify(gatewayService, times(1)).getDeletedSales();
     }
 
     @Test
     public void testGetAllSalesFilteredAndSorted_ReturnsPageOfSaleResponse() throws HeaderProcessingException {
+        // Arrange
         List<SaleResponse> saleResponseList = Collections.singletonList(new SaleResponse());
         Page<SaleResponse> saleResponsePage = new PageImpl<>(saleResponseList);
         
@@ -92,14 +95,17 @@ public class ReportServiceImplTest {
         when(gatewayService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate))
                 .thenReturn(saleResponsePage);
 
+        // Act
         Page<SaleResponse> result = reportService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate);
 
+        // Assert
         assertThat(result).isEqualTo(saleResponsePage);
         verify(gatewayService, times(1)).getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate);
     }
 
     @Test
     public void testGetReceipt_ReturnsReceiptBytes() throws HeaderProcessingException, ReceiptGenerationException {
+        // Arrange
         Long id = 1L;
         SaleResponse saleResponse = new SaleResponse();
         byte[] receiptBytes = new byte[]{1, 2, 3};
@@ -107,8 +113,10 @@ public class ReportServiceImplTest {
         when(gatewayService.getSale(id)).thenReturn(saleResponse);
         when(receiptService.generateReceipt(saleResponse)).thenReturn(receiptBytes);
 
+        // Act
         byte[] result = reportService.getReceipt(id);
 
+        // Assert
         assertThat(result).isEqualTo(receiptBytes);
         verify(gatewayService, times(1)).getSale(id);
         verify(receiptService, times(1)).generateReceipt(saleResponse);
@@ -116,21 +124,24 @@ public class ReportServiceImplTest {
 
     @Test
     public void testGetReceipt_ThrowsHeaderProcessingException() throws HeaderProcessingException {
+        // Arrange
         Long id = 1L;
-        
         when(gatewayService.getSale(id)).thenThrow(HeaderProcessingException.class);
 
+        // Act & Assert
         assertThrows(HeaderProcessingException.class, () -> reportService.getReceipt(id));
     }
 
     @Test
     public void testGetReceipt_ThrowsReceiptGenerationException() throws HeaderProcessingException, ReceiptGenerationException {
+        // Arrange
         Long id = 1L;
         SaleResponse saleResponse = new SaleResponse();
         
         when(gatewayService.getSale(id)).thenReturn(saleResponse);
         when(receiptService.generateReceipt(saleResponse)).thenThrow(ReceiptGenerationException.class);
 
+        // Act & Assert
         assertThrows(ReceiptGenerationException.class, () -> reportService.getReceipt(id));
     }
 }

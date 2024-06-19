@@ -1,6 +1,5 @@
 package com.bit.reportservice.controller;
 
-import com.bit.reportservice.controller.ReportController;
 import com.bit.reportservice.dto.SaleResponse;
 import com.bit.reportservice.exception.HeaderProcessingException;
 import com.bit.reportservice.exception.ReceiptGenerationException;
@@ -44,11 +43,14 @@ public class ReportControllerTest {
 
     @Test
     public void testGetSaleById_ReturnsSaleResponse() throws HeaderProcessingException {
+        // Arrange
         Long saleId = 1L;
         when(reportService.getSale(saleId)).thenReturn(saleResponse);
 
+        // Act
         ResponseEntity<SaleResponse> response = reportController.getSale(saleId);
 
+        // Assert
         assertEquals(200, response.getStatusCode().value());
         assertEquals(saleResponse, response.getBody());
         verify(reportService, times(1)).getSale(saleId);
@@ -56,10 +58,13 @@ public class ReportControllerTest {
 
     @Test
     public void testGetAllSales_ReturnsListOfSaleResponse() throws HeaderProcessingException {
+        // Arrange
         when(reportService.getAllSales()).thenReturn(Collections.singletonList(saleResponse));
 
+        // Act
         ResponseEntity<List<SaleResponse>> response = reportController.getAllSales();
 
+        // Assert
         assertEquals(200, response.getStatusCode().value());
         assertEquals(1, response.getBody().size());
         assertEquals(saleResponse, response.getBody().get(0));
@@ -68,10 +73,13 @@ public class ReportControllerTest {
 
     @Test
     public void testGetDeletedSales_ReturnsListOfSaleResponse() throws HeaderProcessingException {
+        // Arrange
         when(reportService.getDeletedSales()).thenReturn(Collections.singletonList(saleResponse));
 
+        // Act
         ResponseEntity<List<SaleResponse>> response = reportController.getDeletedSales();
 
+        // Assert
         assertEquals(200, response.getStatusCode().value());
         assertEquals(1, response.getBody().size());
         assertEquals(saleResponse, response.getBody().get(0));
@@ -80,6 +88,7 @@ public class ReportControllerTest {
 
     @Test
     public void testGetAllSalesFilteredAndSorted_ReturnsPageOfSaleResponse() throws HeaderProcessingException {
+        // Arrange
         int page = 0;
         int size = 10;
         String sortBy = "id";
@@ -95,9 +104,11 @@ public class ReportControllerTest {
                 eq(page), eq(size), eq(sortBy), eq(direction), eq(cashier), eq(paymentMethod), eq(minPrice), eq(maxPrice), eq(startDate), eq(endDate)))
                 .thenReturn(saleResponsePage);
 
+        // Act
         ResponseEntity<Page<SaleResponse>> response = reportController.getAllSalesFilteredAndSorted(
                 page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate);
 
+        // Assert
         assertEquals(200, response.getStatusCode().value());
         assertEquals(1, response.getBody().getContent().size());
         assertEquals(saleResponse, response.getBody().getContent().get(0));
@@ -107,12 +118,15 @@ public class ReportControllerTest {
 
     @Test
     public void testGetReceiptById_ReturnsPdfBytes() throws ReceiptGenerationException, HeaderProcessingException {
+        // Arrange
         Long saleId = 1L;
         byte[] pdfBytes = new byte[]{1, 2, 3, 4};
         when(reportService.getReceipt(saleId)).thenReturn(pdfBytes);
 
+        // Act
         ResponseEntity<byte[]> response = reportController.getReceipt(saleId);
 
+        // Assert
         assertEquals(201, response.getStatusCode().value());
         assertEquals("application/pdf", response.getHeaders().getContentType().toString());
         assertArrayEquals(pdfBytes, response.getBody());
