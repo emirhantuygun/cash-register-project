@@ -16,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -42,13 +41,8 @@ public class SaleServiceImplTest {
     private ProductRepository productRepository;
 
     @Mock
-    private CampaignProcessService campaignProcessService;
-
-    @Mock
     private GatewayService gatewayService;
 
-    @Mock
-    private RabbitTemplate rabbitTemplate;
 
     @Test
     void testGetSale_ExistingSale_ReturnsSaleResponse() {
@@ -75,7 +69,7 @@ public class SaleServiceImplTest {
         Long id = 1L;
         when(saleRepository.findById(id)).thenReturn(Optional.empty());
 
-        // Act and Assert
+        // Act & Assert
         assertThrows(SaleNotFoundException.class, () -> saleService.getSale(id));
     }
 
@@ -180,7 +174,7 @@ public class SaleServiceImplTest {
         SaleRequest saleRequest = new SaleRequest();
         when(saleRepository.findById(id)).thenReturn(Optional.empty());
 
-        // Act and Assert
+        // Act & Assert
         assertThrows(SaleNotFoundException.class, () -> saleService.updateSale(id, saleRequest));
     }
 
@@ -208,7 +202,7 @@ public class SaleServiceImplTest {
         Long id = 1L;
         when(saleRepository.findById(id)).thenReturn(Optional.empty());
 
-        // Act and Assert
+        // Act & Assert
         assertThrows(SaleNotFoundException.class, () -> saleService.cancelSale(id));
     }
 
@@ -219,7 +213,7 @@ public class SaleServiceImplTest {
         Sale existingSale = new Sale();
         lenient().when(saleRepository.findById(id)).thenReturn(Optional.of(existingSale));
 
-        // Act and Assert
+        // Act & Assert
         assertThrows(SaleNotSoftDeletedException.class, () -> saleService.restoreSale(id));
     }
 
@@ -244,7 +238,7 @@ public class SaleServiceImplTest {
         Long id = 1L;
         lenient().when(saleRepository.findById(id)).thenReturn(Optional.empty());
 
-        // Act and Assert
+        // Act & Assert
         assertThrows(SaleNotFoundException.class, () -> saleService.deleteSale(id));
     }
 
@@ -267,7 +261,7 @@ public class SaleServiceImplTest {
         Long id = 1L;
         lenient().when(saleRepository.findById(id)).thenReturn(Optional.empty());
 
-        // Act and Assert
+        // Act & Assert
         assertThrows(SaleNotFoundException.class, () -> saleService.deleteSalePermanently(id));
     }
 }

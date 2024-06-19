@@ -4,7 +4,6 @@ import com.bit.saleservice.dto.CampaignResponse;
 import com.bit.saleservice.entity.Campaign;
 import com.bit.saleservice.exception.CampaignNotFoundException;
 import com.bit.saleservice.repository.CampaignRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,12 +28,9 @@ public class CampaignServiceImplTest {
     @InjectMocks
     private CampaignServiceImpl campaignService;
 
-    @BeforeEach
-    public void setUp() {
-    }
-
     @Test
     public void testGetCampaign_WhenCampaignExists_ReturnsCampaignResponse() {
+        // Arrange
         Long campaignId = 1L;
         Campaign campaign = new Campaign();
         campaign.setId(campaignId);
@@ -44,8 +40,10 @@ public class CampaignServiceImplTest {
 
         when(campaignRepository.findById(campaignId)).thenReturn(Optional.of(campaign));
 
+        // Act
         CampaignResponse response = campaignService.getCampaign(campaignId);
 
+        // Assert
         assertNotNull(response);
         assertEquals(campaignId, response.getId());
         assertEquals("Test Campaign", response.getName());
@@ -54,15 +52,18 @@ public class CampaignServiceImplTest {
 
     @Test
     public void testGetCampaign_WhenCampaignDoesNotExist_ThrowsCampaignNotFoundException() {
+        // Arrange
         Long campaignId = 1L;
         when(campaignRepository.findById(campaignId)).thenReturn(Optional.empty());
 
+        // Act & Assert
         assertThrows(CampaignNotFoundException.class, () -> campaignService.getCampaign(campaignId));
         verify(campaignRepository).findById(campaignId);
     }
 
     @Test
     public void testGetAllCampaigns_ReturnsListOfCampaignResponses() {
+        // Arrange
         List<Campaign> campaigns = Arrays.asList(
             new Campaign(1L, "Campaign 1", "Details 1", new Date(), false, Collections.emptyList()),
             new Campaign(2L, "Campaign 2", "Details 2", new Date(), false, Collections.emptyList())
@@ -70,8 +71,10 @@ public class CampaignServiceImplTest {
         
         when(campaignRepository.findAll()).thenReturn(campaigns);
 
+        // Act
         List<CampaignResponse> responses = campaignService.getAllCampaigns();
 
+        // Assert
         assertNotNull(responses);
         assertEquals(2, responses.size());
         verify(campaignRepository).findAll();
@@ -79,6 +82,7 @@ public class CampaignServiceImplTest {
 
     @Test
     public void testGetAllCampaignsFilteredAndSorted_ReturnsPagedCampaignResponses() {
+        // Arrange
         List<Campaign> campaigns = Arrays.asList(
             new Campaign(1L, "Campaign 1", "Details 1", new Date(), false, Collections.emptyList()),
             new Campaign(2L, "Campaign 2", "Details 2", new Date(), false, Collections.emptyList())
@@ -87,12 +91,13 @@ public class CampaignServiceImplTest {
 
         when(campaignRepository.findAll((Specification<Campaign>) any(), any(Pageable.class))).thenReturn(campaignPage);
 
+        // Act
         Page<CampaignResponse> responsePage = campaignService.getAllCampaignsFilteredAndSorted(
             0, 10, "name", "ASC", "Campaign", "Details", null);
 
+        // Assert
         assertNotNull(responsePage);
         assertEquals(2, responsePage.getTotalElements());
         verify(campaignRepository).findAll((Specification<Campaign>) any(), any(Pageable.class));
     }
-
 }
