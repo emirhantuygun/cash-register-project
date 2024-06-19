@@ -7,11 +7,8 @@ import com.bit.productservice.exception.AlgorithmNotFoundException;
 import com.bit.productservice.exception.ProductNotFoundException;
 import com.bit.productservice.exception.ProductNotSoftDeletedException;
 import com.bit.productservice.repository.ProductRepository;
-import com.bit.productservice.service.BarcodeService;
-import com.bit.productservice.service.ProductServiceImpl;
 import com.bit.productservice.wrapper.ProductStockReduceRequest;
 import com.bit.productservice.wrapper.ProductStockReturnRequest;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,9 +18,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -40,10 +39,6 @@ class ProductServiceImplTest {
 
     @InjectMocks
     private ProductServiceImpl productService;
-
-    @BeforeEach
-    void setUp() {
-    }
 
     @Test
     void getProduct_shouldReturnProductResponse_whenProductExists() {
@@ -105,7 +100,6 @@ class ProductServiceImplTest {
         Product product = new Product();
         product.setId(1L);
         Page<Product> productPage = new PageImpl<>(Collections.singletonList(product));
-        //noinspection unchecked
         when(productRepository.findAll((Specification<Product>) any(), any(Pageable.class))).thenReturn(productPage);
 
         // Act
@@ -141,6 +135,7 @@ class ProductServiceImplTest {
         productRequest.setName("Updated Product");
         Product existingProduct = new Product();
         existingProduct.setId(1L);
+
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(existingProduct));
         when(barcodeService.generateBarcodeNumber(anyString())).thenReturn("1234567890123");
         when(productRepository.save(any(Product.class))).thenReturn(existingProduct);
@@ -168,6 +163,7 @@ class ProductServiceImplTest {
         // Arrange
         Product product = new Product();
         product.setId(1L);
+
         when(productRepository.existsByIdAndDeletedTrue(anyLong())).thenReturn(true);
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
 
@@ -216,6 +212,7 @@ class ProductServiceImplTest {
         Product product = new Product();
         product.setId(1L);
         product.setStockQuantity(10);
+
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
 
         // Act
@@ -231,6 +228,7 @@ class ProductServiceImplTest {
         Product product = new Product();
         product.setId(1L);
         product.setStockQuantity(10);
+
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
 
         // Act
@@ -256,6 +254,7 @@ class ProductServiceImplTest {
         product.setId(1L);
         product.setStockQuantity(10);
         ProductStockReduceRequest request = new ProductStockReduceRequest(1L, 5);
+
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
 
         // Act
@@ -273,6 +272,7 @@ class ProductServiceImplTest {
         product.setId(1L);
         product.setStockQuantity(10);
         ProductStockReturnRequest request = new ProductStockReturnRequest(1L, 5);
+
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
 
         // Act
