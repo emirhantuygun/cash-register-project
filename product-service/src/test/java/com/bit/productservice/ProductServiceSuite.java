@@ -5,10 +5,8 @@ import org.junit.platform.suite.api.Suite;
 
 @Suite
 @SelectPackages({
-        "com.bit.authservice.config",
-        "com.bit.authservice.controller",
-        "com.bit.authservice.service",
-        "com.bit.authservice.util."
+        "com.bit.productservice.controller",
+        "com.bit.productservice.service"
 })
 public class ProductServiceSuite {
 }
