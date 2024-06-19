@@ -26,5 +26,4 @@ public class Resilience4JConfig {
                         .build())
                 .build());
     }
-
 }

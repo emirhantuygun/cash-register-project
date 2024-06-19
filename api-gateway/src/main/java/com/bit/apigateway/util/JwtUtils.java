@@ -65,7 +65,6 @@ public class JwtUtils {
     }
 
 
-    @SuppressWarnings("unchecked")
     public List<String> getRoles(Claims claims) {
         return (List<String>) claims.get(AUTHORITIES_KEY);
     }
