@@ -4,6 +4,7 @@ import com.bit.authservice.dto.AuthRequest;
 import com.bit.authservice.dto.AuthUserRequest;
 import com.bit.authservice.entity.AppUser;
 import com.bit.authservice.entity.Role;
+import com.bit.authservice.entity.Token;
 import com.bit.authservice.exception.*;
 import com.bit.authservice.repository.RoleRepository;
 import com.bit.authservice.repository.TokenRepository;
@@ -23,8 +24,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.exceptions.JedisException;
+
 import java.util.List;
 import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -59,6 +65,9 @@ public class AuthServiceImplTest {
     @Mock
     private UserDetails userDetails;
 
+    @Mock
+    private Jedis jedis;
+
     @InjectMocks
     private AuthServiceImpl authService;
 
@@ -66,7 +75,11 @@ public class AuthServiceImplTest {
     private AppUser appUser;
 
     @BeforeEach
-    void setUp() throws RedisOperationException {
+    void setUp() {
+        ReflectionTestUtils.setField(authService, "redisHost", "localhost");
+        ReflectionTestUtils.setField(authService, "redisPort", "6379");
+        ReflectionTestUtils.setField(authService, "jedis", jedis);
+
         authRequest = new AuthRequest("testUser", "testPass");
 
         appUser = AppUser.builder()
@@ -75,9 +88,29 @@ public class AuthServiceImplTest {
                 .password("encodedPass")
                 .roles(List.of(new Role("ROLE_USER")))
                 .build();
+    }
 
+    @Test
+    public void givenValidRedisHostAndPort_whenInitMethodIsCalled_thenJedisInstanceIsInitialized() throws RedisOperationException {
+        // Arrange
         authService = spy(authService);
         lenient().doNothing().when(authService).saveUserToken(any(), anyString());
+
+        // Act
+        authService.init();
+        Jedis jedis = (Jedis) ReflectionTestUtils.getField(authService, "jedis");
+
+        // Assert
+        assertNotNull(jedis, "Jedis instance should be initialized");
+    }
+
+    @Test
+    public void givenInvalidPort_whenInitMethodIsCalled_thenNumberFormatExceptionIsThrown() {
+        // Arrange
+        ReflectionTestUtils.setField(authService, "redisPort", "invalidPort");
+
+        // Act & Assert
+        assertThrows(NumberFormatException.class, () -> authService.init(), "Invalid port should throw NumberFormatException");
     }
 
     @Test
@@ -302,5 +335,18 @@ public class AuthServiceImplTest {
         // Assert
         verify(userRepository).deleteRolesForUser(anyLong());
         verify(userRepository).deletePermanently(anyLong());
+    }
+
+    @Test
+    public void givenJedisException_whenSaveUserTokenIsCalled_thenRedisOperationExceptionIsThrown() {
+        // Arrange
+        AppUser user = new AppUser();
+        String jwtToken = "sample-jwt-token";
+        doThrow(JedisException.class).when(jedis).set(anyString(), anyString());
+
+        // Act & Assert
+        assertThrows(RedisOperationException.class, () -> authService.saveUserToken(user, jwtToken));
+        verify(tokenRepository, times(1)).save(any(Token.class));
+        verify(jedis, times(1)).set(anyString(), anyString());
     }
 }

@@ -30,7 +30,7 @@ public class CustomLogoutHandler implements LogoutHandler {
     private String redisPort;
 
     @PostConstruct
-    public void init() {
+    protected void init() {
         this.jedis = new Jedis(redisHost, Integer.parseInt(redisPort));
     }
 
