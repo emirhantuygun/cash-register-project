@@ -46,11 +46,14 @@ class AuthControllerTest {
 
     @Test
     void testLogin_Success() throws RedisOperationException {
+        // Arrange
         List<String> tokens = List.of("accessToken", "refreshToken");
         when(authService.login(authRequest)).thenReturn(tokens);
 
+        // Act
         ResponseEntity<AuthResponse> response = authController.login(authRequest);
 
+        // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(AuthStatus.LOGIN_SUCCESS, response.getBody().authStatus());
@@ -60,11 +63,14 @@ class AuthControllerTest {
 
     @Test
     void testRefreshToken_Success() throws RedisOperationException, InvalidRefreshTokenException, UsernameExtractionException {
+        // Arrange
         List<String> tokens = List.of("newAccessToken", "newRefreshToken");
         when(authService.refreshToken(httpServletRequest)).thenReturn(tokens);
 
+        // Act
         ResponseEntity<AuthResponse> response = authController.refreshToken(httpServletRequest);
 
+        // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(AuthStatus.TOKEN_REFRESHED_SUCCESSFULLY, response.getBody().authStatus());

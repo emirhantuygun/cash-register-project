@@ -6,7 +6,6 @@ import com.bit.authservice.exception.TokenNotFoundException;
 import com.bit.authservice.repository.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,14 +33,12 @@ public class CustomLogoutHandlerTest {
     @InjectMocks
     private CustomLogoutHandler customLogoutHandler;
 
-    @BeforeEach
-    public void setup() {
-    }
-
     @Test
     public void testLogout_WhenAuthorizationHeaderIsMissing_ShouldThrowMissingAuthorizationHeaderException() {
+        // Arrange
         when(request.getHeader("Authorization")).thenReturn(null);
 
+        // Act & Assert
         assertThrows(MissingAuthorizationHeaderException.class, () ->
             customLogoutHandler.logout(request, response, authentication)
         );
@@ -49,8 +46,10 @@ public class CustomLogoutHandlerTest {
 
     @Test
     public void testLogout_WhenAuthorizationHeaderIsInvalid_ShouldThrowInvalidAuthorizationHeaderException() {
+        // Arrange
         when(request.getHeader("Authorization")).thenReturn("InvalidToken");
 
+        // Act & Assert
         assertThrows(InvalidAuthorizationHeaderException.class, () ->
             customLogoutHandler.logout(request, response, authentication)
         );
@@ -58,10 +57,12 @@ public class CustomLogoutHandlerTest {
 
     @Test
     public void testLogout_WhenTokenNotFound_ShouldThrowTokenNotFoundException() {
+        // Arrange
         String token = "Bearer validToken";
         when(request.getHeader("Authorization")).thenReturn(token);
         when(tokenRepository.findByToken("validToken")).thenReturn(java.util.Optional.empty());
 
+        // Act & Assert
         assertThrows(TokenNotFoundException.class, () ->
             customLogoutHandler.logout(request, response, authentication)
         );

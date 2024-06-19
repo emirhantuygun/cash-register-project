@@ -69,7 +69,7 @@ public class UserDetailsServiceImplTest {
         UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class, () ->
                 userDetailsService.loadUserByUsername("nonexistentuser"));
 
-        //Assert
+        // Assert
         assertEquals("User not found with username: nonexistentuser", exception.getMessage());
     }
 }

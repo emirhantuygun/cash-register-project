@@ -82,13 +82,16 @@ public class AuthServiceImplTest {
 
     @Test
     void login_WithValidCredentials_ShouldReturnAccessTokenAndRefreshToken() throws RedisOperationException {
+        // Arrange
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(null);
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(appUser));
         when(jwtUtils.generateAccessToken(anyString(), anyList())).thenReturn("accessToken");
         when(jwtUtils.generateRefreshToken(anyString())).thenReturn("refreshToken");
 
+        // Act
         List<String> tokens = authService.login(authRequest);
 
+        // Assert
         assertNotNull(tokens);
         assertEquals(2, tokens.size());
         assertEquals("accessToken", tokens.get(0));
@@ -97,9 +100,11 @@ public class AuthServiceImplTest {
 
     @Test
     void login_WithInvalidCredentials_ShouldThrowAuthenticationFailedException() {
+        // Arrange
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenThrow(new RuntimeException("Authentication failed"));
 
+        // Act & Assert
         AuthenticationFailedException exception = assertThrows(AuthenticationFailedException.class,
                 () -> authService.login(authRequest));
 
@@ -108,9 +113,11 @@ public class AuthServiceImplTest {
 
     @Test
     void login_WithNonExistentUser_ShouldThrowUserNotFoundException() {
+        // Arrange
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(null);
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
 
+        // Act & Assert
         UserNotFoundException exception = assertThrows(UserNotFoundException.class,
                 () -> authService.login(authRequest));
 
@@ -119,6 +126,7 @@ public class AuthServiceImplTest {
 
     @Test
     void refreshToken_WithValidRefreshToken_ShouldReturnNewAccessTokenAndRefreshToken() throws Exception {
+        // Arrange
         String refreshToken = "validRefreshToken";
         String username = "testUser";
 
@@ -129,8 +137,10 @@ public class AuthServiceImplTest {
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(appUser));
         when(jwtUtils.generateAccessToken(anyString(), anyList())).thenReturn("newAccessToken");
 
+        // Act
         List<String> tokens = authService.refreshToken(request);
 
+        // Assert
         assertNotNull(tokens);
         assertEquals(2, tokens.size());
         assertEquals("newAccessToken", tokens.get(0));
@@ -139,8 +149,10 @@ public class AuthServiceImplTest {
 
     @Test
     void refreshToken_WithInvalidRefreshToken_ShouldThrowInvalidRefreshTokenException() {
+        // Arrange
         when(request.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn("NotBearer invalidRefreshToken");
 
+        // Act & Assert
         InvalidRefreshTokenException exception = assertThrows(InvalidRefreshTokenException.class,
                 () -> authService.refreshToken(request));
 
@@ -149,6 +161,7 @@ public class AuthServiceImplTest {
 
     @Test
     void refreshToken_WithNonExistentUser_ShouldThrowUserNotFoundException() {
+        // Arrange
         String refreshToken = "validRefreshToken";
         String username = "testUser";
 
@@ -156,6 +169,7 @@ public class AuthServiceImplTest {
         when(jwtUtils.extractUsername(refreshToken)).thenReturn(username);
         when(userDetailsService.loadUserByUsername(username)).thenReturn(null);
 
+        // Act & Assert
         UserNotFoundException exception = assertThrows(UserNotFoundException.class,
                 () -> authService.refreshToken(request));
 
@@ -164,6 +178,7 @@ public class AuthServiceImplTest {
 
     @Test
     void refreshToken_WithInvalidUserDetails_ShouldThrowUserNotFoundException() {
+        // Arrange
         String refreshToken = "validRefreshToken";
         String username = "testUser";
 
@@ -171,6 +186,7 @@ public class AuthServiceImplTest {
         when(jwtUtils.extractUsername(refreshToken)).thenReturn(username);
         when(userDetailsService.loadUserByUsername(username)).thenReturn(null);
 
+        // Act & Assert
         UserNotFoundException exception = assertThrows(UserNotFoundException.class,
                 () -> authService.refreshToken(request));
 
@@ -179,36 +195,41 @@ public class AuthServiceImplTest {
 
     @Test
     void refreshToken_WithUsernameExtractionFailure_ShouldThrowUsernameExtractionException() {
+        // Arrange
         String refreshToken = "validRefreshToken";
 
         when(request.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn("Bearer " + refreshToken);
         when(jwtUtils.extractUsername(refreshToken)).thenReturn(null);
 
+        // Act & Assert
         UsernameExtractionException exception = assertThrows(UsernameExtractionException.class,
                 () -> authService.refreshToken(request));
 
         assertEquals("Username extraction failed", exception.getMessage());
     }
 
-    // Additional tests for RabbitMQ listeners can be added here if needed
-
     @Test
     void createUser_WithValidRequest_ShouldSaveUser() throws RoleNotFoundException {
+        // Arrange
         AuthUserRequest authUserRequest = new AuthUserRequest("testUser", "testPass", List.of("ROLE_USER"));
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPass");
         when(roleRepository.findByRoleName(anyString())).thenReturn(Optional.of(new Role("ROLE_USER")));
         when(userRepository.save(any(AppUser.class))).thenReturn(appUser);
 
+        // Act
         authService.createUser(authUserRequest);
 
+        // Assert
         verify(userRepository).save(any(AppUser.class));
     }
 
     @Test
     void createUser_WithInvalidRole_ShouldThrowRoleNotFoundException() {
+        // Arrange
         AuthUserRequest authUserRequest = new AuthUserRequest("testUser", "testPass", List.of("ROLE_INVALID"));
         when(roleRepository.findByRoleName(anyString())).thenReturn(Optional.empty());
 
+        // Act & Assert
         RoleNotFoundException exception = assertThrows(RoleNotFoundException.class,
                 () -> authService.createUser(authUserRequest));
 
@@ -217,23 +238,28 @@ public class AuthServiceImplTest {
 
     @Test
     void updateUser_WithValidRequest_ShouldUpdateUser() throws RoleNotFoundException {
+        // Arrange
         AuthUserRequest authUserRequest = new AuthUserRequest("testUser", "testPass", List.of("ROLE_USER"));
         UpdateUserMessage updateUserMessage = new UpdateUserMessage(1L, authUserRequest);
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(appUser));
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPass");
         when(roleRepository.findByRoleName(anyString())).thenReturn(Optional.of(new Role("ROLE_USER")));
 
+        // Act
         authService.updateUserWrapped(updateUserMessage);
 
+        // Assert
         verify(userRepository).save(any(AppUser.class));
     }
 
     @Test
     void updateUser_WithNonExistentUser_ShouldThrowUserNotFoundException() {
+        // Arrange
         AuthUserRequest authUserRequest = new AuthUserRequest("testUser", "testPass", List.of("ROLE_USER"));
         UpdateUserMessage updateUserMessage = new UpdateUserMessage(1L, authUserRequest);
         when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
+        // Act & Assert
         UserNotFoundException exception = assertThrows(UserNotFoundException.class,
                 () -> authService.updateUserWrapped(updateUserMessage));
 
@@ -242,31 +268,39 @@ public class AuthServiceImplTest {
 
     @Test
     void restoreUser_WithValidId_ShouldRestoreUser() {
+        // Arrange
         doNothing().when(userRepository).restoreUser(anyLong());
 
+        // Act
         authService.restoreUser(1L);
 
+        // Assert
         verify(userRepository).restoreUser(anyLong());
     }
 
     @Test
     void deleteUser_WithValidId_ShouldDeleteUser() {
+        // Arrange
         doNothing().when(userRepository).deleteById(anyLong());
 
+        // Act
         authService.deleteUser(1L);
 
+        // Assert
         verify(userRepository).deleteById(anyLong());
     }
 
     @Test
     void deleteUserPermanently_WithValidId_ShouldDeleteUserRolesAndPermanentlyDeleteUser() {
+        // Arrange
         doNothing().when(userRepository).deleteRolesForUser(anyLong());
         doNothing().when(userRepository).deletePermanently(anyLong());
 
+        // Act
         authService.deleteUserPermanently(1L);
 
+        // Assert
         verify(userRepository).deleteRolesForUser(anyLong());
         verify(userRepository).deletePermanently(anyLong());
     }
-
 }

@@ -42,47 +42,72 @@ public class JwtUtilsTest {
 
     @Test
     public void givenValidToken_whenExtractUsername_thenUsernameIsExtracted() {
+        // Act
         String token = jwtUtils.generateAccessToken("user", List.of("ROLE_USER"));
         String username = jwtUtils.extractUsername(token);
+
+        // Assert
         assertEquals("user", username);
     }
 
     @Test
     public void givenValidTokenAndUser_whenIsValid_thenReturnsTrue() {
+        // Arrange
         when(userDetails.getUsername()).thenReturn("user");
+
+        // Act
         String token = jwtUtils.generateAccessToken("user", List.of("ROLE_USER"));
+
+        // Assert
         assertTrue(jwtUtils.isValid(token, userDetails));
     }
 
     @Test
     public void givenValidToken_whenExtractClaim_thenCorrectClaimIsExtracted() {
+        // Act
         String token = jwtUtils.generateAccessToken("user", List.of("ROLE_USER"));
         String username = jwtUtils.extractClaim(token, Claims::getSubject);
+
+        // Assert
         assertEquals("user", username);
     }
 
     @Test
     public void givenValidUserAndRoles_whenGenerateAccessToken_thenTokenIsGenerated() {
+        // Act
         String token = jwtUtils.generateAccessToken("user", List.of("ROLE_USER"));
+
+        // Assert
         assertNotNull(token);
     }
 
     @Test
     public void givenValidUser_whenGenerateRefreshToken_thenTokenIsGenerated() {
+        // Act
         String token = jwtUtils.generateRefreshToken("user");
+
+        // Assert
         assertNotNull(token);
     }
 
     @Test
     public void givenValidClaimsAndExpiration_whenBuildToken_thenTokenIsBuilt() {
+        // Arrange
         Claims claims = Jwts.claims().subject("user").build();
+
+        // Act
         String token = jwtUtils.buildToken(claims, accessTokenExpiration);
+
+        // Assert
         assertNotNull(token);
     }
 
     @Test
     public void givenInvalidToken_whenExtractUsername_thenThrowsException() {
+        // Arrange
         String invalidToken = "invalid.token.here";
+
+        // Act & Assert
         assertThrows(MalformedJwtException.class, () -> jwtUtils.extractUsername(invalidToken));
     }
 }
