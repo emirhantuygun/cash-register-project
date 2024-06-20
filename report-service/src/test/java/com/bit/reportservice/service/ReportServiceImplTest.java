@@ -32,7 +32,7 @@ class ReportServiceImplTest {
     private ReceiptService receiptService;
 
     @Test
-    public void testGetSale_ReturnsSaleResponse() throws HeaderProcessingException {
+    void testGetSale_ReturnsSaleResponse() throws HeaderProcessingException {
         // Arrange
         Long id = 1L;
         SaleResponse saleResponse = new SaleResponse();
@@ -48,7 +48,7 @@ class ReportServiceImplTest {
     }
 
     @Test
-    public void testGetAllSales_ReturnsListOfSaleResponse() throws HeaderProcessingException {
+    void testGetAllSales_ReturnsListOfSaleResponse() throws HeaderProcessingException {
         // Arrange
         List<SaleResponse> saleResponseList = Collections.singletonList(new SaleResponse());
         when(gatewayService.getAllSales()).thenReturn(saleResponseList);
@@ -62,7 +62,7 @@ class ReportServiceImplTest {
     }
 
     @Test
-    public void testGetDeletedSales_ReturnsListOfSaleResponse() throws HeaderProcessingException {
+    void testGetDeletedSales_ReturnsListOfSaleResponse() throws HeaderProcessingException {
         // Arrange
         List<SaleResponse> saleResponseList = Collections.singletonList(new SaleResponse());
         when(gatewayService.getDeletedSales()).thenReturn(saleResponseList);
@@ -76,7 +76,7 @@ class ReportServiceImplTest {
     }
 
     @Test
-    public void testGetAllSalesFilteredAndSorted_ReturnsPageOfSaleResponse() throws HeaderProcessingException {
+    void testGetAllSalesFilteredAndSorted_ReturnsPageOfSaleResponse() throws HeaderProcessingException {
         // Arrange
         List<SaleResponse> saleResponseList = Collections.singletonList(new SaleResponse());
         Page<SaleResponse> saleResponsePage = new PageImpl<>(saleResponseList);
@@ -104,7 +104,7 @@ class ReportServiceImplTest {
     }
 
     @Test
-    public void testGetReceipt_ReturnsReceiptBytes() throws HeaderProcessingException, ReceiptGenerationException {
+    void testGetReceipt_ReturnsReceiptBytes() throws HeaderProcessingException, ReceiptGenerationException {
         // Arrange
         Long id = 1L;
         SaleResponse saleResponse = new SaleResponse();
@@ -123,7 +123,7 @@ class ReportServiceImplTest {
     }
 
     @Test
-    public void testGetReceipt_ThrowsHeaderProcessingException() throws HeaderProcessingException {
+    void testGetReceipt_ThrowsHeaderProcessingException() throws HeaderProcessingException {
         // Arrange
         Long id = 1L;
         when(gatewayService.getSale(id)).thenThrow(HeaderProcessingException.class);
@@ -133,7 +133,7 @@ class ReportServiceImplTest {
     }
 
     @Test
-    public void testGetReceipt_ThrowsReceiptGenerationException() throws HeaderProcessingException, ReceiptGenerationException {
+    void testGetReceipt_ThrowsReceiptGenerationException() throws HeaderProcessingException, ReceiptGenerationException {
         // Arrange
         Long id = 1L;
         SaleResponse saleResponse = new SaleResponse();

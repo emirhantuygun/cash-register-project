@@ -36,13 +36,13 @@ class ReportControllerTest {
     private Page<SaleResponse> saleResponsePage;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         saleResponse = new SaleResponse();
         saleResponsePage = new PageImpl<>(Collections.singletonList(saleResponse), PageRequest.of(0, 10), 1);
     }
 
     @Test
-    public void testGetSaleById_ReturnsSaleResponse() throws HeaderProcessingException {
+    void testGetSaleById_ReturnsSaleResponse() throws HeaderProcessingException {
         // Arrange
         Long saleId = 1L;
         when(reportService.getSale(saleId)).thenReturn(saleResponse);
@@ -57,7 +57,7 @@ class ReportControllerTest {
     }
 
     @Test
-    public void testGetAllSales_ReturnsListOfSaleResponse() throws HeaderProcessingException {
+    void testGetAllSales_ReturnsListOfSaleResponse() throws HeaderProcessingException {
         // Arrange
         when(reportService.getAllSales()).thenReturn(Collections.singletonList(saleResponse));
 
@@ -72,7 +72,7 @@ class ReportControllerTest {
     }
 
     @Test
-    public void testGetDeletedSales_ReturnsListOfSaleResponse() throws HeaderProcessingException {
+    void testGetDeletedSales_ReturnsListOfSaleResponse() throws HeaderProcessingException {
         // Arrange
         when(reportService.getDeletedSales()).thenReturn(Collections.singletonList(saleResponse));
 
@@ -87,7 +87,7 @@ class ReportControllerTest {
     }
 
     @Test
-    public void testGetAllSalesFilteredAndSorted_ReturnsPageOfSaleResponse() throws HeaderProcessingException {
+    void testGetAllSalesFilteredAndSorted_ReturnsPageOfSaleResponse() throws HeaderProcessingException {
         // Arrange
         int page = 0;
         int size = 10;
@@ -117,7 +117,7 @@ class ReportControllerTest {
     }
 
     @Test
-    public void testGetReceiptById_ReturnsPdfBytes() throws ReceiptGenerationException, HeaderProcessingException {
+    void testGetReceiptById_ReturnsPdfBytes() throws ReceiptGenerationException, HeaderProcessingException {
         // Arrange
         Long saleId = 1L;
         byte[] pdfBytes = new byte[]{1, 2, 3, 4};
