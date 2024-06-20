@@ -496,7 +496,7 @@ class SaleServiceImplTest {
 
 
     @Test
-    public void testReduceStocks_shouldSendReduceMessagesToRabbitMQ() {
+    void testReduceStocks_shouldSendReduceMessagesToRabbitMQ() {
         // Arrange
         ReflectionTestUtils.setField(saleService, "EXCHANGE", "some-exchange");
         ReflectionTestUtils.setField(saleService, "ROUTING_KEY", "some-routing-key");
@@ -527,7 +527,7 @@ class SaleServiceImplTest {
     }
 
     @Test
-    public void testReduceStocks_shouldThrowRabbitMQExceptionWhenSendingFails() {
+    void testReduceStocks_shouldThrowRabbitMQExceptionWhenSendingFails() {
         // Arrange
         Product product1 = Product.builder()
                 .productId(1L)

@@ -28,7 +28,7 @@ class CampaignControllerTest {
     private CampaignService campaignService;
 
     @Test
-    public void testGetCampaign_ReturnsCampaignResponse() {
+    void testGetCampaign_ReturnsCampaignResponse() {
         // Arrange
         Long id = 1L;
         CampaignResponse campaignResponse = new CampaignResponse();
@@ -47,7 +47,7 @@ class CampaignControllerTest {
     }
 
     @Test
-    public void testGetAllCampaigns_ReturnsListOfCampaignResponse() {
+    void testGetAllCampaigns_ReturnsListOfCampaignResponse() {
         // Arrange
         List<CampaignResponse> campaignResponseList = Arrays.asList(new CampaignResponse(), new CampaignResponse());
         when(campaignService.getAllCampaigns()).thenReturn(campaignResponseList);
@@ -62,7 +62,7 @@ class CampaignControllerTest {
     }
 
     @Test
-    public void testGetAllCampaignsFilteredAndSorted_ReturnsPageOfCampaignResponse() {
+    void testGetAllCampaignsFilteredAndSorted_ReturnsPageOfCampaignResponse() {
         // Arrange
         List<CampaignResponse> campaignResponseList = Arrays.asList(new CampaignResponse(), new CampaignResponse());
         Page<CampaignResponse> campaignResponsePage = new PageImpl<>(campaignResponseList, PageRequest.of(0, 10), 1);

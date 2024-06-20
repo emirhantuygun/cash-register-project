@@ -35,7 +35,7 @@ class CampaignProcessServiceTest {
     private Campaign campaign3;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         campaign1 = new Campaign();
         campaign1.setId(1L);
         campaign1.setExpiration(new Date(System.currentTimeMillis() + 10000));
@@ -50,7 +50,7 @@ class CampaignProcessServiceTest {
     }
 
     @Test
-    public void testGetCampaigns_WithValidIds_ReturnsCampaigns() {
+    void testGetCampaigns_WithValidIds_ReturnsCampaigns() {
         // Arrange
         List<Long> ids = Arrays.asList(1L, 2L, 3L);
         when(campaignRepository.findById(1L)).thenReturn(Optional.of(campaign1));
@@ -68,7 +68,7 @@ class CampaignProcessServiceTest {
     }
 
     @Test
-    public void testProcessCampaigns_WithDuplicateIds_ThrowsDuplicateCampaignException() {
+    void testProcessCampaigns_WithDuplicateIds_ThrowsDuplicateCampaignException() {
         // Arrange
         List<Long> ids = Arrays.asList(1L, 2L, 2L);
         CampaignProcessRequest request = new CampaignProcessRequest();
@@ -79,7 +79,7 @@ class CampaignProcessServiceTest {
     }
 
     @Test
-    public void testProcessCampaigns_WithCampaign1_AppliesDiscount() {
+    void testProcessCampaigns_WithCampaign1_AppliesDiscount() {
         // Arrange
         List<Long> ids = List.of(1L);
         CampaignProcessRequest request = new CampaignProcessRequest();
@@ -97,7 +97,7 @@ class CampaignProcessServiceTest {
     }
 
     @Test
-    public void testProcessCampaigns_WithCampaign2_AppliesBuy2Get1Free() {
+    void testProcessCampaigns_WithCampaign2_AppliesBuy2Get1Free() {
         // Arrange
         List<Long> ids = List.of(2L);
         CampaignProcessRequest request = new CampaignProcessRequest();
@@ -121,7 +121,7 @@ class CampaignProcessServiceTest {
     }
 
     @Test
-    public void testProcessCampaigns_WithCampaign3_Applies20PercentOff() {
+    void testProcessCampaigns_WithCampaign3_Applies20PercentOff() {
         // Arrange
         List<Long> ids = List.of(3L);
         CampaignProcessRequest request = new CampaignProcessRequest();
@@ -139,7 +139,7 @@ class CampaignProcessServiceTest {
     }
 
     @Test
-    public void testCampaign_1_WithTotalLessThanLimit_ThrowsCampaignNotApplicableException() {
+    void testCampaign_1_WithTotalLessThanLimit_ThrowsCampaignNotApplicableException() {
         // Arrange
         CampaignProcessResponse response = CampaignProcessResponse.builder().total(BigDecimal.valueOf(150)).build();
 
@@ -148,7 +148,7 @@ class CampaignProcessServiceTest {
     }
 
     @Test
-    public void testCampaign_1_WithTotalGreaterThanOrEqualToLimit_AppliesDiscount() {
+    void testCampaign_1_WithTotalGreaterThanOrEqualToLimit_AppliesDiscount() {
         // Arrange
         CampaignProcessResponse response = CampaignProcessResponse.builder().total(BigDecimal.valueOf(250)).build();
 
@@ -160,7 +160,7 @@ class CampaignProcessServiceTest {
     }
 
     @Test
-    public void testIsCampaignValidAndNotExpired_WithValidCampaign_DoesNotThrowException() {
+    void testIsCampaignValidAndNotExpired_WithValidCampaign_DoesNotThrowException() {
         // Arrange
         when(campaignRepository.findById(1L)).thenReturn(Optional.of(campaign1));
 
@@ -169,7 +169,7 @@ class CampaignProcessServiceTest {
     }
 
     @Test
-    public void testIsCampaignValidAndNotExpired_WithExpiredCampaign_ThrowsCampaignNotApplicableException() {
+    void testIsCampaignValidAndNotExpired_WithExpiredCampaign_ThrowsCampaignNotApplicableException() {
         // Arrange
         Campaign expiredCampaign = new Campaign();
         expiredCampaign.setId(4L);
@@ -181,7 +181,7 @@ class CampaignProcessServiceTest {
     }
 
     @Test
-    public void testIsCampaignValidAndNotExpired_WithNonExistentCampaign_ThrowsCampaignNotFoundException() {
+    void testIsCampaignValidAndNotExpired_WithNonExistentCampaign_ThrowsCampaignNotFoundException() {
         // Arrange
         when(campaignRepository.findById(anyLong())).thenReturn(Optional.empty());
 

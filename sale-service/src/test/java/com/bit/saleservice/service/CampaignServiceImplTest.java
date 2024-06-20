@@ -4,10 +4,6 @@ import com.bit.saleservice.dto.CampaignResponse;
 import com.bit.saleservice.entity.Campaign;
 import com.bit.saleservice.exception.CampaignNotFoundException;
 import com.bit.saleservice.repository.CampaignRepository;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,23 +25,11 @@ class CampaignServiceImplTest {
     @Mock
     private CampaignRepository campaignRepository;
 
-    @Mock
-    private Root<Campaign> root;
-
-    @Mock
-    private CriteriaBuilder criteriaBuilder;
-
-    @Mock
-    private CriteriaQuery<Campaign> query;
-
-    @Mock
-    private Predicate predicate;
-
     @InjectMocks
     private CampaignServiceImpl campaignService;
 
     @Test
-    public void testGetCampaign_WhenCampaignExists_ReturnsCampaignResponse() {
+    void testGetCampaign_WhenCampaignExists_ReturnsCampaignResponse() {
         // Arrange
         Long campaignId = 1L;
         Campaign campaign = new Campaign();
@@ -67,7 +51,7 @@ class CampaignServiceImplTest {
     }
 
     @Test
-    public void testGetCampaign_WhenCampaignDoesNotExist_ThrowsCampaignNotFoundException() {
+    void testGetCampaign_WhenCampaignDoesNotExist_ThrowsCampaignNotFoundException() {
         // Arrange
         Long campaignId = 1L;
         when(campaignRepository.findById(campaignId)).thenReturn(Optional.empty());
@@ -78,7 +62,7 @@ class CampaignServiceImplTest {
     }
 
     @Test
-    public void testGetAllCampaigns_ReturnsListOfCampaignResponses() {
+    void testGetAllCampaigns_ReturnsListOfCampaignResponses() {
         // Arrange
         List<Campaign> campaigns = Arrays.asList(
             new Campaign(1L, "Campaign 1", "Details 1", new Date(), false, Collections.emptyList()),
@@ -97,7 +81,7 @@ class CampaignServiceImplTest {
     }
 
     @Test
-    public void testGetAllCampaignsFilteredAndSorted_ReturnsPagedCampaignResponses() {
+    void testGetAllCampaignsFilteredAndSorted_ReturnsPagedCampaignResponses() {
         // Arrange
         List<Campaign> campaigns = Arrays.asList(
             new Campaign(1L, "Campaign 1", "Details 1", new Date(), false, Collections.emptyList()),
@@ -116,8 +100,6 @@ class CampaignServiceImplTest {
         assertEquals(2, responsePage.getTotalElements());
         verify(campaignRepository).findAll((Specification<Campaign>) any(), any(Pageable.class));
     }
-
-    //**************
 
     @Test
     void testGetAllCampaignsFilteredAndSorted_NoFiltersProvided_ReturnsAllCampaigns() {

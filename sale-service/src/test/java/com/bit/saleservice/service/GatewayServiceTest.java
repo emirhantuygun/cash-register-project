@@ -1,7 +1,9 @@
 package com.bit.saleservice.service;
 
 import com.bit.saleservice.dto.ProductServiceResponse;
-import com.bit.saleservice.exception.*;
+import com.bit.saleservice.exception.HeaderProcessingException;
+import com.bit.saleservice.exception.ProductNotFoundException;
+import com.bit.saleservice.exception.ProductServiceException;
 import com.bit.saleservice.wrapper.ProductStockCheckRequest;
 import com.bit.saleservice.wrapper.ProductStockReturnRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,12 +19,9 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClient.ResponseSpec;
+import org.springframework.web.reactive.function.client.WebClient.RequestBodyUriSpec;
+import org.springframework.web.reactive.function.client.WebClient.RequestHeadersSpec;
 import reactor.core.publisher.Mono;
-
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -37,14 +36,9 @@ class GatewayServiceTest {
     private WebClient webClient;
 
     @Mock
-    private WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
+    private RequestHeadersSpec requestHeadersSpec;
     @Mock
-    private WebClient.RequestHeadersSpec requestHeadersSpec;
-    @Mock
-    private WebClient.RequestBodyUriSpec requestBodyUriSpec;
-
-    @Mock
-    private WebClient.RequestBodySpec requestBodySpec;
+    private RequestBodyUriSpec requestBodyUriSpec;
 
     @Mock
     private WebClient.ResponseSpec responseSpec;
@@ -54,7 +48,7 @@ class GatewayServiceTest {
 
 
     @BeforeEach
-    public void setUp() throws HeaderProcessingException {
+    void setUp() throws HeaderProcessingException {
         ReflectionTestUtils.setField(gatewayService, "GATEWAY_URL", "http://localhost:8080/");
         ReflectionTestUtils.setField(gatewayService, "CHECK_STOCK_ENDPOINT", "products/stock");
 
@@ -63,7 +57,7 @@ class GatewayServiceTest {
     }
 
     @Test
-    public void testGetProduct_WhenProductExists_ReturnsProductServiceResponse() throws HeaderProcessingException {
+    void testGetProduct_WhenProductExists_ReturnsProductServiceResponse() throws HeaderProcessingException {
         // Arrange
         Long productId = 1L;
         ProductServiceResponse mockResponse = new ProductServiceResponse();
@@ -82,7 +76,7 @@ class GatewayServiceTest {
     }
 
     @Test
-    public void testGetProduct_WhenProductDoesNotExist_ThrowsProductNotFoundException() {
+    void testGetProduct_WhenProductDoesNotExist_ThrowsProductNotFoundException() {
         // Arrange
         Long productId = 1L;
 
@@ -94,7 +88,7 @@ class GatewayServiceTest {
     }
 
     @Test
-    public void testCheckEnoughProductsInStock_WhenStockIsSufficient_ReturnsTrue() throws HeaderProcessingException {
+    void testCheckEnoughProductsInStock_WhenStockIsSufficient_ReturnsTrue() throws HeaderProcessingException {
         // Arrange
         ProductStockCheckRequest request = new ProductStockCheckRequest(1L, 1);
         Boolean mockResponse = true;
@@ -118,7 +112,7 @@ class GatewayServiceTest {
     }
 
     @Test
-    public void testReturnProducts_WhenRequestIsSuccessful_DoesNotThrowException() {
+    void testReturnProducts_WhenRequestIsSuccessful_DoesNotThrowException() {
         // Arrange
         ProductStockReturnRequest request = new ProductStockReturnRequest(1L, 1);
 
@@ -131,7 +125,7 @@ class GatewayServiceTest {
     }
 
     @Test
-    public void testReturnProducts_WhenProductDoesNotExist_ThrowsProductNotFoundException() {
+    void testReturnProducts_WhenProductDoesNotExist_ThrowsProductNotFoundException() {
         // Arrange
         ProductStockReturnRequest request = new ProductStockReturnRequest(1L, 1);
 
