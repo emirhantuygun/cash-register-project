@@ -27,6 +27,7 @@ public class Role {
 
     @JsonIgnore
     @ManyToMany(mappedBy = "roles", cascade = CascadeType.DETACH)
+    @Builder.Default
     private List<AppUser> users = new ArrayList<>();
 
     public Role (String roleName){

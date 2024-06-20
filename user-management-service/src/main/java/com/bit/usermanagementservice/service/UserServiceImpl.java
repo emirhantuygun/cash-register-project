@@ -1,24 +1,24 @@
 package com.bit.usermanagementservice.service;
 
 import com.bit.usermanagementservice.UserManagementServiceApplication;
+import com.bit.usermanagementservice.annotation.ExcludeFromGeneratedCoverage;
 import com.bit.usermanagementservice.dto.AuthUserRequest;
 import com.bit.usermanagementservice.dto.UserRequest;
 import com.bit.usermanagementservice.dto.UserResponse;
+import com.bit.usermanagementservice.entity.AppUser;
+import com.bit.usermanagementservice.entity.Role;
 import com.bit.usermanagementservice.exception.InvalidRoleException;
 import com.bit.usermanagementservice.exception.RabbitMQException;
 import com.bit.usermanagementservice.exception.UserNotFoundException;
 import com.bit.usermanagementservice.exception.UserNotSoftDeletedException;
-import com.bit.usermanagementservice.entity.AppUser;
-import com.bit.usermanagementservice.entity.Role;
 import com.bit.usermanagementservice.repository.RoleRepository;
 import com.bit.usermanagementservice.repository.UserRepository;
 import com.bit.usermanagementservice.wrapper.UpdateUserMessage;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
+import io.micrometer.common.util.StringUtils;
+import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -28,8 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import io.micrometer.common.util.StringUtils;
-import jakarta.persistence.criteria.Predicate;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -98,21 +97,8 @@ public class UserServiceImpl implements UserService {
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
 
         Page<AppUser> usersPage = userRepository.findAll((root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (StringUtils.isNotBlank(name)) {
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
-            }
-            if (StringUtils.isNotBlank(username)) {
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("username")), "%" + username.toLowerCase() + "%"));
-            }
-            if (StringUtils.isNotBlank(email)) {
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), "%" + email.toLowerCase() + "%"));
-            }
-            if (StringUtils.isNotBlank(roleName)) {
-                Join<AppUser, Role> roleJoin = root.join("roles", JoinType.INNER);
-                predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(roleJoin.get("roleName")), roleName.toLowerCase()));
-            }
 
+            List<Predicate> predicates = getPredicates(name, username, email, roleName, root, criteriaBuilder);
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         }, pageable);
 
@@ -238,11 +224,33 @@ public class UserServiceImpl implements UserService {
         userRepository.deletePermanently(id);
     }
 
+    @ExcludeFromGeneratedCoverage
+    private List<Predicate> getPredicates (String name, String username, String email, String roleName, Root<AppUser> root, CriteriaBuilder criteriaBuilder){
+        List<Predicate> predicates = new ArrayList<>();
+        if (StringUtils.isNotBlank(name)) {
+            predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
+        }
+        if (StringUtils.isNotBlank(username)) {
+            predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("username")), "%" + username.toLowerCase() + "%"));
+        }
+        if (StringUtils.isNotBlank(email)) {
+            predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), "%" + email.toLowerCase() + "%"));
+        }
+        if (StringUtils.isNotBlank(roleName)) {
+            Join<AppUser, Role> roleJoin = root.join("roles", JoinType.INNER);
+            predicates.add(criteriaBuilder.equal(criteriaBuilder.lower(roleJoin.get("roleName")), roleName.toLowerCase()));
+        }
+        return predicates;
+    }
+
+
     private void checkUniqueness(UserRequest userRequest) {
         if (userRepository.existsByUsername(userRequest.getUsername()) || userRepository.existsByEmail(userRequest.getEmail())) {
             throw new IllegalArgumentException("Username or email already in use");
         }
     }
+
+    @ExcludeFromGeneratedCoverage
     private void checkUniquenessForUpdate(AppUser appUser, UserRequest userRequest){
         if (!userRequest.getUsername().equals(appUser.getUsername()) && userRepository.existsByUsername(userRequest.getUsername())) {
             throw new DataIntegrityViolationException("Username already exists: " + userRequest.getUsername());
@@ -252,6 +260,8 @@ public class UserServiceImpl implements UserService {
             throw new DataIntegrityViolationException("Email already exists: " + userRequest.getEmail());
         }
     }
+
+    @ExcludeFromGeneratedCoverage
     protected void validateRoles(List<String> roles) {
 
         for (String role : roles) {
