@@ -23,12 +23,12 @@ class BarcodeServiceTest {
     private BarcodeService barcodeService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         ReflectionTestUtils.setField(barcodeService, "COMPANY_NAME", "COMPANY123");
     }
 
     @Test
-    public void givenProductName_whenGenerateBarcodeNumber_thenReturnsBarcodeNumber() throws AlgorithmNotFoundException {
+    void givenProductName_whenGenerateBarcodeNumber_thenReturnsBarcodeNumber() throws AlgorithmNotFoundException {
         // Arrange
         String productName = "Product";
 
@@ -40,7 +40,7 @@ class BarcodeServiceTest {
     }
 
     @Test
-    public void givenProductNameAndNoAlgorithm_whenGenerateBarcodeNumber_thenThrowsAlgorithmNotFoundException() {
+    void givenProductNameAndNoAlgorithm_whenGenerateBarcodeNumber_thenThrowsAlgorithmNotFoundException() {
         // Arrange
         String productName = "Product";
 
