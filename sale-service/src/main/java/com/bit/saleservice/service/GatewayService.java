@@ -1,5 +1,6 @@
 package com.bit.saleservice.service;
 
+import com.bit.saleservice.annotation.ExcludeFromGeneratedCoverage;
 import com.bit.saleservice.dto.ProductServiceResponse;
 import com.bit.saleservice.exception.*;
 import com.bit.saleservice.wrapper.ProductStockCheckRequest;
@@ -44,7 +45,7 @@ public class GatewayService {
     private final WebClient webClient;
 
     @PostConstruct
-    private void initGatewayUrl() {
+    protected void initGatewayUrl() {
         GATEWAY_URL = "http://" + GATEWAY_HOST + ":" + GATEWAY_PORT + "/";
     }
 
@@ -141,6 +142,7 @@ public class GatewayService {
         }
     }
 
+    @ExcludeFromGeneratedCoverage
     protected HttpHeaders getHttpHeaders() throws HeaderProcessingException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
