@@ -3,6 +3,7 @@ package com.bit.saleservice.service;
 import com.bit.saleservice.dto.ProductServiceResponse;
 import com.bit.saleservice.exception.HeaderProcessingException;
 import com.bit.saleservice.exception.ProductNotFoundException;
+import com.bit.saleservice.exception.ProductReturnException;
 import com.bit.saleservice.exception.ProductServiceException;
 import com.bit.saleservice.wrapper.ProductStockReturnRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +34,6 @@ class GatewayServiceTest {
     @BeforeEach
     void setUp() throws HeaderProcessingException {
         ReflectionTestUtils.setField(gatewayService, "GATEWAY_URL", "http://localhost:8080/");
-        ReflectionTestUtils.setField(gatewayService, "CHECK_STOCK_ENDPOINT", "products/stock");
 
         gatewayService = spy(gatewayService);
         lenient().doReturn(new HttpHeaders()).when(gatewayService).getHttpHeaders();
@@ -130,6 +130,6 @@ class GatewayServiceTest {
                 .thenThrow(new RestClientException("REST client error"));
 
         // Act and Assert
-        assertThrows(ProductServiceException.class, () -> gatewayService.returnProducts(request));
+        assertThrows(ProductReturnException.class, () -> gatewayService.returnProducts(request));
     }
 }

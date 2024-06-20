@@ -34,15 +34,11 @@ public class GatewayService {
     @Value("${endpoint.product-service.get-product}")
     private String GET_PRODUCT_ENDPOINT;
 
-    @Value("${endpoint.product-service.check-stock}")
-    private String CHECK_STOCK_ENDPOINT;
-
     @Value("${endpoint.product-service.return-products}")
     private String RETURN_PRODUCTS_ENDPOINT;
 
     private String GATEWAY_URL;
     private final RestTemplate restTemplate;
-    private final WebClient webClient;
 
     @PostConstruct
     protected void initGatewayUrl() {

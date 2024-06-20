@@ -19,7 +19,6 @@ gateway:
 endpoint:
   product-service:
     get-product: products/{id}
-    check-stock: products/stock
     return-products: products/return
 
 rabbitmq:
