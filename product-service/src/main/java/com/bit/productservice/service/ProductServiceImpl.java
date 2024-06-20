@@ -11,7 +11,9 @@ import com.bit.productservice.repository.ProductRepository;
 import com.bit.productservice.wrapper.ProductStockReduceRequest;
 import com.bit.productservice.wrapper.ProductStockReturnRequest;
 import io.micrometer.common.util.StringUtils;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -178,6 +180,23 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(product);
     }
 
+    private List<Predicate> getPredicates (String name, String description, BigDecimal minPrice, BigDecimal maxPrice,
+                                           CriteriaBuilder criteriaBuilder, Root<Product> root){
+        List<Predicate> predicates = new ArrayList<>();
+        if (StringUtils.isNotBlank(name)) {
+            predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
+        }
+        if (StringUtils.isNotBlank(description)) {
+            predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), "%" + description.toLowerCase() + "%"));
+        }
+        if (minPrice != null) {
+            predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("price"), minPrice));
+        }
+        if (maxPrice != null) {
+            predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("price"), maxPrice));
+        }
+        return predicates;
+    }
 
     private ProductResponse mapToProductResponse(Product product) {
         return ProductResponse.builder()
