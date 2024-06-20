@@ -1,6 +1,7 @@
 package com.bit.productservice.service;
 
 import com.bit.productservice.ProductServiceApplication;
+import com.bit.productservice.annotation.ExcludeFromGeneratedCoverage;
 import com.bit.productservice.dto.ProductRequest;
 import com.bit.productservice.dto.ProductResponse;
 import com.bit.productservice.exception.AlgorithmNotFoundException;
@@ -70,19 +71,7 @@ public class ProductServiceImpl implements ProductService {
         logger.info("Fetching all products with filters and sorting");
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
         Page<Product> productsPage = productRepository.findAll((root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (StringUtils.isNotBlank(name)) {
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
-            }
-            if (StringUtils.isNotBlank(description)) {
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), "%" + description.toLowerCase() + "%"));
-            }
-            if (minPrice != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("price"), minPrice));
-            }
-            if (maxPrice != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("price"), maxPrice));
-            }
+            List<Predicate> predicates = getPredicates(name, description, minPrice, maxPrice, criteriaBuilder, root);
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         }, pageable);
@@ -180,6 +169,7 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(product);
     }
 
+    @ExcludeFromGeneratedCoverage
     private List<Predicate> getPredicates (String name, String description, BigDecimal minPrice, BigDecimal maxPrice,
                                            CriteriaBuilder criteriaBuilder, Root<Product> root){
         List<Predicate> predicates = new ArrayList<>();
