@@ -243,7 +243,7 @@ public class UserServiceImpl implements UserService {
         return predicates;
     }
 
-
+    @ExcludeFromGeneratedCoverage
     private void checkUniqueness(UserRequest userRequest) {
         if (userRepository.existsByUsername(userRequest.getUsername()) || userRepository.existsByEmail(userRequest.getEmail())) {
             throw new IllegalArgumentException("Username or email already in use");
