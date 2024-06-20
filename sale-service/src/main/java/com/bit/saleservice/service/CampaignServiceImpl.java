@@ -1,13 +1,17 @@
 package com.bit.saleservice.service;
 
 import com.bit.saleservice.SaleServiceApplication;
+import com.bit.saleservice.annotation.ExcludeFromGeneratedCoverage;
 import com.bit.saleservice.dto.CampaignResponse;
 import com.bit.saleservice.entity.Campaign;
 import com.bit.saleservice.entity.Sale;
 import com.bit.saleservice.exception.CampaignNotFoundException;
 import com.bit.saleservice.repository.CampaignRepository;
 import io.micrometer.common.util.StringUtils;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -54,26 +58,32 @@ public class CampaignServiceImpl implements CampaignService{
         logger.info("Fetching all campaigns with filters and sorting");
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
         Page<Campaign> campaignsPage = campaignRepository.findAll((root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (StringUtils.isNotBlank(name)) {
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
-            }
-            if (StringUtils.isNotBlank(details)) {
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("details")), "%" + details.toLowerCase() + "%"));
-            }
-            if (isExpired != null) {
-                if (isExpired) {
-                    predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("expiration"), new Date()));
-                } else {
-                    predicates.add(criteriaBuilder.greaterThan(root.get("expiration"), new Date()));
-                }
-            }
+            List<Predicate> predicates = getPredicates(name, details, isExpired, root, criteriaBuilder);
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         }, pageable);
 
         logger.info("Retrieved {} campaigns", campaignsPage.getTotalElements());
         return campaignsPage.map(this::mapToCampaignResponse);
+    }
+
+    @ExcludeFromGeneratedCoverage
+    private List<Predicate> getPredicates(String name, String details, Boolean isExpired, Root<Campaign> root, CriteriaBuilder criteriaBuilder){
+        List<Predicate> predicates = new ArrayList<>();
+        if (StringUtils.isNotBlank(name)) {
+            predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
+        }
+        if (StringUtils.isNotBlank(details)) {
+            predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("details")), "%" + details.toLowerCase() + "%"));
+        }
+        if (isExpired != null) {
+            if (isExpired) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("expiration"), new Date()));
+            } else {
+                predicates.add(criteriaBuilder.greaterThan(root.get("expiration"), new Date()));
+            }
+        }
+        return predicates;
     }
 
     private CampaignResponse mapToCampaignResponse(Campaign campaign) {

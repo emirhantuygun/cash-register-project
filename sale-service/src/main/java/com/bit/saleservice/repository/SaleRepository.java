@@ -1,5 +1,6 @@
 package com.bit.saleservice.repository;
 
+import com.bit.saleservice.annotation.ExcludeFromGeneratedCoverage;
 import com.bit.saleservice.entity.Sale;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

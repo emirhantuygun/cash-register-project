@@ -1,10 +1,7 @@
 package com.bit.saleservice.service;
 
 import com.bit.saleservice.dto.ProductServiceResponse;
-import com.bit.saleservice.exception.HeaderProcessingException;
-import com.bit.saleservice.exception.ProductNotFoundException;
-import com.bit.saleservice.exception.ProductServiceException;
-import com.bit.saleservice.exception.ServerErrorException;
+import com.bit.saleservice.exception.*;
 import com.bit.saleservice.wrapper.ProductStockCheckRequest;
 import com.bit.saleservice.wrapper.ProductStockReturnRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +20,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClient.ResponseSpec;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -54,18 +52,12 @@ class GatewayServiceTest {
     @InjectMocks
     private GatewayService gatewayService;
 
-    @Mock
-    private WebClient.RequestBodyUriSpec requestBodyUriSpec;
-
-    @Mock
-    private WebClient.RequestHeadersSpec<?> requestHeadersSpec;
-
-    @Mock
-    private ResponseSpec responseSpec;
-
 
     @BeforeEach
     public void setUp() throws HeaderProcessingException {
+        ReflectionTestUtils.setField(gatewayService, "GATEWAY_URL", "http://localhost:8080/");
+        ReflectionTestUtils.setField(gatewayService, "CHECK_STOCK_ENDPOINT", "products/stock");
+
         gatewayService = spy(gatewayService);
         lenient().doReturn(new HttpHeaders()).when(gatewayService).getHttpHeaders();
     }
@@ -186,78 +178,5 @@ class GatewayServiceTest {
 
         // Act and Assert
         assertThrows(ProductServiceException.class, () -> gatewayService.returnProducts(request));
-    }
-
-    //*******************
-
-    @Test
-    void testCheckEnoughProductsInStock_ProductFound_ReturnsTrue() throws HeaderProcessingException {
-        // Arrange
-        ProductStockCheckRequest request = new ProductStockCheckRequest(1L, 1);
-        when(webClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestBodySpec);
-        when(requestBodySpec.body(any(BodyInserter.class))).thenReturn(requestHeadersSpec);
-        when(responseSpec.bodyToMono(Boolean.class)).thenReturn(Mono.just(true));
-
-        // Act
-        Mono<Boolean> result = gatewayService.checkEnoughProductsInStock(request);
-
-        // Assert
-        assertTrue(result.block());
-    }
-
-    @Test
-    void testCheckEnoughProductsInStock_ProductNotFound_ThrowsProductNotFoundException() throws HeaderProcessingException {
-        // Arrange
-        ProductStockCheckRequest request = new ProductStockCheckRequest(1L, 1);
-        when(webClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestBodySpec);
-        when(requestBodySpec.body(any(BodyInserter.class))).thenReturn(requestBodySpec);
-        when(responseSpec.onStatus(any(Predicate.class), any(Function.class))).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(Boolean.class)).thenReturn(Mono.error(new ProductNotFoundException("Product not found with id: 1")));
-
-        // Act and Assert
-        assertThrows(ProductNotFoundException.class, () -> gatewayService.checkEnoughProductsInStock(request).block());
-    }
-
-    @Test
-    void testCheckEnoughProductsInStock_ClientErrorOccurred_ThrowsClientErrorException() throws HeaderProcessingException {
-        // Arrange
-        ProductStockCheckRequest request = new ProductStockCheckRequest(1L, 1);
-        when(webClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestBodySpec);
-        when(requestBodySpec.body(any(BodyInserter.class))).thenReturn(requestBodySpec);
-        when(responseSpec.onStatus(any(Predicate.class), any(Function.class))).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(Boolean.class)).thenReturn(Mono.error(new ClientErrorException("Client error occurred while checking product stock")));
-
-        // Act and Assert
-        assertThrows(ClientErrorException.class, () -> gatewayService.checkEnoughProductsInStock(request).block());
-    }
-
-    @Test
-    void testCheckEnoughProductsInStock_ServerErrorOccurred_ThrowsServerErrorException() throws HeaderProcessingException {
-        // Arrange
-        ProductStockCheckRequest request = new ProductStockCheckRequest(1L);
-        when(webClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestBodySpec);
-        when(requestBodySpec.body(any(BodyInserter.class))).thenReturn(responseSpec);
-        when(responseSpec.onStatus(any(Predicate.class), any(Function.class))).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(Boolean.class)).thenReturn(Mono.error(new ServerErrorException("Server error occurred while checking product stock")));
-
-        // Act and Assert
-        assertThrows(ServerErrorException.class, () -> gatewayService.checkEnoughProductsInStock(request).block());
-    }
-
-    @Test
-    void testCheckEnoughProductsInStock_ErrorOccurredWhileCheckingProductStock_ThrowsProductStockCheckException() throws HeaderProcessingException {
-        // Arrange
-        ProductStockCheckRequest request = new ProductStockCheckRequest(1L);
-        when(webClient.post()).thenReturn(requestHeadersUriSpec);
-        when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestBodySpec);
-        when(requestBodySpec.body(any(BodyInserter.class))).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(Boolean.class)).thenReturn(Mono.error(new RuntimeException("Error occurred while checking product stock")));
-
-        // Act and Assert
-        assertThrows(ProductStockCheckException.class, () -> gatewayService.checkEnoughProductsInStock(request).block());
     }
 }

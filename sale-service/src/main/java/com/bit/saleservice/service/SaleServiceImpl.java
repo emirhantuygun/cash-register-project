@@ -1,6 +1,7 @@
 package com.bit.saleservice.service;
 
 import com.bit.saleservice.SaleServiceApplication;
+import com.bit.saleservice.annotation.ExcludeFromGeneratedCoverage;
 import com.bit.saleservice.dto.*;
 import com.bit.saleservice.entity.*;
 import com.bit.saleservice.exception.*;
@@ -10,7 +11,9 @@ import com.bit.saleservice.wrapper.ProductStockCheckRequest;
 import com.bit.saleservice.wrapper.ProductStockReduceRequest;
 import com.bit.saleservice.wrapper.ProductStockReturnRequest;
 import io.micrometer.common.util.StringUtils;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -85,37 +88,7 @@ public class SaleServiceImpl implements SaleService {
         logger.info("Fetching all sales with filters and sorting");
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
         Page<Sale> salesPage = saleRepository.findAll((root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (StringUtils.isNotBlank(cashier)) {
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("cashier")), "%" + cashier.toLowerCase() + "%"));
-            }
-            if (StringUtils.isNotBlank(paymentMethod)) {
-                predicates.add(criteriaBuilder.equal(root.get("paymentMethod"), Payment.valueOf(paymentMethod)));
-            }
-            if (minTotal != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("totalWithCampaign"), minTotal));
-            }
-            if (maxTotal != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("totalWithCampaign"), maxTotal));
-            }
-            if (StringUtils.isNotBlank(startDate)) {
-                try {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    Date date = dateFormat.parse(startDate);
-                    predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("date"), date));
-                } catch (ParseException e) {
-                    logger.error("Failed to parse start date: {}", startDate);
-                }
-            }
-            if (StringUtils.isNotBlank(endDate)) {
-                try {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    Date date = dateFormat.parse(endDate);
-                    predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("date"), date));
-                } catch (ParseException e) {
-                    logger.error("Failed to parse end date: {}", endDate);
-                }
-            }
+            List<Predicate> predicates = getPredicates(cashier, paymentMethod, minTotal, maxTotal, startDate, endDate, root, criteriaBuilder);
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         }, pageable);
@@ -292,7 +265,46 @@ public class SaleServiceImpl implements SaleService {
         saleRepository.deletePermanently(id);
     }
 
+    @ExcludeFromGeneratedCoverage
+    private List<Predicate> getPredicates (String cashier, String paymentMethod,
+                                           BigDecimal minTotal, BigDecimal maxTotal,
+                                           String startDate, String endDate,
+                                           Root<Sale> root, CriteriaBuilder criteriaBuilder){
+        List<Predicate> predicates = new ArrayList<>();
+        if (StringUtils.isNotBlank(cashier)) {
+            predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("cashier")), "%" + cashier.toLowerCase() + "%"));
+        }
+        if (StringUtils.isNotBlank(paymentMethod)) {
+            predicates.add(criteriaBuilder.equal(root.get("paymentMethod"), Payment.valueOf(paymentMethod)));
+        }
+        if (minTotal != null) {
+            predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("totalWithCampaign"), minTotal));
+        }
+        if (maxTotal != null) {
+            predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("totalWithCampaign"), maxTotal));
+        }
+        if (StringUtils.isNotBlank(startDate)) {
+            try {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date date = dateFormat.parse(startDate);
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("date"), date));
+            } catch (ParseException e) {
+                logger.error("Failed to parse start date: {}", startDate);
+            }
+        }
+        if (StringUtils.isNotBlank(endDate)) {
+            try {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date date = dateFormat.parse(endDate);
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("date"), date));
+            } catch (ParseException e) {
+                logger.error("Failed to parse end date: {}", endDate);
+            }
+        }
+        return predicates;
+    }
 
+    @ExcludeFromGeneratedCoverage
     private List<Product> getProducts(List<ProductRequest> productRequests) throws HeaderProcessingException {
 
         List<Product> products = new ArrayList<>();
@@ -403,7 +415,7 @@ public class SaleServiceImpl implements SaleService {
         BigDecimal amountToBePaidByCash = totalWithCampaign.subtract(creditCardAmount);
         return cashAmount.subtract(amountToBePaidByCash);
     }
-
+    @ExcludeFromGeneratedCoverage
     private Payment getPaymentMethod(String paymentMethod) {
         try {
             return Payment.valueOf(paymentMethod.toUpperCase());

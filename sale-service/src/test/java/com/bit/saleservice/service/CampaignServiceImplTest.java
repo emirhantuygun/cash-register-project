@@ -4,6 +4,10 @@ import com.bit.saleservice.dto.CampaignResponse;
 import com.bit.saleservice.entity.Campaign;
 import com.bit.saleservice.exception.CampaignNotFoundException;
 import com.bit.saleservice.repository.CampaignRepository;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,6 +28,18 @@ class CampaignServiceImplTest {
 
     @Mock
     private CampaignRepository campaignRepository;
+
+    @Mock
+    private Root<Campaign> root;
+
+    @Mock
+    private CriteriaBuilder criteriaBuilder;
+
+    @Mock
+    private CriteriaQuery<Campaign> query;
+
+    @Mock
+    private Predicate predicate;
 
     @InjectMocks
     private CampaignServiceImpl campaignService;

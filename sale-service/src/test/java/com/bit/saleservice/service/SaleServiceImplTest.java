@@ -172,6 +172,22 @@ class SaleServiceImplTest {
     }
 
     @Test
+    void testUpdateSale_SamePaymentMethod_ThrowsPaymentMethodUpdateNotAllowedException() {
+        // Arrange
+        Long id = 1L;
+        SaleRequest saleRequest = new SaleRequest();
+        saleRequest.setPaymentMethod("paypal");
+        Sale existingSale = new Sale();
+        existingSale.setId(id);
+        existingSale.setPaymentMethod(Payment.CREDIT_CARD);
+
+        when(saleRepository.findById(id)).thenReturn(Optional.of(existingSale));
+
+        // Act & Assert
+        assertThrows(PaymentMethodUpdateNotAllowedException.class, () -> saleService.updateSale(id, saleRequest));
+    }
+
+    @Test
     void testUpdateSale_NonExistingSale_ThrowsSaleNotFoundException() {
         // Arrange
         Long id = 1L;
@@ -376,7 +392,6 @@ class SaleServiceImplTest {
         // Act & Assert
         assertThrows(InsufficientMixedPaymentException.class, () -> saleService.processMixedPayment(mixedPayment, totalWithCampaign));
     }
-
     @Test
     void givenValidFilters_whenGetAllSalesFilteredAndSorted_thenReturnsFilteredAndSortedSales() {
         // Arrange
@@ -479,6 +494,7 @@ class SaleServiceImplTest {
         verify(saleRepository, times(1)).findAll((Specification<Sale>) any(), any(Pageable.class));
     }
 
+
     @Test
     public void testReduceStocks_shouldSendReduceMessagesToRabbitMQ() {
         // Arrange
@@ -530,5 +546,39 @@ class SaleServiceImplTest {
         // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class, () -> saleService.reduceStocks(products));
         assertEquals("Failed to send reduce message to RabbitMQ", exception.getMessage());
+    }
+
+    @Test
+    void testRestoreSale_SaleFoundAndRestored_ReturnsRestoredSaleResponse() {
+        // Arrange
+        Long id = 1L;
+        Sale sale = Sale.builder().id(id).paymentMethod(Payment.PAYPAL).build();
+        Product product = Product.builder().sale(sale).build();
+        sale.setProducts(List.of(product));
+
+        when(saleRepository.existsByIdAndDeletedTrue(id)).thenReturn(true);
+        doNothing().when(productRepository).restoreProductsBySaleId(id);
+        doNothing().when(saleRepository).restoreSale(id);
+        when(saleRepository.findById(id)).thenReturn(Optional.of(sale));
+
+        // Act
+        SaleResponse result = saleService.restoreSale(id);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(id, result.getId());
+    }
+
+    @Test
+    void testRestoreSale_SaleNotFound_ThrowsSaleNotFoundException() {
+        // Arrange
+        Long id = 1L;
+        when(saleRepository.existsByIdAndDeletedTrue(id)).thenReturn(true);
+        doNothing().when(productRepository).restoreProductsBySaleId(id);
+        doNothing().when(saleRepository).restoreSale(id);
+        when(saleRepository.findById(id)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(SaleNotFoundException.class, () -> saleService.restoreSale(id));
     }
 }
