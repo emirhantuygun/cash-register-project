@@ -120,7 +120,6 @@ public class SaleServiceImpl implements SaleService {
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         }, pageable);
 
-        logger.info("Retrieved {} sales", salesPage.getTotalElements());
         return salesPage.map(this::mapToSaleResponse);
     }
 
@@ -413,7 +412,7 @@ public class SaleServiceImpl implements SaleService {
         }
     }
 
-    private void reduceStocks(List<Product> products) {
+    protected void reduceStocks(List<Product> products) {
         products.forEach(product -> {
             ProductStockReduceRequest productStockReduceRequest = new ProductStockReduceRequest(product.getProductId(), product.getQuantity());
             try {

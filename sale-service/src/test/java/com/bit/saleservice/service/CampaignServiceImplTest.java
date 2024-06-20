@@ -100,4 +100,68 @@ class CampaignServiceImplTest {
         assertEquals(2, responsePage.getTotalElements());
         verify(campaignRepository).findAll((Specification<Campaign>) any(), any(Pageable.class));
     }
+
+    //**************
+
+    @Test
+    void testGetAllCampaignsFilteredAndSorted_NoFiltersProvided_ReturnsAllCampaigns() {
+        // Arrange
+        Page<Campaign> campaignsPage = Page.empty();
+        when(campaignRepository.findAll((Specification<Campaign>) any(), any())).thenReturn(campaignsPage);
+
+        // Act
+        Page<CampaignResponse> result = campaignService.getAllCampaignsFilteredAndSorted(0, 10, "id", "ASC", null, null, null);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(0, result.getTotalElements());
+    }
+
+    @Test
+    void testGetAllCampaignsFilteredAndSorted_NameFilterProvided_ReturnsCampaignsMatchingName() {
+        // Arrange
+        Campaign campaign = Campaign.builder().id(1L).name("Test Campaign").build();
+        Page<Campaign> campaignsPage = new PageImpl<>(List.of(campaign));
+        when(campaignRepository.findAll((Specification<Campaign>) any(), any())).thenReturn(campaignsPage);
+
+        // Act
+        Page<CampaignResponse> result = campaignService.getAllCampaignsFilteredAndSorted(0, 10, "id", "ASC", "Test Campaign", null, null);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        assertEquals("Test Campaign", result.getContent().get(0).getName());
+    }
+
+    @Test
+    void testGetAllCampaignsFilteredAndSorted_DetailsFilterProvided_ReturnsCampaignsMatchingDetails() {
+        // Arrange
+        Campaign campaign = Campaign.builder().id(1L).details("Test Details").build();
+        Page<Campaign> campaignsPage = new PageImpl<>(List.of(campaign));
+        when(campaignRepository.findAll((Specification<Campaign>) any(), any())).thenReturn(campaignsPage);
+
+        // Act
+        Page<CampaignResponse> result = campaignService.getAllCampaignsFilteredAndSorted(0, 10, "id", "ASC", null, "Test Details", null);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        assertEquals("Test Details", result.getContent().get(0).getDetails());
+    }
+
+    @Test
+    void testGetAllCampaignsFilteredAndSorted_IsExpiredFilterProvided_ReturnsCampaignsMatchingIsExpired() {
+        // Arrange
+        Campaign campaign = Campaign.builder().id(1L).expiration(new Date()).build();
+        Page<Campaign> campaignsPage = new PageImpl<>(List.of(campaign));
+        when(campaignRepository.findAll((Specification<Campaign>) any(), any())).thenReturn(campaignsPage);
+
+        // Act
+        Page<CampaignResponse> result = campaignService.getAllCampaignsFilteredAndSorted(0, 10, "id", "ASC", null, null, true);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        assertNotNull(result.getContent().get(0).getExpiration());
+    }
 }

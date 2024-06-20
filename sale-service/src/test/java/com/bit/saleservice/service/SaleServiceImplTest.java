@@ -7,17 +7,22 @@ import com.bit.saleservice.repository.ProductRepository;
 import com.bit.saleservice.repository.SaleRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-
+import com.bit.saleservice.wrapper.ProductStockReduceRequest;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.test.util.ReflectionTestUtils;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -35,6 +40,9 @@ class SaleServiceImplTest {
 
     @Mock
     private CampaignProcessService campaignProcessService;
+
+    @Mock
+    private RabbitTemplate rabbitTemplate;
 
     @Mock
     private GatewayService gatewayService;
@@ -367,5 +375,160 @@ class SaleServiceImplTest {
 
         // Act & Assert
         assertThrows(InsufficientMixedPaymentException.class, () -> saleService.processMixedPayment(mixedPayment, totalWithCampaign));
+    }
+
+    @Test
+    void givenValidFilters_whenGetAllSalesFilteredAndSorted_thenReturnsFilteredAndSortedSales() {
+        // Arrange
+        int page = 0;
+        int size = 10;
+        String sortBy = "date";
+        String direction = "ASC";
+        String cashier = "john";
+        String paymentMethod = "CASH";
+        BigDecimal minTotal = BigDecimal.valueOf(50);
+        BigDecimal maxTotal = BigDecimal.valueOf(500);
+        String startDate = "2023-01-01";
+        String endDate = "2023-12-31";
+
+        Sale sale = new Sale();
+        sale.setPaymentMethod(Payment.PAYPAL);
+        sale.setProducts(List.of(Product.builder().sale(sale).build()));
+        Page<Sale> salePage = new PageImpl<>(Collections.singletonList(sale));
+        when(saleRepository.findAll((Specification<Sale>) any(), any(Pageable.class))).thenReturn(salePage);
+
+        // Act
+        Page<SaleResponse> result = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        verify(saleRepository, times(1)).findAll((Specification<Sale>) any(), any(Pageable.class));
+    }
+
+    @Test
+    void givenInvalidDirection_whenGetAllSalesFilteredAndSorted_thenThrowsIllegalArgumentException() {
+        // Arrange
+        int page = 0;
+        int size = 10;
+        String sortBy = "date";
+        String direction = "INVALID";
+        String cashier = "";
+        String paymentMethod = "";
+        BigDecimal minTotal = null;
+        BigDecimal maxTotal = null;
+        String startDate = "";
+        String endDate = "";
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate));
+    }
+
+    @Test
+    void givenValidFiltersWithInvalidDates_whenGetAllSalesFilteredAndSorted_thenLogsErrorAndReturnsSales() {
+        // Arrange
+        int page = 0;
+        int size = 10;
+        String sortBy = "date";
+        String direction = "ASC";
+        String cashier = "";
+        String paymentMethod = "";
+        BigDecimal minTotal = null;
+        BigDecimal maxTotal = null;
+        String startDate = "invalid-date";
+        String endDate = "invalid-date";
+
+        Sale sale = new Sale();
+        sale.setPaymentMethod(Payment.PAYPAL);
+        sale.setProducts(List.of(Product.builder().sale(sale).build()));
+        Page<Sale> salePage = new PageImpl<>(Collections.singletonList(sale));
+        when(saleRepository.findAll((Specification<Sale>) any(), any(Pageable.class))).thenReturn(salePage);
+
+        // Act
+        Page<SaleResponse> result = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        verify(saleRepository, times(1)).findAll((Specification<Sale>) any(), any(Pageable.class));
+    }
+
+    @Test
+    void givenEmptyResult_whenGetAllSalesFilteredAndSorted_thenReturnsEmptyPage() {
+        // Arrange
+        int page = 0;
+        int size = 10;
+        String sortBy = "date";
+        String direction = "ASC";
+        String cashier = "";
+        String paymentMethod = "";
+        BigDecimal minTotal = null;
+        BigDecimal maxTotal = null;
+        String startDate = "";
+        String endDate = "";
+
+        Page<Sale> salePage = Page.empty();
+        when(saleRepository.findAll((Specification<Sale>) any(), any(Pageable.class))).thenReturn(salePage);
+
+        // Act
+        Page<SaleResponse> result = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(0, result.getTotalElements());
+        verify(saleRepository, times(1)).findAll((Specification<Sale>) any(), any(Pageable.class));
+    }
+
+    @Test
+    public void testReduceStocks_shouldSendReduceMessagesToRabbitMQ() {
+        // Arrange
+        ReflectionTestUtils.setField(saleService, "EXCHANGE", "some-exchange");
+        ReflectionTestUtils.setField(saleService, "ROUTING_KEY", "some-routing-key");
+        Product product1 = Product.builder()
+                .productId(1L)
+                .quantity(10)
+                .build();
+
+        Product product2 = Product.builder()
+                .productId(2L)
+                .quantity(5)
+                .build();
+
+        List<Product> products = List.of(product1, product2);
+
+        // Act
+        saleService.reduceStocks(products);
+
+        // Assert
+        ArgumentCaptor<ProductStockReduceRequest> captor = ArgumentCaptor.forClass(ProductStockReduceRequest.class);
+        verify(rabbitTemplate, times(2)).convertAndSend(anyString(), anyString(), captor.capture());
+
+        List<ProductStockReduceRequest> allValues = captor.getAllValues();
+        assertEquals(1L, allValues.get(0).getId());
+        assertEquals(10, allValues.get(0).getRequestedQuantity());
+        assertEquals(2L, allValues.get(1).getId());
+        assertEquals(5, allValues.get(1).getRequestedQuantity());
+    }
+
+    @Test
+    public void testReduceStocks_shouldThrowRabbitMQExceptionWhenSendingFails() {
+        // Arrange
+        Product product1 = Product.builder()
+                .productId(1L)
+                .quantity(10)
+                .build();
+
+        Product product2 = Product.builder()
+                .productId(2L)
+                .quantity(5)
+                .build();
+
+        List<Product> products = List.of(product1, product2);
+
+        doThrow(new RuntimeException("RabbitMQ error")).when(rabbitTemplate).convertAndSend(anyString(), anyString(), Optional.ofNullable(any()));
+
+        // Act & Assert
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> saleService.reduceStocks(products));
+        assertEquals("Failed to send reduce message to RabbitMQ", exception.getMessage());
     }
 }
