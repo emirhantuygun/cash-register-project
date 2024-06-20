@@ -181,7 +181,7 @@ public class GatewayServiceTest {
     @Test
     void testGetAllSales_HttpServerErrorException_ThrowsSaleServiceException() {
         // Arrange
-        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(new ParameterizedTypeReference<PageWrapper<SaleResponse>>() {})))
+        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(ParameterizedTypeReference.class)))
                 .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
 
         // Act and Assert
@@ -191,7 +191,7 @@ public class GatewayServiceTest {
     @Test
     void testGetAllSales_RestClientException_ThrowsSaleServiceException() {
         // Arrange
-        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(new ParameterizedTypeReference<PageWrapper<SaleResponse>>() {})))
+        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(ParameterizedTypeReference.class)))
                 .thenThrow(new RestClientException("REST client error"));
 
         // Act and Assert
@@ -201,7 +201,7 @@ public class GatewayServiceTest {
     @Test
     void testGetDeletedSales_HttpClientErrorException_ThrowsSaleServiceException() {
         // Arrange
-        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(new ParameterizedTypeReference<PageWrapper<SaleResponse>>() {})))
+        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(ParameterizedTypeReference.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
         // Act and Assert
@@ -211,7 +211,7 @@ public class GatewayServiceTest {
     @Test
     void testGetDeletedSales_HttpServerErrorException_ThrowsSaleServiceException() {
         // Arrange
-        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(new ParameterizedTypeReference<PageWrapper<SaleResponse>>() {})))
+        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(ParameterizedTypeReference.class)))
                 .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
 
         // Act and Assert
@@ -221,7 +221,7 @@ public class GatewayServiceTest {
     @Test
     void testGetDeletedSales_RestClientException_ThrowsSaleServiceException() {
         // Arrange
-        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(new ParameterizedTypeReference<PageWrapper<SaleResponse>>() {})))
+        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(ParameterizedTypeReference.class)))
                 .thenThrow(new RestClientException("REST client error"));
 
         // Act and Assert
