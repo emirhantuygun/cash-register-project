@@ -14,7 +14,6 @@ import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -339,7 +338,7 @@ public class SaleServiceImpl implements SaleService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private CampaignProcessResult processCampaigns(List<Long> campaignIds, List<Product> products, BigDecimal total) {
+    protected CampaignProcessResult processCampaigns(List<Long> campaignIds, List<Product> products, BigDecimal total) {
         CampaignProcessRequest campaignProcessRequest = CampaignProcessRequest.builder()
                 .campaignIds(campaignIds)
                 .products(products)
@@ -376,7 +375,7 @@ public class SaleServiceImpl implements SaleService {
         return campaignNames;
     }
 
-    private BigDecimal processCashPayment(BigDecimal cash, BigDecimal totalWithCampaign) {
+    protected BigDecimal processCashPayment(BigDecimal cash, BigDecimal totalWithCampaign) {
         if (cash == null)
             throw new CashNotProvidedException("Cash not provided");
 
@@ -386,7 +385,7 @@ public class SaleServiceImpl implements SaleService {
         return cash.subtract(totalWithCampaign);
     }
 
-    private BigDecimal processMixedPayment(MixedPayment mixedPayment, BigDecimal totalWithCampaign) {
+    protected BigDecimal processMixedPayment(MixedPayment mixedPayment, BigDecimal totalWithCampaign) {
         if (mixedPayment == null) {
             throw new MixedPaymentNotFoundException("Mixed payment not found");
         }

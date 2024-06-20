@@ -47,5 +47,6 @@ public class Sale {
     @Embedded
     private MixedPayment mixedPayment;
 
+    @Builder.Default
     private boolean cancelled = false;
 }

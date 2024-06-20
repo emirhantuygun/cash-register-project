@@ -1,6 +1,5 @@
 package com.bit.saleservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,6 +28,7 @@ public class Campaign {
     private Date expiration;
     private Boolean isExpired;
 
+    @Builder.Default
     @ManyToMany(mappedBy = "campaigns", cascade = CascadeType.DETACH)
     private List<Sale> sales = new ArrayList<>();
 }

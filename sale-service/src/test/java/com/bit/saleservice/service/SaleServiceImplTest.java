@@ -1,14 +1,8 @@
 package com.bit.saleservice.service;
 
-import com.bit.saleservice.dto.ProductRequest;
-import com.bit.saleservice.dto.SaleRequest;
-import com.bit.saleservice.dto.SaleResponse;
-import com.bit.saleservice.entity.Payment;
-import com.bit.saleservice.entity.Product;
-import com.bit.saleservice.entity.Sale;
-import com.bit.saleservice.exception.HeaderProcessingException;
-import com.bit.saleservice.exception.SaleNotFoundException;
-import com.bit.saleservice.exception.SaleNotSoftDeletedException;
+import com.bit.saleservice.dto.*;
+import com.bit.saleservice.entity.*;
+import com.bit.saleservice.exception.*;
 import com.bit.saleservice.repository.ProductRepository;
 import com.bit.saleservice.repository.SaleRepository;
 import org.junit.jupiter.api.Test;
@@ -24,8 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +32,9 @@ class SaleServiceImplTest {
 
     @Mock
     private ProductRepository productRepository;
+
+    @Mock
+    private CampaignProcessService campaignProcessService;
 
     @Mock
     private GatewayService gatewayService;
@@ -263,5 +259,113 @@ class SaleServiceImplTest {
 
         // Act & Assert
         assertThrows(SaleNotFoundException.class, () -> saleService.deleteSalePermanently(id));
+    }
+
+    @Test
+    void processCampaigns_shouldReturnCampaignProcessResult_whenCampaignsAreProcessedSuccessfully() {
+        // Arrange
+        List<Long> campaignIds = List.of(1L, 2L);
+        List<Product> products = List.of(new Product());
+        BigDecimal total = BigDecimal.valueOf(100);
+
+        CampaignProcessResponse campaignProcessResponse = new CampaignProcessResponse();
+        campaignProcessResponse.setProducts(products);
+        campaignProcessResponse.setTotal(total);
+
+        when(campaignProcessService.processCampaigns(any(CampaignProcessRequest.class))).thenReturn(campaignProcessResponse);
+        when(campaignProcessService.getCampaigns(any(List.class))).thenReturn(List.of(new Campaign()));
+
+        // Act
+        CampaignProcessResult result = saleService.processCampaigns(campaignIds, products, total);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(products, result.getProducts());
+        assertEquals(total, result.getTotalWithCampaign());
+        assertEquals(1, result.getCampaigns().size());
+        verify(campaignProcessService, times(1)).processCampaigns(any(CampaignProcessRequest.class));
+        verify(campaignProcessService, times(1)).getCampaigns(any(List.class));
+    }
+
+    @Test
+    void processCashPayment_shouldReturnChange_whenCashIsSufficient() {
+        // Arrange
+        BigDecimal cash = BigDecimal.valueOf(150);
+        BigDecimal totalWithCampaign = BigDecimal.valueOf(100);
+
+        // Act
+        BigDecimal change = saleService.processCashPayment(cash, totalWithCampaign);
+
+        // Assert
+        assertEquals(BigDecimal.valueOf(50), change);
+    }
+
+    @Test
+    void processCashPayment_shouldThrowException_whenCashIsNotProvided() {
+        // Arrange
+        BigDecimal cash = null;
+        BigDecimal totalWithCampaign = BigDecimal.valueOf(100);
+
+        // Act & Assert
+        assertThrows(CashNotProvidedException.class, () -> saleService.processCashPayment(cash, totalWithCampaign));
+    }
+
+    @Test
+    void processCashPayment_shouldThrowException_whenCashIsInsufficient() {
+        // Arrange
+        BigDecimal cash = BigDecimal.valueOf(50);
+        BigDecimal totalWithCampaign = BigDecimal.valueOf(100);
+
+        // Act & Assert
+        assertThrows(InsufficientCashException.class, () -> saleService.processCashPayment(cash, totalWithCampaign));
+    }
+
+    @Test
+    void processMixedPayment_shouldReturnChange_whenMixedPaymentIsSufficient() {
+        // Arrange
+        MixedPayment mixedPayment = new MixedPayment();
+        mixedPayment.setCashAmount(BigDecimal.valueOf(50));
+        mixedPayment.setCreditCardAmount(BigDecimal.valueOf(60));
+        BigDecimal totalWithCampaign = BigDecimal.valueOf(100);
+
+        // Act
+        BigDecimal change = saleService.processMixedPayment(mixedPayment, totalWithCampaign);
+
+        // Assert
+        assertEquals(BigDecimal.valueOf(10), change);
+    }
+
+    @Test
+    void processMixedPayment_shouldThrowException_whenMixedPaymentIsNull() {
+        // Arrange
+        MixedPayment mixedPayment = null;
+        BigDecimal totalWithCampaign = BigDecimal.valueOf(100);
+
+        // Act & Assert
+        assertThrows(MixedPaymentNotFoundException.class, () -> saleService.processMixedPayment(mixedPayment, totalWithCampaign));
+    }
+
+    @Test
+    void processMixedPayment_shouldThrowException_whenMixedPaymentIsInvalid() {
+        // Arrange
+        MixedPayment mixedPayment = new MixedPayment();
+        mixedPayment.setCashAmount(null);
+        mixedPayment.setCreditCardAmount(null);
+        BigDecimal totalWithCampaign = BigDecimal.valueOf(100);
+
+        // Act & Assert
+        assertThrows(InvalidMixedPaymentException.class, () -> saleService.processMixedPayment(mixedPayment, totalWithCampaign));
+    }
+
+    @Test
+    void processMixedPayment_shouldThrowException_whenTotalPaymentIsInsufficient() {
+        // Arrange
+        MixedPayment mixedPayment = new MixedPayment();
+        mixedPayment.setCashAmount(BigDecimal.valueOf(30));
+        mixedPayment.setCreditCardAmount(BigDecimal.valueOf(40));
+        BigDecimal totalWithCampaign = BigDecimal.valueOf(100);
+
+        // Act & Assert
+        assertThrows(InsufficientMixedPaymentException.class, () -> saleService.processMixedPayment(mixedPayment, totalWithCampaign));
     }
 }
