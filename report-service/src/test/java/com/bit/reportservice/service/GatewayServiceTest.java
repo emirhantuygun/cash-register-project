@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.*;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import java.math.BigDecimal;
@@ -130,5 +131,100 @@ public class GatewayServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(saleResponses.size(), result.getContent().size());
+    }
+
+    //**************************************
+
+    @Test
+    void testGetSale_HttpClientErrorException_ThrowsSaleServiceException() {
+        // Arrange
+        Long id = 1L;
+        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(SaleResponse.class), eq(id)))
+                .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+
+        // Act and Assert
+        assertThrows(SaleServiceException.class, () -> gatewayService.getSale(id));
+    }
+
+    @Test
+    void testGetSale_HttpServerErrorException_ThrowsSaleServiceException() {
+        // Arrange
+        Long id = 1L;
+        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(SaleResponse.class), eq(id)))
+                .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+
+        // Act and Assert
+        assertThrows(SaleServiceException.class, () -> gatewayService.getSale(id));
+    }
+
+    @Test
+    void testGetSale_RestClientException_ThrowsSaleServiceException() {
+        // Arrange
+        Long id = 1L;
+        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(SaleResponse.class), eq(id)))
+                .thenThrow(new RestClientException("REST client error"));
+
+        // Act and Assert
+        assertThrows(SaleServiceException.class, () -> gatewayService.getSale(id));
+    }
+
+    @Test
+    void testGetAllSales_HttpClientErrorException_ThrowsSaleServiceException() {
+        // Arrange
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), any(ParameterizedTypeReference.class)))
+                .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+
+        // Act and Assert
+        assertThrows(SaleServiceException.class, () -> gatewayService.getAllSales());
+    }
+
+    @Test
+    void testGetAllSales_HttpServerErrorException_ThrowsSaleServiceException() {
+        // Arrange
+        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(new ParameterizedTypeReference<PageWrapper<SaleResponse>>() {})))
+                .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+
+        // Act and Assert
+        assertThrows(SaleServiceException.class, () -> gatewayService.getAllSales());
+    }
+
+    @Test
+    void testGetAllSales_RestClientException_ThrowsSaleServiceException() {
+        // Arrange
+        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(new ParameterizedTypeReference<PageWrapper<SaleResponse>>() {})))
+                .thenThrow(new RestClientException("REST client error"));
+
+        // Act and Assert
+        assertThrows(SaleServiceException.class, () -> gatewayService.getAllSales());
+    }
+
+    @Test
+    void testGetDeletedSales_HttpClientErrorException_ThrowsSaleServiceException() {
+        // Arrange
+        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(new ParameterizedTypeReference<PageWrapper<SaleResponse>>() {})))
+                .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+
+        // Act and Assert
+        assertThrows(SaleServiceException.class, () -> gatewayService.getDeletedSales());
+    }
+
+    @Test
+    void testGetDeletedSales_HttpServerErrorException_ThrowsSaleServiceException() {
+        // Arrange
+        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(new ParameterizedTypeReference<PageWrapper<SaleResponse>>() {})))
+                .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+
+        // Act and Assert
+        assertThrows(SaleServiceException.class, () -> gatewayService.getDeletedSales());
+    }
+
+    @Test
+    void testGetDeletedSales_RestClientException_ThrowsSaleServiceException() {
+        // Arrange
+        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(new ParameterizedTypeReference<PageWrapper<SaleResponse>>() {})))
+                .thenThrow(new RestClientException("REST client error"));
+
+        // Act and Assert
+        assertThrows(SaleServiceException.class, () -> gatewayService.getDeletedSales());
     }
 }
