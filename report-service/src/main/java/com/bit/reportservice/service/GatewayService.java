@@ -50,7 +50,7 @@ public class GatewayService {
     private final RestTemplate restTemplate;
 
     @PostConstruct
-    private void initGatewayUrl() {
+    protected void initGatewayUrl() {
         GATEWAY_URL = "http://" + GATEWAY_HOST + ":" + GATEWAY_PORT + "/";
     }
 

@@ -9,4 +9,4 @@ import org.junit.platform.suite.api.Suite;
         "com.bit.apigateway.controller",
         "com.bit.apigateway.util."
 })
-public class ApiGatewaySuite {}
+class ApiGatewaySuite {}

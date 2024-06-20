@@ -23,13 +23,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class JwtUtilsTest {
+class JwtUtilsTest {
 
     @Mock
     private Jedis jedis;
     @InjectMocks
     private JwtUtils jwtUtils;
-
 
     @BeforeEach
     void setUp() {

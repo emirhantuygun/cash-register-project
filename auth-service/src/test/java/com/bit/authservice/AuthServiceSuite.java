@@ -10,4 +10,4 @@ import org.junit.platform.suite.api.Suite;
         "com.bit.authservice.service",
         "com.bit.authservice.util."
 })
-public class AuthServiceSuite {}
+class AuthServiceSuite {}

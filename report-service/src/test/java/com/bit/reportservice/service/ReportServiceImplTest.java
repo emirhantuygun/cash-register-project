@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ReportServiceImplTest {
+class ReportServiceImplTest {
 
     @InjectMocks
     private ReportServiceImpl reportService;

@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class CustomLogoutHandlerTest {
+class CustomLogoutHandlerTest {
 
     @Mock
     private TokenRepository tokenRepository;

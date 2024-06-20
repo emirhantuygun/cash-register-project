@@ -18,16 +18,18 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class GatewayServiceTest {
+class GatewayServiceTest {
 
     @Mock
     private RestTemplate restTemplate;
@@ -37,16 +39,16 @@ public class GatewayServiceTest {
 
     @BeforeEach
     void setUp() throws HeaderProcessingException {
-        ReflectionTestUtils.setField(gatewayService, "GATEWAY_URL", "http://some-domain/");
         ReflectionTestUtils.setField(gatewayService, "GET_ALL_SALES_FILTERED_AND_SORTED_ENDPOINT", "/some-endpoint");
 
         gatewayService = spy(gatewayService);
-        doReturn(new HttpHeaders()).when(gatewayService).getHttpHeaders();
+        lenient().doReturn(new HttpHeaders()).when(gatewayService).getHttpHeaders();
     }
 
     @Test
     void getSale_Success_ReturnsSaleResponse() throws HeaderProcessingException {
         // Arrange
+        ReflectionTestUtils.setField(gatewayService, "GATEWAY_URL", "http://some-domain/");
         SaleResponse saleResponse = new SaleResponse();
         when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(SaleResponse.class), anyLong()))
                 .thenReturn(new ResponseEntity<>(saleResponse, HttpStatus.OK));
@@ -62,6 +64,7 @@ public class GatewayServiceTest {
     @Test
     void getSale_HttpClientErrorException_ThrowsSaleServiceException() {
         // Arrange
+        ReflectionTestUtils.setField(gatewayService, "GATEWAY_URL", "http://some-domain/");
         when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(SaleResponse.class), anyLong()))
                 .thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
 
@@ -72,6 +75,7 @@ public class GatewayServiceTest {
     @Test
     void getAllSales_Success_ReturnsListOfSaleResponse() throws HeaderProcessingException {
         // Arrange
+        ReflectionTestUtils.setField(gatewayService, "GATEWAY_URL", "http://some-domain/");
         List<SaleResponse> saleResponses = Arrays.asList(new SaleResponse(), new SaleResponse());
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class),
                 any(ParameterizedTypeReference.class)))
@@ -88,6 +92,7 @@ public class GatewayServiceTest {
     @Test
     void getDeletedSales_Success_ReturnsListOfSaleResponse() throws HeaderProcessingException {
         // Arrange
+        ReflectionTestUtils.setField(gatewayService, "GATEWAY_URL", "http://some-domain/");
         List<SaleResponse> deletedSaleResponses = Collections.singletonList(new SaleResponse());
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class),
                 any(ParameterizedTypeReference.class)))
@@ -104,6 +109,7 @@ public class GatewayServiceTest {
     @Test
     void getAllSalesFilteredAndSorted_RestClientException_ThrowsSaleServiceException() {
         // Arrange
+        ReflectionTestUtils.setField(gatewayService, "GATEWAY_URL", "http://some-domain/");
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class),
                 any(ParameterizedTypeReference.class)))
                 .thenThrow(new RestClientException("REST client error"));
@@ -117,6 +123,7 @@ public class GatewayServiceTest {
     @Test
     void getAllSalesFilteredAndSorted_Success_ReturnsPageOfSaleResponse() throws HeaderProcessingException {
         // Arrange
+        ReflectionTestUtils.setField(gatewayService, "GATEWAY_URL", "http://some-domain/");
         List<SaleResponse> saleResponses = Arrays.asList(new SaleResponse(), new SaleResponse());
         PageWrapper<SaleResponse> pageWrapper = new PageWrapper<>(saleResponses, 2, 10, 10L);
 
@@ -133,11 +140,11 @@ public class GatewayServiceTest {
         assertEquals(saleResponses.size(), result.getContent().size());
     }
 
-    //**************************************
 
     @Test
     void testGetSale_HttpClientErrorException_ThrowsSaleServiceException() {
         // Arrange
+        ReflectionTestUtils.setField(gatewayService, "GATEWAY_URL", "http://some-domain/");
         Long id = 1L;
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(SaleResponse.class), eq(id)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
@@ -149,6 +156,7 @@ public class GatewayServiceTest {
     @Test
     void testGetSale_HttpServerErrorException_ThrowsSaleServiceException() {
         // Arrange
+        ReflectionTestUtils.setField(gatewayService, "GATEWAY_URL", "http://some-domain/");
         Long id = 1L;
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(SaleResponse.class), eq(id)))
                 .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
@@ -160,6 +168,7 @@ public class GatewayServiceTest {
     @Test
     void testGetSale_RestClientException_ThrowsSaleServiceException() {
         // Arrange
+        ReflectionTestUtils.setField(gatewayService, "GATEWAY_URL", "http://some-domain/");
         Long id = 1L;
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(SaleResponse.class), eq(id)))
                 .thenThrow(new RestClientException("REST client error"));
@@ -171,6 +180,7 @@ public class GatewayServiceTest {
     @Test
     void testGetAllSales_HttpClientErrorException_ThrowsSaleServiceException() {
         // Arrange
+        ReflectionTestUtils.setField(gatewayService, "GATEWAY_URL", "http://some-domain/");
         when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), any(ParameterizedTypeReference.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
@@ -181,6 +191,7 @@ public class GatewayServiceTest {
     @Test
     void testGetAllSales_HttpServerErrorException_ThrowsSaleServiceException() {
         // Arrange
+        ReflectionTestUtils.setField(gatewayService, "GATEWAY_URL", "http://some-domain/");
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(ParameterizedTypeReference.class)))
                 .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
 
@@ -191,6 +202,7 @@ public class GatewayServiceTest {
     @Test
     void testGetAllSales_RestClientException_ThrowsSaleServiceException() {
         // Arrange
+        ReflectionTestUtils.setField(gatewayService, "GATEWAY_URL", "http://some-domain/");
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(ParameterizedTypeReference.class)))
                 .thenThrow(new RestClientException("REST client error"));
 
@@ -201,6 +213,7 @@ public class GatewayServiceTest {
     @Test
     void testGetDeletedSales_HttpClientErrorException_ThrowsSaleServiceException() {
         // Arrange
+        ReflectionTestUtils.setField(gatewayService, "GATEWAY_URL", "http://some-domain/");
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(ParameterizedTypeReference.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
@@ -211,6 +224,7 @@ public class GatewayServiceTest {
     @Test
     void testGetDeletedSales_HttpServerErrorException_ThrowsSaleServiceException() {
         // Arrange
+        ReflectionTestUtils.setField(gatewayService, "GATEWAY_URL", "http://some-domain/");
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(ParameterizedTypeReference.class)))
                 .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
 
@@ -221,10 +235,24 @@ public class GatewayServiceTest {
     @Test
     void testGetDeletedSales_RestClientException_ThrowsSaleServiceException() {
         // Arrange
+        ReflectionTestUtils.setField(gatewayService, "GATEWAY_URL", "http://some-domain/");
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(ParameterizedTypeReference.class)))
                 .thenThrow(new RestClientException("REST client error"));
 
         // Act and Assert
         assertThrows(SaleServiceException.class, () -> gatewayService.getDeletedSales());
+    }
+
+    @Test
+    void testInitGatewayUrl_GatewayHostAndPortAreSet_GatewayUrlIsInitializedCorrectly() {
+        // Arrange
+        ReflectionTestUtils.setField(gatewayService, "GATEWAY_HOST", "localhost");
+        ReflectionTestUtils.setField(gatewayService, "GATEWAY_PORT", "8080");
+
+        // Act
+        gatewayService.initGatewayUrl();
+
+        // Assert
+        assertEquals("http://localhost:8080/", ReflectionTestUtils.getField(gatewayService, "GATEWAY_URL"));
     }
 }

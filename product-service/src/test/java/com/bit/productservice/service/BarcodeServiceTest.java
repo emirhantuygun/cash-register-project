@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mockStatic;
 
 @ExtendWith(MockitoExtension.class)
-public class BarcodeServiceTest {
+class BarcodeServiceTest {
 
     @InjectMocks
     private BarcodeService barcodeService;

@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class SaleServiceImplTest {
+class SaleServiceImplTest {
 
     @InjectMocks
     private SaleServiceImpl saleService;

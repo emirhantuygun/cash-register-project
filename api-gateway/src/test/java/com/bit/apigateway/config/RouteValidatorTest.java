@@ -7,7 +7,7 @@ import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class RouteValidatorTest {
+class RouteValidatorTest {
 
     private RouteValidator routeValidator;
 

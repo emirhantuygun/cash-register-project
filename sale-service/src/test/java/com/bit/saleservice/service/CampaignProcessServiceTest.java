@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class CampaignProcessServiceTest {
+class CampaignProcessServiceTest {
 
     @Mock
     private CampaignRepository campaignRepository;
