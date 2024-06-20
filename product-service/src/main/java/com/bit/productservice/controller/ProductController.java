@@ -5,7 +5,6 @@ import com.bit.productservice.dto.ProductRequest;
 import com.bit.productservice.dto.ProductResponse;
 import com.bit.productservice.exception.AlgorithmNotFoundException;
 import com.bit.productservice.service.ProductService;
-import com.bit.productservice.wrapper.ProductStockCheckRequest;
 import com.bit.productservice.wrapper.ProductStockReturnRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -70,12 +69,6 @@ public class ProductController {
 
         logger.info("Returning {} product responses filtered and sorted", productResponses.getTotalElements());
         return new ResponseEntity<>(productResponses, HttpStatus.OK);
-    }
-
-    @PostMapping("/stock")
-    public ResponseEntity<Boolean> checkStock(@Valid @RequestBody ProductStockCheckRequest request) {
-        boolean enoughInStock = productService.checkStock(request.getId(), request.getRequestedQuantity());
-        return ResponseEntity.ok(enoughInStock);
     }
 
     @PostMapping("/return")

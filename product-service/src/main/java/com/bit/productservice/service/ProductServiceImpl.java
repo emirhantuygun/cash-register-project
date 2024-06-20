@@ -143,13 +143,6 @@ public class ProductServiceImpl implements ProductService {
         productRepository.deletePermanently(id);
     }
 
-    @Override
-    public Boolean checkStock(Long id, int requestedQuantity) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + id));
-        return product.getStockQuantity() >= requestedQuantity;
-    }
-
     @Transactional
     @RabbitListener(queues = "${rabbitmq.queue}")
     public void reduceProductStock(ProductStockReduceRequest request) {

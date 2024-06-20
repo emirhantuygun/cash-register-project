@@ -207,47 +207,6 @@ class ProductServiceImplTest {
     }
 
     @Test
-    void checkStock_shouldReturnTrue_whenRequestedQuantityIsLessThanOrEqualToStockQuantity() {
-        // Arrange
-        Product product = new Product();
-        product.setId(1L);
-        product.setStockQuantity(10);
-
-        when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
-
-        // Act
-        boolean result = productService.checkStock(1L, 5);
-
-        // Assert
-        assertTrue(result);
-    }
-
-    @Test
-    void checkStock_shouldReturnFalse_whenRequestedQuantityIsGreaterThanStockQuantity() {
-        // Arrange
-        Product product = new Product();
-        product.setId(1L);
-        product.setStockQuantity(10);
-
-        when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
-
-        // Act
-        boolean result = productService.checkStock(1L, 15);
-
-        // Assert
-        assertFalse(result);
-    }
-
-    @Test
-    void checkStock_shouldThrowProductNotFoundException_whenProductDoesNotExist() {
-        // Arrange
-        when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        // Act & Assert
-        assertThrows(ProductNotFoundException.class, () -> productService.checkStock(1L, 5));
-    }
-
-    @Test
     void reduceProductStock_shouldReduceStock_whenProductExists() {
         // Arrange
         Product product = new Product();

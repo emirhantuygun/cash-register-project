@@ -2,8 +2,10 @@ package com.bit.saleservice.service;
 
 import com.bit.saleservice.annotation.ExcludeFromGeneratedCoverage;
 import com.bit.saleservice.dto.ProductServiceResponse;
-import com.bit.saleservice.exception.*;
-import com.bit.saleservice.wrapper.ProductStockCheckRequest;
+import com.bit.saleservice.exception.HeaderProcessingException;
+import com.bit.saleservice.exception.ProductNotFoundException;
+import com.bit.saleservice.exception.ProductReturnException;
+import com.bit.saleservice.exception.ProductServiceException;
 import com.bit.saleservice.wrapper.ProductStockReturnRequest;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,9 +19,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -83,36 +83,36 @@ public class GatewayService {
         }
     }
 
-    protected Mono<Boolean> checkEnoughProductsInStock(ProductStockCheckRequest request) throws HeaderProcessingException {
-        HttpHeaders headers = getHttpHeaders();
-        return webClient.post()
-                .uri(GATEWAY_URL + CHECK_STOCK_ENDPOINT)
-                .headers(httpHeaders -> httpHeaders.addAll(headers))
-                .body(BodyInserters.fromValue(request))
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
-                    if (clientResponse.statusCode() == HttpStatus.NOT_FOUND) {
-                        return Mono.error(new ProductNotFoundException("Product not found with id: " + request.getId()));
-                    }
-                    return Mono.error(new ClientErrorException("Client error occurred while checking product stock"));
-                })
-                .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
-                        Mono.error(new ServerErrorException("Server error occurred while checking product stock"))
-                )
-                .bodyToMono(Boolean.class)
-                .doOnError(e -> {
-                    // Log the error or take appropriate action
-                    System.err.println("Error occurred while checking product stock: " + e.getMessage());
-                    throw new ProductStockCheckException("Error occurred while checking product stock", e);
-                })
-                .onErrorResume(e -> {
-                    // Handle the error and provide a default value
-                    return Mono.just(false);
-                });
-    }
+//    protected Mono<Boolean> checkEnoughProductsInStock(ProductStockCheckRequest request) throws HeaderProcessingException {
+//        HttpHeaders headers = getHttpHeaders();
+//        return webClient.post()
+//                .uri(GATEWAY_URL + CHECK_STOCK_ENDPOINT)
+//                .headers(httpHeaders -> httpHeaders.addAll(headers))
+//                .body(BodyInserters.fromValue(request))
+//                .retrieve()
+//                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
+//                    if (clientResponse.statusCode() == HttpStatus.NOT_FOUND) {
+//                        return Mono.error(new ProductNotFoundException("Product not found with id: " + request.getId()));
+//                    }
+//                    return Mono.error(new ClientErrorException("Client error occurred while checking product stock"));
+//                })
+//                .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
+//                        Mono.error(new ServerErrorException("Server error occurred while checking product stock"))
+//                )
+//                .bodyToMono(Boolean.class)
+//                .doOnError(e -> {
+//                    // Log the error or take appropriate action
+//                    System.err.println("Error occurred while checking product stock: " + e.getMessage());
+//                    throw new ProductStockCheckException("Error occurred while checking product stock", e);
+//                })
+//                .onErrorResume(e -> {
+//                    // Handle the error and provide a default value
+//                    return Mono.just(false);
+//                });
+//    }
 
 
-    protected void returnProducts(ProductStockReturnRequest request) throws HeaderProcessingException {
+    protected void returnProducts(ProductStockReturnRequest request) throws HeaderProcessingException, ProductReturnException {
         try {
             String returnUrl = GATEWAY_URL + RETURN_PRODUCTS_ENDPOINT;
 
@@ -138,7 +138,7 @@ public class GatewayService {
 
             throw new ProductServiceException("HTTP error: " + statusCode.value() + ". Product Service is temporarily unavailable. Please try again later.");
         } catch (RestClientException e) {
-            throw new ProductServiceException("REST client error: " + e.getMessage());
+            throw new ProductReturnException("REST client error: " + e.getMessage());
         }
     }
 

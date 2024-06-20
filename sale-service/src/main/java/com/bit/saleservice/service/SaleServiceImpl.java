@@ -7,7 +7,6 @@ import com.bit.saleservice.entity.*;
 import com.bit.saleservice.exception.*;
 import com.bit.saleservice.repository.ProductRepository;
 import com.bit.saleservice.repository.SaleRepository;
-import com.bit.saleservice.wrapper.ProductStockCheckRequest;
 import com.bit.saleservice.wrapper.ProductStockReduceRequest;
 import com.bit.saleservice.wrapper.ProductStockReturnRequest;
 import io.micrometer.common.util.StringUtils;
@@ -314,8 +313,8 @@ public class SaleServiceImpl implements SaleService {
                 ProductServiceResponse productServiceResponse = gatewayService.getProduct(productRequest.getId());
 
                 if (productServiceResponse != null) {
-                    ProductStockCheckRequest productStockCheckRequest = new ProductStockCheckRequest(productRequest.getId(), productRequest.getQuantity());
-                    boolean areEnoughProductsInStock = Boolean.TRUE.equals(gatewayService.checkEnoughProductsInStock(productStockCheckRequest).block());
+//                    ProductStockCheckRequest productStockCheckRequest = new ProductStockCheckRequest(productRequest.getId(), productRequest.getQuantity());
+                    boolean areEnoughProductsInStock = Boolean.TRUE.equals(productServiceResponse.getStockQuantity() >= productRequest.getQuantity());
 
                     if (areEnoughProductsInStock) {
                         BigDecimal totalPrice = productServiceResponse.getPrice().multiply(BigDecimal.valueOf(productRequest.getQuantity()));

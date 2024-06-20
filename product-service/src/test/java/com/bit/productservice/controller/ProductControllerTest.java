@@ -4,7 +4,6 @@ import com.bit.productservice.dto.ProductRequest;
 import com.bit.productservice.dto.ProductResponse;
 import com.bit.productservice.exception.AlgorithmNotFoundException;
 import com.bit.productservice.service.ProductService;
-import com.bit.productservice.wrapper.ProductStockCheckRequest;
 import com.bit.productservice.wrapper.ProductStockReturnRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
@@ -158,19 +156,6 @@ class ProductControllerTest {
         // Assert
         assertEquals(200, response.getStatusCode().value());
         assertEquals("Product deleted permanently!", response.getBody());
-    }
-
-    @Test
-    void testCheckStock_ShouldReturnStockStatus() {
-        // Arrange
-        when(productService.checkStock(anyLong(), anyInt())).thenReturn(true);
-
-        // Act
-        ResponseEntity<Boolean> response = productController.checkStock(new ProductStockCheckRequest(1L, 10));
-
-        // Assert
-        assertEquals(200, response.getStatusCode().value());
-        assertTrue(response.getBody());
     }
 
     @Test

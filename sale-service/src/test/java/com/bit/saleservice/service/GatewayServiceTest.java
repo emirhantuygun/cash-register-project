@@ -4,7 +4,6 @@ import com.bit.saleservice.dto.ProductServiceResponse;
 import com.bit.saleservice.exception.HeaderProcessingException;
 import com.bit.saleservice.exception.ProductNotFoundException;
 import com.bit.saleservice.exception.ProductServiceException;
-import com.bit.saleservice.wrapper.ProductStockCheckRequest;
 import com.bit.saleservice.wrapper.ProductStockReturnRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,11 +16,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.reactive.function.BodyInserter;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClient.RequestBodyUriSpec;
-import org.springframework.web.reactive.function.client.WebClient.RequestHeadersSpec;
-import reactor.core.publisher.Mono;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -31,17 +25,6 @@ class GatewayServiceTest {
 
     @Mock
     private RestTemplate restTemplate;
-
-    @Mock
-    private WebClient webClient;
-
-    @Mock
-    private RequestHeadersSpec requestHeadersSpec;
-    @Mock
-    private RequestBodyUriSpec requestBodyUriSpec;
-
-    @Mock
-    private WebClient.ResponseSpec responseSpec;
 
     @InjectMocks
     private GatewayService gatewayService;
@@ -85,30 +68,6 @@ class GatewayServiceTest {
 
         // Act & Assert
         assertThrows(ProductNotFoundException.class, () -> gatewayService.getProduct(productId));
-    }
-
-    @Test
-    void testCheckEnoughProductsInStock_WhenStockIsSufficient_ReturnsTrue() throws HeaderProcessingException {
-        // Arrange
-        ProductStockCheckRequest request = new ProductStockCheckRequest(1L, 1);
-        Boolean mockResponse = true;
-
-        when(webClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.headers(any())).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.body(any(BodyInserter.class))).thenReturn(requestHeadersSpec);
-        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(Boolean.class)).thenReturn(Mono.just(mockResponse));
-
-        // Act
-        Mono<Boolean> responseMono = gatewayService.checkEnoughProductsInStock(request);
-        Boolean response = responseMono.block();
-
-        // Assert
-        assertNotNull(response);
-        assertTrue(response);
-        verify(webClient.post()).uri(anyString());
     }
 
     @Test
