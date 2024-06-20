@@ -5,6 +5,7 @@ import com.bit.usermanagementservice.dto.UserRequest;
 import com.bit.usermanagementservice.dto.UserResponse;
 import com.bit.usermanagementservice.entity.AppUser;
 import com.bit.usermanagementservice.entity.Role;
+import com.bit.usermanagementservice.exception.UserNotSoftDeletedException;
 import com.bit.usermanagementservice.repository.RoleRepository;
 import com.bit.usermanagementservice.repository.UserRepository;
 import com.bit.usermanagementservice.wrapper.UpdateUserMessage;
@@ -22,8 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -220,6 +220,17 @@ class UserServiceImplTest {
         assertEquals("restoredUser", userResponse.getUsername());
         assertEquals("restored@domain.com", userResponse.getEmail());
         verify(rabbitTemplate, times(1)).convertAndSend(any(), any(), eq(userId));
+    }
+
+    @Test
+    void testRestoreUser_NonExistingSoftDeletedUser_ThrowsUserNotSoftDeletedException() {
+        // Arrange
+        Long id = 1L;
+        AppUser existingUser = new AppUser();
+        lenient().when(userRepository.findById(id)).thenReturn(Optional.of(existingUser));
+
+        // Act & Assert
+        assertThrows(UserNotSoftDeletedException.class, () -> userService.restoreUser(id));
     }
 
     @Test
