@@ -91,7 +91,7 @@ class AuthServiceImplTest {
     }
 
     @Test
-    public void givenValidRedisHostAndPort_whenInitMethodIsCalled_thenJedisInstanceIsInitialized() throws RedisOperationException {
+    void givenValidRedisHostAndPort_whenInitMethodIsCalled_thenJedisInstanceIsInitialized() throws RedisOperationException {
         // Arrange
         authService = spy(authService);
         lenient().doNothing().when(authService).saveUserToken(any(), anyString());
@@ -105,7 +105,7 @@ class AuthServiceImplTest {
     }
 
     @Test
-    public void givenInvalidPort_whenInitMethodIsCalled_thenNumberFormatExceptionIsThrown() {
+    void givenInvalidPort_whenInitMethodIsCalled_thenNumberFormatExceptionIsThrown() {
         // Arrange
         ReflectionTestUtils.setField(authService, "redisPort", "invalidPort");
 
@@ -338,7 +338,7 @@ class AuthServiceImplTest {
     }
 
     @Test
-    public void givenJedisException_whenSaveUserTokenIsCalled_thenRedisOperationExceptionIsThrown() {
+    void givenJedisException_whenSaveUserTokenIsCalled_thenRedisOperationExceptionIsThrown() {
         // Arrange
         AppUser user = new AppUser();
         String jwtToken = "sample-jwt-token";

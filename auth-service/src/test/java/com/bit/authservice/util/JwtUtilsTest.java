@@ -29,7 +29,7 @@ class JwtUtilsTest {
     private final long accessTokenExpiration = 1000 * 60 * 60; // 1 hour
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         final String signerKey = "testsignerkeytestsignerkeytestsignerkeytestsignerkey";
         final String authoritiesKey = "roles";
         final long refreshTokenExpiration = 1000 * 60 * 60 * 24; // 24 hours
@@ -41,7 +41,7 @@ class JwtUtilsTest {
     }
 
     @Test
-    public void givenValidToken_whenExtractUsername_thenUsernameIsExtracted() {
+    void givenValidToken_whenExtractUsername_thenUsernameIsExtracted() {
         // Act
         String token = jwtUtils.generateAccessToken("user", List.of("ROLE_USER"));
         String username = jwtUtils.extractUsername(token);
@@ -51,7 +51,7 @@ class JwtUtilsTest {
     }
 
     @Test
-    public void givenValidTokenAndUser_whenIsValid_thenReturnsTrue() {
+    void givenValidTokenAndUser_whenIsValid_thenReturnsTrue() {
         // Arrange
         when(userDetails.getUsername()).thenReturn("user");
 
@@ -63,7 +63,7 @@ class JwtUtilsTest {
     }
 
     @Test
-    public void givenValidToken_whenExtractClaim_thenCorrectClaimIsExtracted() {
+    void givenValidToken_whenExtractClaim_thenCorrectClaimIsExtracted() {
         // Act
         String token = jwtUtils.generateAccessToken("user", List.of("ROLE_USER"));
         String username = jwtUtils.extractClaim(token, Claims::getSubject);
@@ -73,7 +73,7 @@ class JwtUtilsTest {
     }
 
     @Test
-    public void givenValidUserAndRoles_whenGenerateAccessToken_thenTokenIsGenerated() {
+    void givenValidUserAndRoles_whenGenerateAccessToken_thenTokenIsGenerated() {
         // Act
         String token = jwtUtils.generateAccessToken("user", List.of("ROLE_USER"));
 
@@ -82,7 +82,7 @@ class JwtUtilsTest {
     }
 
     @Test
-    public void givenValidUser_whenGenerateRefreshToken_thenTokenIsGenerated() {
+    void givenValidUser_whenGenerateRefreshToken_thenTokenIsGenerated() {
         // Act
         String token = jwtUtils.generateRefreshToken("user");
 
@@ -91,7 +91,7 @@ class JwtUtilsTest {
     }
 
     @Test
-    public void givenValidClaimsAndExpiration_whenBuildToken_thenTokenIsBuilt() {
+    void givenValidClaimsAndExpiration_whenBuildToken_thenTokenIsBuilt() {
         // Arrange
         Claims claims = Jwts.claims().subject("user").build();
 
@@ -103,7 +103,7 @@ class JwtUtilsTest {
     }
 
     @Test
-    public void givenInvalidToken_whenExtractUsername_thenThrowsException() {
+    void givenInvalidToken_whenExtractUsername_thenThrowsException() {
         // Arrange
         String invalidToken = "invalid.token.here";
 

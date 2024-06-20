@@ -15,7 +15,7 @@ class FallbackControllerTest {
     private FallbackController fallbackController;
 
     @Test
-    public void whenFallbackAuthEndpointIsCalled_thenAuthServiceUnavailableExceptionIsThrown() {
+    void whenFallbackAuthEndpointIsCalled_thenAuthServiceUnavailableExceptionIsThrown() {
 
         // Act & Assert
         Exception exception = assertThrows(AuthServiceUnavailableException.class,
@@ -25,7 +25,7 @@ class FallbackControllerTest {
     }
 
     @Test
-    public void whenFallbackUserEndpointIsCalled_thenUserServiceUnavailableExceptionIsThrown() {
+    void whenFallbackUserEndpointIsCalled_thenUserServiceUnavailableExceptionIsThrown() {
 
         // Act & Assert
         Exception exception = assertThrows(UserServiceUnavailableException.class,
@@ -35,7 +35,7 @@ class FallbackControllerTest {
     }
 
     @Test
-    public void whenFallbackProductEndpointIsCalled_thenProductServiceUnavailableExceptionIsThrown() {
+    void whenFallbackProductEndpointIsCalled_thenProductServiceUnavailableExceptionIsThrown() {
 
         // Act & Assert
         Exception exception = assertThrows(ProductServiceUnavailableException.class,
@@ -45,7 +45,7 @@ class FallbackControllerTest {
     }
 
     @Test
-    public void whenFallbackSaleEndpointIsCalled_thenSaleServiceUnavailableExceptionIsThrown() {
+    void whenFallbackSaleEndpointIsCalled_thenSaleServiceUnavailableExceptionIsThrown() {
 
         // Act & Assert
         Exception exception = assertThrows(SaleServiceUnavailableException.class,
@@ -55,7 +55,7 @@ class FallbackControllerTest {
     }
 
     @Test
-    public void whenFallbackReportEndpointIsCalled_thenReportServiceUnavailableExceptionIsThrown() {
+    void whenFallbackReportEndpointIsCalled_thenReportServiceUnavailableExceptionIsThrown() {
 
         // Act & Assert
         Exception exception = assertThrows(ReportServiceUnavailableException.class,

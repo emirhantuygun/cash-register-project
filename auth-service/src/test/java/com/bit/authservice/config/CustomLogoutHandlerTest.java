@@ -38,13 +38,13 @@ class CustomLogoutHandlerTest {
     private CustomLogoutHandler customLogoutHandler;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         ReflectionTestUtils.setField(customLogoutHandler, "redisHost", "localhost");
         ReflectionTestUtils.setField(customLogoutHandler, "redisPort", "6379");
     }
 
     @Test
-    public void givenValidRedisHostAndPort_whenInitMethodIsCalled_thenJedisInstanceIsInitialized() {
+    void givenValidRedisHostAndPort_whenInitMethodIsCalled_thenJedisInstanceIsInitialized() {
         // Act
         customLogoutHandler.init();
         Jedis jedis = (Jedis) ReflectionTestUtils.getField(customLogoutHandler, "jedis");
@@ -54,7 +54,7 @@ class CustomLogoutHandlerTest {
     }
 
     @Test
-    public void givenInvalidPort_whenInitMethodIsCalled_thenNumberFormatExceptionIsThrown() {
+    void givenInvalidPort_whenInitMethodIsCalled_thenNumberFormatExceptionIsThrown() {
         // Arrange
         ReflectionTestUtils.setField(customLogoutHandler, "redisPort", "invalidPort");
 
@@ -63,7 +63,7 @@ class CustomLogoutHandlerTest {
     }
 
     @Test
-    public void testLogout_WhenAuthorizationHeaderIsMissing_ShouldThrowMissingAuthorizationHeaderException() {
+    void testLogout_WhenAuthorizationHeaderIsMissing_ShouldThrowMissingAuthorizationHeaderException() {
         // Arrange
         when(request.getHeader("Authorization")).thenReturn(null);
 
@@ -74,7 +74,7 @@ class CustomLogoutHandlerTest {
     }
 
     @Test
-    public void testLogout_WhenAuthorizationHeaderIsInvalid_ShouldThrowInvalidAuthorizationHeaderException() {
+    void testLogout_WhenAuthorizationHeaderIsInvalid_ShouldThrowInvalidAuthorizationHeaderException() {
         // Arrange
         when(request.getHeader("Authorization")).thenReturn("InvalidToken");
 
@@ -85,7 +85,7 @@ class CustomLogoutHandlerTest {
     }
 
     @Test
-    public void testLogout_WhenTokenNotFound_ShouldThrowTokenNotFoundException() {
+    void testLogout_WhenTokenNotFound_ShouldThrowTokenNotFoundException() {
         // Arrange
         String token = "Bearer validToken";
         when(request.getHeader("Authorization")).thenReturn(token);

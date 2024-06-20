@@ -56,7 +56,7 @@ class AuthGatewayFilterFactoryTest {
     private AuthGatewayFilterFactory.Config config;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         config = new AuthGatewayFilterFactory.Config();
         config.setRoleMapping(Collections.singletonMap("/secure", Arrays.asList("ROLE_USER", "ROLE_ADMIN")));
 
@@ -68,7 +68,7 @@ class AuthGatewayFilterFactoryTest {
     }
 
     @Test
-    public void givenOpenEndpoint_whenApply_thenChainFilterIsCalled() {
+    void givenOpenEndpoint_whenApply_thenChainFilterIsCalled() {
         // Arrange
         when(isSecured.test(any(ServerHttpRequest.class))).thenReturn(false);
 
@@ -81,7 +81,7 @@ class AuthGatewayFilterFactoryTest {
     }
 
     @Test
-    public void givenMissingAuthorizationHeader_whenApply_thenThrowsMissingAuthorizationHeaderException() {
+    void givenMissingAuthorizationHeader_whenApply_thenThrowsMissingAuthorizationHeaderException() {
         // Arrange
         when(isSecured.test(any(ServerHttpRequest.class))).thenReturn(true);
         when(request.getHeaders()).thenReturn(new HttpHeaders());
@@ -94,7 +94,7 @@ class AuthGatewayFilterFactoryTest {
     }
 
     @Test
-    public void givenInvalidAuthorizationHeader_whenApply_thenThrowsMissingAuthorizationHeaderException() {
+    void givenInvalidAuthorizationHeader_whenApply_thenThrowsMissingAuthorizationHeaderException() {
         // Arrange
         when(isSecured.test(any(ServerHttpRequest.class))).thenReturn(true);
         HttpHeaders headers = new HttpHeaders();
@@ -109,7 +109,7 @@ class AuthGatewayFilterFactoryTest {
     }
 
     @Test
-    public void givenInvalidToken_whenApply_thenThrowsInvalidTokenException() {
+    void givenInvalidToken_whenApply_thenThrowsInvalidTokenException() {
         // Arrange
         when(isSecured.test(any(ServerHttpRequest.class))).thenReturn(true);
         HttpHeaders headers = new HttpHeaders();
@@ -125,7 +125,7 @@ class AuthGatewayFilterFactoryTest {
     }
 
     @Test
-    public void givenLoggedOutToken_whenApply_thenThrowsLoggedOutTokenException() {
+    void givenLoggedOutToken_whenApply_thenThrowsLoggedOutTokenException() {
         // Arrange
         when(isSecured.test(any(ServerHttpRequest.class))).thenReturn(true);
         HttpHeaders headers = new HttpHeaders();
@@ -143,7 +143,7 @@ class AuthGatewayFilterFactoryTest {
     }
 
     @Test
-    public void givenMissingRoles_whenApply_thenThrowsMissingRolesException() {
+    void givenMissingRoles_whenApply_thenThrowsMissingRolesException() {
         // Arrange
         when(isSecured.test(any(ServerHttpRequest.class))).thenReturn(true);
         HttpHeaders headers = new HttpHeaders();
@@ -163,7 +163,7 @@ class AuthGatewayFilterFactoryTest {
     }
 
     @Test
-    public void givenInsufficientRoles_whenApply_thenThrowsInsufficientRolesException() {
+    void givenInsufficientRoles_whenApply_thenThrowsInsufficientRolesException() {
         // Arrange
         when(isSecured.test(any(ServerHttpRequest.class))).thenReturn(true);
         HttpHeaders headers = new HttpHeaders();
@@ -185,7 +185,7 @@ class AuthGatewayFilterFactoryTest {
     }
 
     @Test
-    public void givenValidTokenAndRoles_whenApply_thenChainFilterIsCalled() {
+    void givenValidTokenAndRoles_whenApply_thenChainFilterIsCalled() {
         // Arrange
         when(isSecured.test(any(ServerHttpRequest.class))).thenReturn(true);
         HttpHeaders headers = new HttpHeaders();

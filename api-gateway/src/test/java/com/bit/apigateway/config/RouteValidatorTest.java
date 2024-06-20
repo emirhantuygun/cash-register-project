@@ -12,12 +12,12 @@ class RouteValidatorTest {
     private RouteValidator routeValidator;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         routeValidator = new RouteValidator();
     }
 
     @Test
-    public void testIsOpenEndpointWithOpenEndpoint() {
+    void testIsOpenEndpointWithOpenEndpoint() {
         // Act
         ServerHttpRequest request = MockServerHttpRequest.get("/auth").build();
 
@@ -26,7 +26,7 @@ class RouteValidatorTest {
     }
 
     @Test
-    public void testIsOpenEndpointWithNonOpenEndpoint() {
+    void testIsOpenEndpointWithNonOpenEndpoint() {
         // Act
         ServerHttpRequest request = MockServerHttpRequest.get("/some-other-endpoint").build();
 
@@ -35,7 +35,7 @@ class RouteValidatorTest {
     }
 
     @Test
-    public void testIsRoleBasedAuthorizationNeededWithNoRoleBasedAuthorizationEndpoint() {
+    void testIsRoleBasedAuthorizationNeededWithNoRoleBasedAuthorizationEndpoint() {
         // Act
         ServerHttpRequest request = MockServerHttpRequest.get("/products").build();
 
@@ -44,7 +44,7 @@ class RouteValidatorTest {
     }
 
     @Test
-    public void testIsRoleBasedAuthorizationNeededWithNonNoRoleBasedAuthorizationEndpoint() {
+    void testIsRoleBasedAuthorizationNeededWithNonNoRoleBasedAuthorizationEndpoint() {
         // Act
         ServerHttpRequest request = MockServerHttpRequest.get("/some-other-endpoint").build();
 

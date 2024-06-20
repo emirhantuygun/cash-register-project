@@ -38,7 +38,7 @@ class JwtUtilsTest {
     }
 
     @Test
-    public void givenValidRedisHostAndPort_whenInitMethodIsCalled_thenJedisInstanceIsInitialized() {
+    void givenValidRedisHostAndPort_whenInitMethodIsCalled_thenJedisInstanceIsInitialized() {
         // Act
         jwtUtils.init();
         Jedis jedis = (Jedis) ReflectionTestUtils.getField(jwtUtils, "jedis");
@@ -48,7 +48,7 @@ class JwtUtilsTest {
     }
 
     @Test
-    public void givenInvalidPort_whenInitMethodIsCalled_thenNumberFormatExceptionIsThrown() {
+    void givenInvalidPort_whenInitMethodIsCalled_thenNumberFormatExceptionIsThrown() {
         // Arrange
         ReflectionTestUtils.setField(jwtUtils, "redisPort", "invalidPort");
 

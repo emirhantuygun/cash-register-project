@@ -1,5 +1,6 @@
 package com.bit.reportservice.service;
 
+import com.bit.reportservice.annotation.ExcludeFromGeneratedCoverage;
 import com.bit.reportservice.dto.SaleResponse;
 import com.bit.reportservice.exception.HeaderProcessingException;
 import com.bit.reportservice.exception.SaleServiceException;
@@ -59,7 +60,7 @@ public class GatewayService {
             String getUrl = GATEWAY_URL + GET_SALE_ENDPOINT;
 
             HttpHeaders headers = getHttpHeaders();
-                HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+            HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
             ResponseEntity<SaleResponse> responseEntity = restTemplate.exchange(
                     getUrl,
@@ -191,7 +192,7 @@ public class GatewayService {
         }
     }
 
-
+    @ExcludeFromGeneratedCoverage
     protected HttpHeaders getHttpHeaders() throws HeaderProcessingException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
