@@ -29,9 +29,8 @@ class UserControllerTest {
     @InjectMocks
     private UserController userController;
 
-
     @Test
-    public void testGetUser_WithValidId_ReturnsUserResponse() {
+    void testGetUser_WithValidId_ReturnsUserResponse() {
         // Arrange
         Long userId = 1L;
         UserResponse userResponse = UserResponse.builder().id(userId).username("testUser").email("test@domain.com").build();
@@ -49,7 +48,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void testGetAllUsers_ReturnsListOfUserResponses() {
+    void testGetAllUsers_ReturnsListOfUserResponses() {
         // Arrange
         List<UserResponse> userResponses = Arrays.asList(
                 UserResponse.builder().id(1L).build(),
@@ -69,7 +68,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void testGetDeletedUsers_ReturnsListOfUserResponses() {
+    void testGetDeletedUsers_ReturnsListOfUserResponses() {
         // Arrange
         List<UserResponse> deletedUserResponses = Arrays.asList(
                 UserResponse.builder().id(3L).build(),
@@ -89,7 +88,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void testGetAllUsersFilteredAndSorted_ReturnsPageOfUserResponses() {
+    void testGetAllUsersFilteredAndSorted_ReturnsPageOfUserResponses() {
         // Arrange
         Page<UserResponse> usersPage = new PageImpl<>(Arrays.asList(
                 UserResponse.builder().id(5L).build(),
@@ -109,7 +108,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void testCreateUser_WithValidUserRequest_ReturnsCreatedUserResponse() {
+    void testCreateUser_WithValidUserRequest_ReturnsCreatedUserResponse() {
         // Arrange
         UserRequest userRequest = UserRequest.builder().username("newUser").email("new@domain.com").build();
         UserResponse userResponse = UserResponse.builder().id(7L).username("newUser").email("new@domain.com").build();
@@ -127,7 +126,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void testUpdateUser_WithValidUserRequest_ReturnsUpdatedUserResponse() {
+    void testUpdateUser_WithValidUserRequest_ReturnsUpdatedUserResponse() {
         // Arrange
         Long userId = 8L;
         UserRequest userRequest = UserRequest.builder().username("updatedUser").email("updated@domain.com").build();
@@ -146,7 +145,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void testRestoreUser_WithValidId_ReturnsRestoredUserResponse() {
+    void testRestoreUser_WithValidId_ReturnsRestoredUserResponse() {
         // Arrange
         Long userId = 9L;
         UserResponse userResponse =  UserResponse.builder().id(userId).username("restoredUser").email("restored@domain.com").build();
@@ -164,7 +163,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void testDeleteUser_WithValidId_ReturnsSuccessMessage() {
+    void testDeleteUser_WithValidId_ReturnsSuccessMessage() {
         // Arrange
         Long userId = 10L;
 
@@ -178,7 +177,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void testDeleteUserPermanently_WithValidId_ReturnsSuccessMessage() {
+    void testDeleteUserPermanently_WithValidId_ReturnsSuccessMessage() {
         // Arrange
         Long userId = 11L;
 

@@ -43,13 +43,13 @@ class UserServiceImplTest {
     private UserServiceImpl userService;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         userService = spy(userService);
         lenient().doNothing().when(userService).validateRoles(anyList());
     }
 
     @Test
-    public void testGetUser_WithValidId_ReturnsUserResponse() {
+    void testGetUser_WithValidId_ReturnsUserResponse() {
         // Arrange
         Long userId = 1L;
         AppUser user = new AppUser();
@@ -70,7 +70,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    public void testGetAllUsers_ReturnsListOfUserResponses() {
+    void testGetAllUsers_ReturnsListOfUserResponses() {
         // Arrange
         AppUser user1 = new AppUser();
         user1.setId(1L);
@@ -95,7 +95,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    public void testGetDeletedUsers_ReturnsListOfUserResponses() {
+    void testGetDeletedUsers_ReturnsListOfUserResponses() {
         // Arrange
         AppUser deletedUser1 = new AppUser();
         deletedUser1.setId(3L);
@@ -120,7 +120,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    public void testGetAllUsersFilteredAndSorted_ReturnsPageOfUserResponses() {
+    void testGetAllUsersFilteredAndSorted_ReturnsPageOfUserResponses() {
         // Arrange
         AppUser user1 = new AppUser();
         user1.setId(5L);
@@ -148,7 +148,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    public void testCreateUser_WithValidUserRequest_ReturnsCreatedUserResponse() {
+    void testCreateUser_WithValidUserRequest_ReturnsCreatedUserResponse() {
         // Arrange
         UserRequest userRequest = UserRequest.builder().username("newUser").email("new@domain.com").password("password123").build();
         Role role = new Role();
@@ -172,7 +172,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    public void testUpdateUser_WithValidUserRequest_ReturnsUpdatedUserResponse() {
+    void testUpdateUser_WithValidUserRequest_ReturnsUpdatedUserResponse() {
         // Arrange
         Long userId = 8L;
         UserRequest userRequest = UserRequest.builder().username("updatedUser").email("updated@domain.com").password("password123").build();
@@ -200,7 +200,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    public void testRestoreUser_WithValidId_ReturnsRestoredUserResponse() {
+    void testRestoreUser_WithValidId_ReturnsRestoredUserResponse() {
         // Arrange
         Long userId = 9L;
         AppUser user = new AppUser();
@@ -234,7 +234,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    public void testDeleteUser_WithValidId_SendsDeleteMessage() {
+    void testDeleteUser_WithValidId_SendsDeleteMessage() {
         // Arrange
         Long userId = 10L;
         when(userRepository.existsById(userId)).thenReturn(true);
@@ -248,7 +248,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    public void testDeleteUserPermanently_WithValidId_SendsDeletePermanentMessage() {
+    void testDeleteUserPermanently_WithValidId_SendsDeletePermanentMessage() {
         // Arrange
         Long userId = 11L;
         when(userRepository.existsById(userId)).thenReturn(true);
