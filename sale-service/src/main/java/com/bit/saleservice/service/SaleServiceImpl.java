@@ -313,7 +313,6 @@ public class SaleServiceImpl implements SaleService {
                 ProductServiceResponse productServiceResponse = gatewayService.getProduct(productRequest.getId());
 
                 if (productServiceResponse != null) {
-//                    ProductStockCheckRequest productStockCheckRequest = new ProductStockCheckRequest(productRequest.getId(), productRequest.getQuantity());
                     boolean areEnoughProductsInStock = Boolean.TRUE.equals(productServiceResponse.getStockQuantity() >= productRequest.getQuantity());
 
                     if (areEnoughProductsInStock) {

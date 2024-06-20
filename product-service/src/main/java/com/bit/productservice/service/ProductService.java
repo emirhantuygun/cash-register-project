@@ -14,7 +14,9 @@ public interface ProductService {
     ProductResponse getProduct (Long id);
     List<ProductResponse> getAllProducts();
     List<ProductResponse> getDeletedProducts();
-    Page<ProductResponse> getAllProductsFilteredAndSorted(int page, int size, String sortBy, String direction, String name, String description, BigDecimal minPrice, BigDecimal maxPrice);
+    Page<ProductResponse> getAllProductsFilteredAndSorted(int page, int size, String sortBy, String direction,
+                                                          String name, String description, BigDecimal minPrice,
+                                                          BigDecimal maxPrice, Integer minStock, Integer maxStock);
     ProductResponse createProduct(ProductRequest productRequest) throws AlgorithmNotFoundException;
     ProductResponse updateProduct (Long id, ProductRequest updatedProduct) throws AlgorithmNotFoundException;
     void deleteProduct (Long id);

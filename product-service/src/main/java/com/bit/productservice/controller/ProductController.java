@@ -61,13 +61,13 @@ public class ProductController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String description,
             @RequestParam(required = false) BigDecimal minPrice,
-            @RequestParam(required = false) BigDecimal maxPrice
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) Integer minStock,
+            @RequestParam(required = false) Integer maxStock
     ) {
-        logger.info("Received request to fetch all products with filters and sorting: page={}, size={}, sortBy={}, direction={}, name={}, description={}, minPrice={}, maxPrice={}",
-                page, size, sortBy, direction, name, description, minPrice, maxPrice);
-        Page<ProductResponse> productResponses = productService.getAllProductsFilteredAndSorted(page, size, sortBy, direction, name, description, minPrice, maxPrice);
 
-        logger.info("Returning {} product responses filtered and sorted", productResponses.getTotalElements());
+        Page<ProductResponse> productResponses = productService.getAllProductsFilteredAndSorted(page, size, sortBy, direction, name, description, minPrice, maxPrice, minStock, maxStock);
+
         return new ResponseEntity<>(productResponses, HttpStatus.OK);
     }
 

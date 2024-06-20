@@ -11,6 +11,10 @@
     <artifactId>report-service</artifactId>
     <name>report-service</name>
 
+    <properties>
+        <start-class>com.bit.reportservice.ReportServiceApplication</start-class>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>

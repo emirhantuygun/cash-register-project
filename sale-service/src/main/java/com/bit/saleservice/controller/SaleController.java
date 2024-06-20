@@ -61,14 +61,14 @@ public class SaleController {
             @RequestParam(defaultValue = "ASC") String direction,
             @RequestParam(required = false) String cashier,
             @RequestParam(required = false) String paymentMethod,
-            @RequestParam(required = false) BigDecimal minPrice,
-            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) BigDecimal minTotal,
+            @RequestParam(required = false) BigDecimal maxTotal,
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate
     ) {
         logger.info("Received request to fetch all sales with filters and sorting: page={}, size={}, sortBy={}, direction={}, cashier={}, paymentMethod={}, minPrice={}, maxPrice={}, startDate={}, endDate={}",
-                page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate);
-        Page<SaleResponse> saleResponses = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate);
+                page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
+        Page<SaleResponse> saleResponses = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
 
         logger.info("Returning {} sale responses filtered and sorted", saleResponses.getTotalElements());
         PageWrapper<SaleResponse> response = new PageWrapper<>();

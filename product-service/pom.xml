@@ -11,6 +11,10 @@
 	<artifactId>product-service</artifactId>
 	<name>product-service</name>
 
+	<properties>
+		<start-class>com.bit.productservice.ProductServiceApplication</start-class>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

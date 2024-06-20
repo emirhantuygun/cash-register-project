@@ -11,6 +11,10 @@
 	<artifactId>user-management-service</artifactId>
 	<name>user-management-service</name>
 
+	<properties>
+		<start-class>com.bit.usermanagementservice.UserManagementServiceApplication</start-class>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

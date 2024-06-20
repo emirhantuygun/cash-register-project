@@ -17,7 +17,7 @@ public interface ReportService {
 
     Page<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction,
                                                     String cashier, String paymentMethod,
-                                                    BigDecimal minPrice, BigDecimal maxPrice,
+                                                    BigDecimal minTotal, BigDecimal maxTotal,
                                                     String startDate, String endDate) throws HeaderProcessingException;
 
     byte[] getReceipt(Long id) throws HeaderProcessingException, ReceiptGenerationException;

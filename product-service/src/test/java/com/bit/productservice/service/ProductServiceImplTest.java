@@ -104,7 +104,7 @@ class ProductServiceImplTest {
 
         // Act
         Page<ProductResponse> responsePage = productService.getAllProductsFilteredAndSorted(
-                0, 10, "id", "ASC", null, null, null, null);
+                0, 10, "id", "ASC", null, null, null, null, null, null);
 
         // Assert
         assertNotNull(responsePage);

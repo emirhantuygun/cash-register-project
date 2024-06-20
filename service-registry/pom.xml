@@ -11,6 +11,10 @@
 	<artifactId>service-registry</artifactId>
 	<name>service-registry</name>
 
+	<properties>
+		<start-class>com.bit.serviceregistry.ServiceRegistryApplication</start-class>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>

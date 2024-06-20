@@ -21,7 +21,6 @@ public class ReportServiceImpl implements ReportService{
     private final GatewayService gatewayService;
     private final ReceiptService receiptService;
 
-
     @Override
     public SaleResponse getSale(Long id) throws HeaderProcessingException {
         logger.info("Fetching sale with ID: {}", id);
@@ -41,9 +40,9 @@ public class ReportServiceImpl implements ReportService{
     }
 
     @Override
-    public Page<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction, String cashier, String paymentMethod, BigDecimal minPrice, BigDecimal maxPrice, String startDate, String endDate) throws HeaderProcessingException {
+    public Page<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction, String cashier, String paymentMethod, BigDecimal minTotal, BigDecimal maxTotal, String startDate, String endDate) throws HeaderProcessingException {
         logger.info("Fetching all deleted sales");
-        return gatewayService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate);
+        return gatewayService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
     }
 
     @Override

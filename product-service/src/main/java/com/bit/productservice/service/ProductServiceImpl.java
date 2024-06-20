@@ -67,11 +67,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductResponse> getAllProductsFilteredAndSorted(int page, int size, String sortBy, String direction, String name, String description, BigDecimal minPrice, BigDecimal maxPrice) {
+    public Page<ProductResponse> getAllProductsFilteredAndSorted(int page, int size, String sortBy, String direction,
+                                                                 String name, String description, BigDecimal minPrice,
+                                                                 BigDecimal maxPrice, Integer minStock, Integer maxStock) {
         logger.info("Fetching all products with filters and sorting");
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
         Page<Product> productsPage = productRepository.findAll((root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = getPredicates(name, description, minPrice, maxPrice, criteriaBuilder, root);
+            List<Predicate> predicates = getPredicates(name, description, minPrice, maxPrice, minStock, maxStock, criteriaBuilder, root);
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         }, pageable);
@@ -164,6 +166,7 @@ public class ProductServiceImpl implements ProductService {
 
     @ExcludeFromGeneratedCoverage
     private List<Predicate> getPredicates (String name, String description, BigDecimal minPrice, BigDecimal maxPrice,
+                                           Integer minStock, Integer maxStock,
                                            CriteriaBuilder criteriaBuilder, Root<Product> root){
         List<Predicate> predicates = new ArrayList<>();
         if (StringUtils.isNotBlank(name)) {
@@ -177,6 +180,12 @@ public class ProductServiceImpl implements ProductService {
         }
         if (maxPrice != null) {
             predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("price"), maxPrice));
+        }
+        if (minStock != null) {
+            predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("stockQuantity"), minStock));
+        }
+        if (maxStock != null) {
+            predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("stockQuantity"), maxStock));
         }
         return predicates;
     }

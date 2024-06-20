@@ -11,6 +11,10 @@
 	<artifactId>auth-service</artifactId>
 	<name>auth-service</name>
 
+	<properties>
+		<start-class>com.bit.authservice.AuthServiceApplication</start-class>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

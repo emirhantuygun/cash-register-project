@@ -36,7 +36,7 @@ public class ReceiptService {
     private String PHONE_NUMBER;
 
 
-    public byte[] generateReceipt(SaleResponse sale) throws ReceiptGenerationException {
+    protected byte[] generateReceipt(SaleResponse sale) throws ReceiptGenerationException {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             Document document = new Document();

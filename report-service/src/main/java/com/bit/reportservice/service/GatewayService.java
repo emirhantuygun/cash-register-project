@@ -55,7 +55,7 @@ public class GatewayService {
         GATEWAY_URL = "http://" + GATEWAY_HOST + ":" + GATEWAY_PORT + "/";
     }
 
-    public SaleResponse getSale(Long id) throws HeaderProcessingException {
+    protected SaleResponse getSale(Long id) throws HeaderProcessingException {
         try {
             String getUrl = GATEWAY_URL + GET_SALE_ENDPOINT;
 
@@ -85,7 +85,7 @@ public class GatewayService {
         }
     }
 
-    public List<SaleResponse> getAllSales() throws HeaderProcessingException {
+    protected List<SaleResponse> getAllSales() throws HeaderProcessingException {
         try {
             String getUrl = GATEWAY_URL + GET_ALL_SALES_ENDPOINT;
 
@@ -115,7 +115,7 @@ public class GatewayService {
         }
     }
 
-    public List<SaleResponse> getDeletedSales() throws HeaderProcessingException {
+    protected List<SaleResponse> getDeletedSales() throws HeaderProcessingException {
         try {
             String getUrl = GATEWAY_URL + GET_DELETED_SALES_ENDPOINT;
 
@@ -145,7 +145,7 @@ public class GatewayService {
         }
     }
 
-    public Page<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction, String cashier, String paymentMethod, BigDecimal minPrice, BigDecimal maxPrice, String startDate, String endDate) throws HeaderProcessingException {
+    protected Page<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction, String cashier, String paymentMethod, BigDecimal minTotal, BigDecimal maxTotal, String startDate, String endDate) throws HeaderProcessingException {
         try {
             String getUrl = GATEWAY_URL + GET_ALL_SALES_FILTERED_AND_SORTED_ENDPOINT;
 
@@ -159,8 +159,8 @@ public class GatewayService {
                     .queryParam("direction", direction)
                     .queryParam("cashier", cashier)
                     .queryParam("paymentMethod", paymentMethod)
-                    .queryParam("minPrice", minPrice)
-                    .queryParam("maxPrice", maxPrice)
+                    .queryParam("minTotal", minTotal)
+                    .queryParam("maxTotal", maxTotal)
                     .queryParam("startDate", startDate)
                     .queryParam("endDate", endDate);
 

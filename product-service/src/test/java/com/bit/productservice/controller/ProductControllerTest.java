@@ -86,11 +86,11 @@ class ProductControllerTest {
     @Test
     void testGetAllProductsFilteredAndSorted_ShouldReturnPagedProducts() {
         // Arrange
-        when(productService.getAllProductsFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any()))
+        when(productService.getAllProductsFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(pagedResponse);
 
         // Act
-        ResponseEntity<Page<ProductResponse>> response = productController.getAllProductsFilteredAndSorted(0, 10, "id", "ASC", null, null, null, null);
+        ResponseEntity<Page<ProductResponse>> response = productController.getAllProductsFilteredAndSorted(0, 10, "id", "ASC", null, null, null, null, null, null);
 
         // Assert
         assertEquals(200, response.getStatusCode().value());

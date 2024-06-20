@@ -11,6 +11,10 @@
 	<artifactId>sale-service</artifactId>
 	<name>sale-service</name>
 
+	<properties>
+		<start-class>com.bit.saleservice.SaleServiceApplication</start-class>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
