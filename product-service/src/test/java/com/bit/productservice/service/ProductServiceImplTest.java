@@ -35,6 +35,9 @@ class ProductServiceImplTest {
     private ProductRepository productRepository;
 
     @Mock
+    private CacheService cacheService;
+
+    @Mock
     private BarcodeService barcodeService;
 
     @InjectMocks
@@ -119,6 +122,7 @@ class ProductServiceImplTest {
 
         when(barcodeService.generateBarcodeNumber(anyString())).thenReturn("1234567890123");
         when(productRepository.save(any(Product.class))).thenReturn(null);
+        when(cacheService.createProductCache(any())).thenReturn(null);
 
         // Act
         ProductResponse response = productService.createProduct(productRequest);

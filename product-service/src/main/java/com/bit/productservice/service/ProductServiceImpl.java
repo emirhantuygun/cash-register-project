@@ -4,10 +4,10 @@ import com.bit.productservice.ProductServiceApplication;
 import com.bit.productservice.annotation.ExcludeFromGeneratedCoverage;
 import com.bit.productservice.dto.ProductRequest;
 import com.bit.productservice.dto.ProductResponse;
+import com.bit.productservice.entity.Product;
 import com.bit.productservice.exception.AlgorithmNotFoundException;
 import com.bit.productservice.exception.ProductNotFoundException;
 import com.bit.productservice.exception.ProductNotSoftDeletedException;
-import com.bit.productservice.entity.Product;
 import com.bit.productservice.repository.ProductRepository;
 import com.bit.productservice.wrapper.ProductStockReduceRequest;
 import com.bit.productservice.wrapper.ProductStockReturnRequest;
@@ -20,14 +20,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.cache.annotation.CachePut;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +38,7 @@ public class ProductServiceImpl implements ProductService {
     private static final Logger logger = LogManager.getLogger(ProductServiceApplication.class);
     private final ProductRepository productRepository;
     private final BarcodeService barcodeService;
+    private final CacheService cacheService;
 
     @Override
     public ProductResponse getProduct(Long id) {
@@ -98,7 +98,9 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(product);
 
         logger.info("Created product with ID: {}", product.getId());
-        return mapToProductResponse(product);
+        ProductResponse productResponse = mapToProductResponse(product);
+        cacheService.createProductCache(productResponse);
+        return productResponse;
     }
 
     @Override
@@ -114,10 +116,11 @@ public class ProductServiceImpl implements ProductService {
         existingProduct.setPrice(productRequest.getPrice());
 
         productRepository.save(existingProduct);
-        updateProductCache(existingProduct);
-
         logger.info("Updated product with ID {}: {}", id, existingProduct);
-        return mapToProductResponse(existingProduct);
+
+        ProductResponse productResponse = mapToProductResponse(existingProduct);
+        cacheService.updateProductCache(productResponse);
+        return productResponse;
     }
 
     @Override
@@ -128,8 +131,10 @@ public class ProductServiceImpl implements ProductService {
         productRepository.restoreProduct(id);
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Couldn't restore the product with id " + id));
-        createProductCache(product);
-        return mapToProductResponse(product);
+
+        ProductResponse productResponse = mapToProductResponse(product);
+        cacheService.createProductCache(productResponse);
+        return productResponse;
     }
 
     @Override
@@ -159,32 +164,19 @@ public class ProductServiceImpl implements ProductService {
 
         product.setStockQuantity(product.getStockQuantity() - request.getRequestedQuantity());
         productRepository.save(product);
-        updateProductCache(product);
+
+        cacheService.updateProductCache(mapToProductResponse(product));
     }
 
     @Override
-    public ProductResponse returnProducts(ProductStockReturnRequest request) {
+    public void returnProducts(ProductStockReturnRequest request) {
         Product product = productRepository.findById(request.getId())
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + request.getId()));
 
         product.setStockQuantity(product.getStockQuantity() + request.getReturnedQuantity());
         productRepository.save(product);
-        updateProductCache(product);
-        return mapToProductResponse(product);
-    }
 
-    @Cacheable(cacheNames = "product_id", key = "#product.id", unless = "#result == null")
-    @ExcludeFromGeneratedCoverage
-    public ProductResponse createProductCache(Product product) {
-
-        return mapToProductResponse(product);
-    }
-
-    @CachePut(cacheNames = "product_id", key = "#product.id", unless = "#result == null")
-    @ExcludeFromGeneratedCoverage
-    public ProductResponse updateProductCache(Product product) {
-
-        return mapToProductResponse(product);
+        cacheService.updateProductCache(mapToProductResponse(product));
     }
 
     @ExcludeFromGeneratedCoverage
