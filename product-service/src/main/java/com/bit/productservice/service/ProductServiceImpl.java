@@ -20,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +42,7 @@ public class ProductServiceImpl implements ProductService {
     private final CacheService cacheService;
 
     @Override
+    @Cacheable(cacheNames = "product_id", key = "#id", unless = "#result == null")
     public ProductResponse getProduct(Long id) {
         logger.info("Fetching product with ID: {}", id);
         Product product = productRepository.findById(id)

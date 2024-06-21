@@ -46,8 +46,6 @@ public class GatewayService {
         GATEWAY_URL = "http://" + GATEWAY_HOST + ":" + GATEWAY_PORT + "/";
     }
 
-
-    @Cacheable(cacheNames = "product_id", key = "#id", unless = "#result == null")
     public ProductResponse getProduct(Long id) throws HeaderProcessingException {
         try {
             String getUrl = GATEWAY_URL + GET_PRODUCT_ENDPOINT;
