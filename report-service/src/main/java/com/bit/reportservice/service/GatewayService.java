@@ -8,6 +8,7 @@ import com.bit.reportservice.wrapper.PageWrapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.math.BigDecimal;
 import java.util.List;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class GatewayService {
@@ -52,12 +54,16 @@ public class GatewayService {
 
     @PostConstruct
     protected void initGatewayUrl() {
+        log.trace("Entering initGatewayUrl method in GatewayService");
         GATEWAY_URL = "http://" + GATEWAY_HOST + ":" + GATEWAY_PORT + "/";
+        log.trace("Exiting initGatewayUrl method in GatewayService");
     }
 
     protected SaleResponse getSale(Long id) throws HeaderProcessingException {
+        log.trace("Entering getSale method in GatewayService");
         try {
             String getUrl = GATEWAY_URL + GET_SALE_ENDPOINT;
+            log.debug("Sending GET request to: {}", getUrl);
 
             HttpHeaders headers = getHttpHeaders();
             HttpEntity<String> requestEntity = new HttpEntity<>(headers);
@@ -71,23 +77,30 @@ public class GatewayService {
             );
 
             if (!(responseEntity.getStatusCode().is2xxSuccessful())) {
+                log.error("Sale fetch failed in sale-service!");
                 throw new SaleServiceException("Sale fetch failed in sale-service!");
             }
 
+            log.debug("Received successful response for getSale: {}", responseEntity.getBody());
+            log.trace("Exiting getSale method in GatewayService");
             return responseEntity.getBody();
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
-            HttpStatusCode statusCode = e.getStatusCode();
-            throw new SaleServiceException("HTTP error: " + statusCode + " for sale service");
+            log.error("HTTP error: {} for sale service", e.getStatusCode(), e);
+            throw new SaleServiceException("HTTP error: " + e.getStatusCode() + " for sale service");
 
         } catch (RestClientException e) {
+            log.error("REST client error: {} for sale service", e.getMessage(), e);
             throw new SaleServiceException("REST client error: " + e.getMessage() + " for sale service");
         }
     }
 
     protected List<SaleResponse> getAllSales() throws HeaderProcessingException {
+        log.trace("Entering getAllSales method in GatewayService");
+
         try {
             String getUrl = GATEWAY_URL + GET_ALL_SALES_ENDPOINT;
+            log.debug("Sending GET request to: {}", getUrl);
 
             HttpHeaders headers = getHttpHeaders();
             HttpEntity<String> requestEntity = new HttpEntity<>(headers);
@@ -96,28 +109,33 @@ public class GatewayService {
                     getUrl,
                     HttpMethod.GET,
                     requestEntity,
-                    new ParameterizedTypeReference<>() {
-                    }
+                    new ParameterizedTypeReference<>() {}
             );
 
             if (!(responseEntity.getStatusCode().is2xxSuccessful())) {
+                log.error("Sales fetch failed in sale-service!");
                 throw new SaleServiceException("Sale fetch failed in sale-service!");
             }
 
+            log.debug("Received successful response for getAllSales: {}", responseEntity.getBody());
+            log.trace("Exiting getAllSales method in GatewayService");
             return responseEntity.getBody();
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
-            HttpStatusCode statusCode = e.getStatusCode();
-            throw new SaleServiceException("HTTP error: " + statusCode + " for sale service");
+            log.error("HTTP error: {} for sale service", e.getStatusCode(), e);
+            throw new SaleServiceException("HTTP error: " + e.getStatusCode() + " for sale service");
 
         } catch (RestClientException e) {
+            log.error("REST client error: {} for sale service", e.getMessage(), e);
             throw new SaleServiceException("REST client error: " + e.getMessage() + " for sale service");
         }
     }
 
     protected List<SaleResponse> getDeletedSales() throws HeaderProcessingException {
+        log.trace("Entering getDeletedSales method in GatewayService");
         try {
             String getUrl = GATEWAY_URL + GET_DELETED_SALES_ENDPOINT;
+            log.debug("Sending GET request to: {}", getUrl);
 
             HttpHeaders headers = getHttpHeaders();
             HttpEntity<String> requestEntity = new HttpEntity<>(headers);
@@ -126,28 +144,36 @@ public class GatewayService {
                     getUrl,
                     HttpMethod.GET,
                     requestEntity,
-                    new ParameterizedTypeReference<>() {
-                    }
+                    new ParameterizedTypeReference<>() {}
             );
 
             if (!(responseEntity.getStatusCode().is2xxSuccessful())) {
+                log.error("Deleted sales fetch failed in sale-service!");
                 throw new SaleServiceException("Deleted sale fetch failed in sale-service!");
             }
 
+            log.debug("Received successful response for getDeletedSales: {}", responseEntity.getBody());
+            log.trace("Exiting getDeletedSales method in GatewayService");
             return responseEntity.getBody();
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
-            HttpStatusCode statusCode = e.getStatusCode();
-            throw new SaleServiceException("HTTP error: " + statusCode + " for sale service");
+            log.error("HTTP error: {} for sale service", e.getStatusCode(), e);
+            throw new SaleServiceException("HTTP error: " + e.getStatusCode() + " for sale service");
 
         } catch (RestClientException e) {
+            log.error("REST client error: {} for sale service", e.getMessage(), e);
             throw new SaleServiceException("REST client error: " + e.getMessage() + " for sale service");
         }
     }
 
-    protected Page<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction, String cashier, String paymentMethod, BigDecimal minTotal, BigDecimal maxTotal, String startDate, String endDate) throws HeaderProcessingException {
+    protected Page<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction, String cashier,
+                                                              String paymentMethod, BigDecimal minTotal, BigDecimal maxTotal,
+                                                              String startDate, String endDate) throws HeaderProcessingException {
+        log.trace("Entering getAllSalesFilteredAndSorted method in GatewayService");
+
         try {
             String getUrl = GATEWAY_URL + GET_ALL_SALES_FILTERED_AND_SORTED_ENDPOINT;
+            log.debug("Sending GET request to: {}", getUrl);
 
             HttpHeaders headers = getHttpHeaders();
             HttpEntity<String> requestEntity = new HttpEntity<>(headers);
@@ -168,32 +194,39 @@ public class GatewayService {
                     builder.toUriString(),
                     HttpMethod.GET,
                     requestEntity,
-                    new ParameterizedTypeReference<>() {
-                    }
+                    new ParameterizedTypeReference<>() {}
             );
 
             if (!(responseEntity.getStatusCode().is2xxSuccessful())) {
+                log.error("Sales fetch failed in sale-service!");
                 throw new SaleServiceException("Sales fetch failed in sale-service!");
             }
 
             PageWrapper<SaleResponse> pageWrapper = responseEntity.getBody();
             if (pageWrapper != null) {
+                log.debug("Received successful response for getAllSalesFilteredAndSorted: {}", pageWrapper.getContent());
+                log.trace("Exiting getAllSalesFilteredAndSorted method in GatewayService");
                 return new PageImpl<>(pageWrapper.getContent(), PageRequest.of(page, size), pageWrapper.getTotalElements());
+
             } else {
+                log.error("Sales fetch failed in sale-service!");
                 throw new SaleServiceException("Sales fetch failed in sale-service!");
             }
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
-            HttpStatusCode statusCode = e.getStatusCode();
-            throw new SaleServiceException("HTTP error: " + statusCode + " for sale service");
+            log.error("HTTP error: {} for sale service", e.getStatusCode(), e);
+            throw new SaleServiceException("HTTP error: " + e.getStatusCode() + " for sale service");
 
         } catch (RestClientException e) {
+            log.error("REST client error: {} for sale service", e.getMessage(), e);
             throw new SaleServiceException("REST client error: " + e.getMessage() + " for sale service");
         }
     }
 
     @ExcludeFromGeneratedCoverage
     protected HttpHeaders getHttpHeaders() throws HeaderProcessingException {
+        log.trace("Entering getAllSalesFilteredAndSorted method in GatewayService");
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -204,12 +237,15 @@ public class GatewayService {
                 String token = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
                 headers.set(HttpHeaders.AUTHORIZATION, token);
             } else {
+                log.error("No request attributes found");
                 throw new HeaderProcessingException("No request attributes found");
             }
         } catch (Exception e) {
+            log.error("Failed to process HTTP headers", e);
             throw new HeaderProcessingException("Failed to process HTTP headers", e);
         }
 
+        log.trace("Exiting getAllSalesFilteredAndSorted method in GatewayService");
         return headers;
     }
 }

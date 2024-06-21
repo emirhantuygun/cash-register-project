@@ -8,6 +8,7 @@ import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 
+@Log4j2
 @Service
 public class ReceiptService {
 
@@ -37,6 +39,8 @@ public class ReceiptService {
 
 
     protected byte[] generateReceipt(SaleResponse sale) throws ReceiptGenerationException {
+        log.trace("Entering generateReceipt method in ReceiptService");
+
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             Document document = new Document();
@@ -355,9 +359,11 @@ public class ReceiptService {
             document.add(subtext);
             document.close();
 
+            log.trace("Exiting generateReceipt method in ReceiptService");
             return baos.toByteArray();
 
         } catch (DocumentException | IOException e) {
+            log.error("Error generating receipt: " + e.getMessage(), e);
             throw new ReceiptGenerationException("Error generating receipt: " + e.getMessage(), e);
         }
     }
