@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -130,6 +131,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "product_id", key = "#id")
     public void deleteProduct(Long id) {
         logger.info("Deleting product with ID: {}", id);
         if (!productRepository.existsById(id))
@@ -140,6 +142,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "product_id", key = "#id")
     public void deleteProductPermanently(Long id) {
         if (!productRepository.existsById(id))
             throw new ProductNotFoundException("Product not found with id " + id);
