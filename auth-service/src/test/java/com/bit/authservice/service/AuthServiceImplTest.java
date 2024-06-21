@@ -279,7 +279,7 @@ class AuthServiceImplTest {
         when(roleRepository.findByRoleName(anyString())).thenReturn(Optional.of(new Role("ROLE_USER")));
 
         // Act
-        authService.updateUserWrapped(updateUserMessage);
+        authService.updateUser(updateUserMessage);
 
         // Assert
         verify(userRepository).save(any(AppUser.class));
@@ -294,7 +294,7 @@ class AuthServiceImplTest {
 
         // Act & Assert
         UserNotFoundException exception = assertThrows(UserNotFoundException.class,
-                () -> authService.updateUserWrapped(updateUserMessage));
+                () -> authService.updateUser(updateUserMessage));
 
         assertEquals("User not found", exception.getMessage());
     }

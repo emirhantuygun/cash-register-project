@@ -14,6 +14,7 @@ import com.bit.authservice.wrapper.UpdateUserMessage;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -31,9 +32,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
+
     @Value("${redis.host}")
     private String redisHost;
 
@@ -49,7 +52,6 @@ public class AuthServiceImpl implements AuthService {
     private final UserDetailsService userDetailsService;
     private Jedis jedis;
 
-
     @PostConstruct
     public void init() {
         this.jedis = new Jedis(redisHost, Integer.parseInt(redisPort));
@@ -62,15 +64,20 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public List<String> login(AuthRequest authRequest) throws RedisOperationException {
+        log.info("Entering login method in AuthServiceImpl");
         try {
             var authToken = new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword());
             authenticationManager.authenticate(authToken);
         } catch (Exception e) {
+            log.error("Authentication failed: Wrong username or password");
             throw new AuthenticationFailedException("Authentication failed: Wrong username or password");
         }
 
         AppUser appUser = userRepository.findByUsername(authRequest.getUsername())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> {
+                    log.error("User not found");
+                    return new UserNotFoundException("User not found");
+                });
 
         String accessToken = jwtUtils.generateAccessToken(authRequest.getUsername(), getRolesAsString(appUser.getRoles()));
         String refreshToken = jwtUtils.generateRefreshToken(authRequest.getUsername());
@@ -78,6 +85,7 @@ public class AuthServiceImpl implements AuthService {
         revokeAllTokensByUser(appUser.getId());
         saveUserToken(appUser, accessToken);
 
+        log.info("Exiting login method in AuthServiceImpl");
         return Arrays.asList(accessToken, refreshToken);
     }
 
@@ -129,7 +137,7 @@ public class AuthServiceImpl implements AuthService {
 
 
     @RabbitListener(queues = "${rabbitmq.queue.update}")
-    public void updateUserWrapped(UpdateUserMessage updateUserMessage) throws RoleNotFoundException {
+    public void updateUser(UpdateUserMessage updateUserMessage) throws RoleNotFoundException {
 
         Long id = updateUserMessage.getId();
         AuthUserRequest authUserRequest = updateUserMessage.getAuthUserRequest();
