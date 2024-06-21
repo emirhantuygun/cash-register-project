@@ -143,6 +143,8 @@ class ProductServiceImplTest {
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(existingProduct));
         when(barcodeService.generateBarcodeNumber(anyString())).thenReturn("1234567890123");
         when(productRepository.save(any(Product.class))).thenReturn(existingProduct);
+        when(cacheService.updateProductCache(any())).thenReturn(null);
+
 
         // Act
         ProductResponse response = productService.updateProduct(1L, productRequest);
@@ -170,6 +172,7 @@ class ProductServiceImplTest {
 
         when(productRepository.existsByIdAndDeletedTrue(anyLong())).thenReturn(true);
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
+        when(cacheService.createProductCache(any())).thenReturn(null);
 
         // Act
         ProductResponse response = productService.restoreProduct(1L);
@@ -219,6 +222,7 @@ class ProductServiceImplTest {
         ProductStockReduceRequest request = new ProductStockReduceRequest(1L, 5);
 
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
+        when(cacheService.updateProductCache(any())).thenReturn(null);
 
         // Act
         productService.reduceProductStock(request);
@@ -237,6 +241,8 @@ class ProductServiceImplTest {
         ProductStockReturnRequest request = new ProductStockReturnRequest(1L, 5);
 
         when(productRepository.findById(anyLong())).thenReturn(Optional.of(product));
+        when(cacheService.updateProductCache(any())).thenReturn(null);
+
 
         // Act
         productService.returnProducts(request);
