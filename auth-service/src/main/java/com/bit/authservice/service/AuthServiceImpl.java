@@ -54,12 +54,14 @@ public class AuthServiceImpl implements AuthService {
 
     @PostConstruct
     public void init() {
+        log.info("Entering init method in AuthServiceImpl");
         this.jedis = new Jedis(redisHost, Integer.parseInt(redisPort));
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             jedis.flushAll();        // Remove all keys from Redis
             jedis.close();           // Close the Redis connection
         }));
+        log.info("Exiting init method in AuthServiceImpl");
     }
 
     @Override
@@ -91,6 +93,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public List<String> refreshToken(HttpServletRequest request) throws InvalidRefreshTokenException, UsernameExtractionException, UserNotFoundException, RedisOperationException {
+        log.info("Entering refreshToken method in AuthServiceImpl");
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -102,28 +105,35 @@ public class AuthServiceImpl implements AuthService {
 
                 if (userDetails != null && jwtUtils.isValid(refreshToken, userDetails)) {
                     AppUser appUser = userRepository.findByUsername(username)
-                            .orElseThrow(() -> new UserNotFoundException("User not found"));
+                            .orElseThrow(() -> {
+                                log.error("User not found");
+                                return new UserNotFoundException("User not found");
+                            });
 
                     String accessToken = jwtUtils.generateAccessToken(username, getRolesAsString(appUser.getRoles()));
 
                     revokeAllTokensByUser(appUser.getId());
                     saveUserToken(appUser, accessToken);
 
+                    log.info("Exiting refreshToken method in AuthServiceImpl");
                     return Arrays.asList(accessToken, refreshToken);
                 } else {
+                    log.error("User not found");
                     throw new UserNotFoundException("User not found");
                 }
             } else {
+                log.error("Username extraction failed");
                 throw new UsernameExtractionException("Username extraction failed");
             }
         } else {
+            log.error("Invalid refresh token");
             throw new InvalidRefreshTokenException("Invalid refresh token");
         }
     }
 
     @RabbitListener(queues = "${rabbitmq.queue.create}")
     public void createUser(AuthUserRequest authUserRequest) throws RoleNotFoundException {
-
+        log.info("Entering createUser method in AuthServiceImpl");
         var encodedPassword = passwordEncoder.encode(authUserRequest.getPassword());
 
         var appUser = AppUser.builder()
@@ -133,12 +143,12 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         userRepository.save(appUser);
+        log.info("Exiting createUser method in AuthServiceImpl");
     }
-
 
     @RabbitListener(queues = "${rabbitmq.queue.update}")
     public void updateUser(UpdateUserMessage updateUserMessage) throws RoleNotFoundException {
-
+        log.info("Entering updateUser method in AuthServiceImpl");
         Long id = updateUserMessage.getId();
         AuthUserRequest authUserRequest = updateUserMessage.getAuthUserRequest();
 
@@ -151,25 +161,33 @@ public class AuthServiceImpl implements AuthService {
         existingUser.setRoles(getRolesAsRole(authUserRequest.getRoles()));
 
         userRepository.save(existingUser);
+        log.info("Exiting updateUser method in AuthServiceImpl");
     }
 
     @RabbitListener(queues = "${rabbitmq.queue.restore}")
     public void restoreUser(Long id) {
+        log.info("Entering restoreUser method in AuthServiceImpl");
         userRepository.restoreUser(id);
+        log.info("Exiting restoreUser method in AuthServiceImpl");
     }
 
     @RabbitListener(queues = "${rabbitmq.queue.delete}")
     public void deleteUser(Long id) {
+        log.info("Entering deleteUser method in AuthServiceImpl");
         userRepository.deleteById(id);
+        log.info("Exiting deleteUser method in AuthServiceImpl");
     }
 
     @RabbitListener(queues = "${rabbitmq.queue.deletePermanent}")
     public void deleteUserPermanently(Long id) {
+        log.info("Entering deleteUserPermanently method in AuthServiceImpl");
         userRepository.deleteRolesForUser(id);
         userRepository.deletePermanently(id);
+        log.info("Exiting deleteUserPermanently method in AuthServiceImpl");
     }
 
     protected void saveUserToken(AppUser user, String jwtToken) throws RedisOperationException {
+        log.debug("Saving user token in Redis");
         var token = Token.builder()
                 .token(jwtToken)
                 .user(user)
@@ -181,11 +199,13 @@ public class AuthServiceImpl implements AuthService {
             jedis.set("token:" + token.getId() + ":is_logged_out", "false");
             jedis.set(jwtToken, String.valueOf(token.getId()));
         } catch (JedisException e) {
+            log.error("Failed to set token status in Redis: {}", e.getMessage());
             throw new RedisOperationException("Failed to set token status in Redis", e);
         }
     }
 
     private void revokeAllTokensByUser(long id) throws RedisOperationException {
+        log.debug("Revoking all tokens for user");
         List<Token> validTokens = tokenRepository.findAllTokensByUser(id);
         if (validTokens.isEmpty()) {
             return;
@@ -196,6 +216,7 @@ public class AuthServiceImpl implements AuthService {
             try {
                 jedis.set("token:" + token.getId() + ":is_logged_out", "true");
             } catch (JedisException e) {
+                log.error("Failed to set token status in Redis: {}", e.getMessage());
                 throw new RedisOperationException("Failed to set token status in Redis", e);
             }
         }
@@ -204,12 +225,14 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private List<String> getRolesAsString(List<Role> roles) {
+        log.debug("Getting roles as string");
         return roles.stream()
                 .map(Role::getRoleName)
                 .collect(Collectors.toList());
     }
 
     private List<Role> getRolesAsRole(List<String> roles) throws RoleNotFoundException {
+        log.debug("Getting roles as role entity");
         List<Role> rolesList = new ArrayList<>();
         for (String roleName : roles) {
             Role role = roleRepository.findByRoleName(roleName)
