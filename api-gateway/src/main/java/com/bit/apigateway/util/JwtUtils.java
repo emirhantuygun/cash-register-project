@@ -15,8 +15,8 @@ import redis.clients.jedis.Jedis;
 import javax.crypto.SecretKey;
 import java.util.List;
 
-@Component
 @Log4j2
+@Component
 public class JwtUtils {
 
     @Value("${jwt.signerKey}")
@@ -31,47 +31,69 @@ public class JwtUtils {
     @Value("${redis.port}")
     private String redisPort;
     private Jedis jedis;
+
     @PostConstruct
     public void init() {
-        this.jedis = new Jedis(redisHost, Integer.parseInt(redisPort));
+        log.info("Entering init method in JwtUtils");
+        try {
+            this.jedis = new Jedis(redisHost, Integer.parseInt(redisPort));
+        } finally {
+            log.info("Exiting init method in JwtUtils");
+        }
     }
 
     public Claims getClaimsAndValidate(String token) {
+        log.info("Entering getClaimsAndValidate method in JwtUtils");
         try {
             return Jwts.parser().verifyWith(getSignInKey()).build().parseSignedClaims(token).getPayload();
-
         } catch (JwtException | IllegalArgumentException e) {
-
+            log.error("Error while parsing token: {}", e.getMessage());
             throw new InvalidTokenException("Invalid token");
+        } finally {
+            log.info("Exiting getClaimsAndValidate method in JwtUtils");
         }
     }
 
     public boolean isLoggedOut(String token) {
+        log.info("Entering isLoggedOut method in JwtUtils");
+        try {
+            String tokenIdStr = jedis.get(token);
+            if (tokenIdStr == null) {
+                log.error("Token not found in Redis");
+                throw new TokenNotFoundException("Token not found in Redis");
+            }
 
-        String tokenIdStr = jedis.get(token);
-        if (tokenIdStr == null) {
-            throw new TokenNotFoundException("Token not found in Redis");
+            long tokenId = Long.parseLong(tokenIdStr);
+            String key = "token:" + tokenId + ":is_logged_out";
+
+            String value = jedis.get(key);
+            if (value == null) {
+                log.error("Token does not have logged out information record in Redis");
+                throw new TokenNotFoundException("Token's logout status information not found in Redis");
+            }
+
+            return Boolean.parseBoolean(value);
+        } finally {
+            log.info("Exiting isLoggedOut method in JwtUtils");
         }
-
-        long tokenId = Long.parseLong(tokenIdStr);
-        String key = "token:" + tokenId + ":is_logged_out";
-
-        String value = jedis.get(key);
-        if (value == null) {
-            throw new TokenNotFoundException("Token's logout status information not found in Redis");
-        }
-
-        return Boolean.parseBoolean(value);
     }
 
-
     public List<String> getRoles(Claims claims) {
-        return (List<String>) claims.get(AUTHORITIES_KEY);
+        log.info("Entering getRoles method in JwtUtils");
+        try {
+            return (List<String>) claims.get(AUTHORITIES_KEY);
+        } finally {
+            log.info("Exiting getRoles method in JwtUtils");
+        }
     }
 
     protected SecretKey getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64URL.decode(SIGNER_KEY);
-        return Keys.hmacShaKeyFor(keyBytes);
+        log.info("Entering getSignInKey method in JwtUtils");
+        try {
+            byte[] keyBytes = Decoders.BASE64URL.decode(SIGNER_KEY);
+            return Keys.hmacShaKeyFor(keyBytes);
+        } finally {
+            log.info("Exiting getSignInKey method in JwtUtils");
+        }
     }
-
 }

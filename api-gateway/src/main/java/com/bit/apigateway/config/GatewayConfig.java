@@ -1,5 +1,6 @@
 package com.bit.apigateway.config;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
@@ -12,8 +13,6 @@ import java.util.Map;
 @Configuration
 public class GatewayConfig {
 
-    private final Map<String, List<String>> endpointRoleMapping = new HashMap<>();
-
     @Value("${route.auth}")
     private String AUTH_URI;
     @Value("${route.user}")
@@ -24,6 +23,7 @@ public class GatewayConfig {
     private String SALE_URI;
     @Value("${route.report}")
     private String REPORT_URI;
+    private final Map<String, List<String>> endpointRoleMapping = new HashMap<>();
 
     public GatewayConfig() {
         endpointRoleMapping.put("/users", List.of("ADMIN"));
