@@ -1,6 +1,5 @@
 package com.bit.productservice.service;
 
-import com.bit.productservice.ProductServiceApplication;
 import com.bit.productservice.annotation.ExcludeFromGeneratedCoverage;
 import com.bit.productservice.dto.ProductRequest;
 import com.bit.productservice.dto.ProductResponse;
@@ -16,8 +15,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,16 +25,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
-    private static final Logger logger = LogManager.getLogger(ProductServiceApplication.class);
     private final ProductRepository productRepository;
     private final BarcodeService barcodeService;
     private final CacheService cacheService;
@@ -44,52 +41,57 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Cacheable(cacheNames = "product_id", key = "#id", unless = "#result == null")
     public ProductResponse getProduct(Long id) {
-        logger.info("Fetching product with ID: {}", id);
+        log.trace("Entering getProduct method in ProductServiceImpl class with id: {}", id);
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + id));
-
-        logger.info("Retrieved product: {}", product);
-        return mapToProductResponse(product);
+        ProductResponse response = mapToProductResponse(product);
+        log.debug("Product found: {}", response);
+        log.trace("Exiting getProduct method in ProductServiceImpl class");
+        return response;
     }
 
     @Override
     public List<ProductResponse> getAllProducts() {
-        logger.info("Fetching all products");
+        log.trace("Entering getAllProducts method in ProductServiceImpl class");
         List<Product> products = productRepository.findAll();
-
-        logger.info("Retrieved {} products", products.size());
-        return products.stream().map(this::mapToProductResponse).toList();
+        List<ProductResponse> responses = products.stream().map(this::mapToProductResponse).toList();
+        log.debug("Found {} products", responses.size());
+        log.trace("Exiting getAllProducts method in ProductServiceImpl class");
+        return responses;
     }
 
     @Override
     public List<ProductResponse> getDeletedProducts() {
-        logger.info("Fetching all deleted products");
+        log.trace("Entering getDeletedProducts method in ProductServiceImpl class");
         List<Product> products = productRepository.findSoftDeletedProducts();
-
-        logger.info("Retrieved {} deleted products", products.size());
-        return products.stream().map(this::mapToProductResponse).toList();
+        List<ProductResponse> responses = products.stream().map(this::mapToProductResponse).toList();
+        log.debug("Found {} deleted products", responses.size());
+        log.trace("Exiting getDeletedProducts method in ProductServiceImpl class");
+        return responses;
     }
 
     @Override
     public Page<ProductResponse> getAllProductsFilteredAndSorted(int page, int size, String sortBy, String direction,
                                                                  String name, String description, BigDecimal minPrice,
                                                                  BigDecimal maxPrice, Integer minStock, Integer maxStock) {
-        logger.info("Fetching all products with filters and sorting");
+        log.trace("Entering getAllProductsFilteredAndSorted method in ProductServiceImpl class");
+        log.debug("Filter and sort parameters - page: {}, size: {}, sortBy: {}, direction: {}, name: {}, description: {}, minPrice: {}, maxPrice: {}, minStock: {}, maxStock: {}",
+                page, size, sortBy, direction, name, description, minPrice, maxPrice, minStock, maxStock);
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
         Page<Product> productsPage = productRepository.findAll((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = getPredicates(name, description, minPrice, maxPrice, minStock, maxStock, criteriaBuilder, root);
-
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         }, pageable);
-
-        logger.info("Retrieved {} products", productsPage.getTotalElements());
-        return productsPage.map(this::mapToProductResponse);
+        Page<ProductResponse> responsePage = productsPage.map(this::mapToProductResponse);
+        log.debug("Found {} products on the filtered and sorted page", responsePage.getTotalElements());
+        log.trace("Exiting getAllProductsFilteredAndSorted method in ProductServiceImpl class");
+        return responsePage;
     }
-
 
     @Override
     public ProductResponse createProduct(ProductRequest productRequest) throws AlgorithmNotFoundException {
-        logger.info("Creating product: {}", productRequest);
+        log.trace("Entering createProduct method in ProductServiceImpl class");
+        log.debug("Creating product with request: {}", productRequest);
         Product product = Product.builder()
                 .name(productRequest.getName())
                 .description(productRequest.getDescription())
@@ -98,93 +100,105 @@ public class ProductServiceImpl implements ProductService {
                 .price(productRequest.getPrice())
                 .build();
         productRepository.save(product);
-
-        logger.info("Created product with ID: {}", product.getId());
         ProductResponse productResponse = mapToProductResponse(product);
         cacheService.createProductCache(productResponse);
+        log.info("Product created with ID: {}", product.getId());
+        log.trace("Exiting createProduct method in ProductServiceImpl class");
         return productResponse;
     }
 
     @Override
     public ProductResponse updateProduct(Long id, ProductRequest productRequest) throws AlgorithmNotFoundException {
-        logger.info("Updating product with ID {}: {}", id, productRequest);
+        log.trace("Entering updateProduct method in ProductServiceImpl class");
+        log.debug("Updating product with ID {} and request: {}", id, productRequest);
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product doesn't exist with id " + id));
-
         existingProduct.setName(productRequest.getName());
         existingProduct.setDescription(productRequest.getDescription());
         existingProduct.setBarcodeNumber(barcodeService.generateBarcodeNumber(productRequest.getName()));
         existingProduct.setStockQuantity(productRequest.getStockQuantity());
         existingProduct.setPrice(productRequest.getPrice());
-
         productRepository.save(existingProduct);
-        logger.info("Updated product with ID {}: {}", id, existingProduct);
-
         ProductResponse productResponse = mapToProductResponse(existingProduct);
         cacheService.updateProductCache(productResponse);
+        log.info("Product updated with ID: {}", existingProduct.getId());
+        log.trace("Exiting updateProduct method in ProductServiceImpl class");
         return productResponse;
     }
 
     @Override
     public ProductResponse restoreProduct(Long id) {
-        if (!productRepository.existsByIdAndDeletedTrue(id))
+        log.trace("Entering restoreProduct method in ProductServiceImpl class with id: {}", id);
+        if (!productRepository.existsByIdAndDeletedTrue(id)) {
+            log.warn("Product with id {} is not soft-deleted and cannot be restored", id);
             throw new ProductNotSoftDeletedException("Product with id " + id + " is not soft-deleted and cannot be restored.");
-
+        }
         productRepository.restoreProduct(id);
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Couldn't restore the product with id " + id));
-
         ProductResponse productResponse = mapToProductResponse(product);
         cacheService.createProductCache(productResponse);
+        log.info("Product restored with ID: {}", id);
+        log.trace("Exiting restoreProduct method in ProductServiceImpl class");
         return productResponse;
     }
 
     @Override
     @CacheEvict(cacheNames = "product_id", key = "#id")
     public void deleteProduct(Long id) {
-        logger.info("Deleting product with ID: {}", id);
-        if (!productRepository.existsById(id))
+        log.trace("Entering deleteProduct method in ProductServiceImpl class with id: {}", id);
+        if (!productRepository.existsById(id)) {
+            log.warn("Product not found with id {}", id);
             throw new ProductNotFoundException("Product not found with id " + id);
-
+        }
         productRepository.deleteById(id);
-        logger.info("Product deleted!");
+        log.info("Product soft deleted with ID: {}", id);
+        log.trace("Exiting deleteProduct method in ProductServiceImpl class");
     }
 
     @Override
     @CacheEvict(cacheNames = "product_id", key = "#id")
     public void deleteProductPermanently(Long id) {
-        if (!productRepository.existsById(id))
+        log.trace("Entering deleteProductPermanently method in ProductServiceImpl class with id: {}", id);
+        if (!productRepository.existsById(id)) {
+            log.warn("Product not found with id {}", id);
             throw new ProductNotFoundException("Product not found with id " + id);
+        }
         productRepository.deletePermanently(id);
+        log.info("Product permanently deleted with ID: {}", id);
+        log.trace("Exiting deleteProductPermanently method in ProductServiceImpl class");
     }
 
     @Transactional
     @RabbitListener(queues = "${rabbitmq.queue}")
     public void reduceProductStock(ProductStockReduceRequest request) {
+        log.trace("Entering reduceProductStock method in ProductServiceImpl class with request: {}", request);
         Product product = productRepository.findById(request.getId())
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + request.getId()));
-
         product.setStockQuantity(product.getStockQuantity() - request.getRequestedQuantity());
         productRepository.save(product);
-
         cacheService.updateProductCache(mapToProductResponse(product));
+        log.info("Reduced stock for product with ID: {}", request.getId());
+        log.trace("Exiting reduceProductStock method in ProductServiceImpl class");
     }
 
     @Override
     public void returnProducts(ProductStockReturnRequest request) {
+        log.trace("Entering returnProducts method in ProductServiceImpl class with request: {}", request);
         Product product = productRepository.findById(request.getId())
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + request.getId()));
-
         product.setStockQuantity(product.getStockQuantity() + request.getReturnedQuantity());
         productRepository.save(product);
-
         cacheService.updateProductCache(mapToProductResponse(product));
+        log.info("Returned products for product with ID: {}", request.getId());
+        log.trace("Exiting returnProducts method in ProductServiceImpl class");
     }
 
     @ExcludeFromGeneratedCoverage
-    private List<Predicate> getPredicates (String name, String description, BigDecimal minPrice, BigDecimal maxPrice,
-                                           Integer minStock, Integer maxStock,
-                                           CriteriaBuilder criteriaBuilder, Root<Product> root){
+    private List<Predicate> getPredicates(String name, String description, BigDecimal minPrice, BigDecimal maxPrice,
+                                          Integer minStock, Integer maxStock,
+                                          CriteriaBuilder criteriaBuilder, Root<Product> root) {
+        log.trace("Entering getPredicates method in ProductServiceImpl class");
         List<Predicate> predicates = new ArrayList<>();
         if (StringUtils.isNotBlank(name)) {
             predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
@@ -204,11 +218,13 @@ public class ProductServiceImpl implements ProductService {
         if (maxStock != null) {
             predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("stockQuantity"), maxStock));
         }
+        log.trace("Exiting getPredicates method in ProductServiceImpl class");
         return predicates;
     }
 
     private ProductResponse mapToProductResponse(Product product) {
-        return ProductResponse.builder()
+        log.trace("Entering mapToProductResponse method in ProductServiceImpl class");
+        ProductResponse response = ProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .description(product.getDescription())
@@ -216,5 +232,7 @@ public class ProductServiceImpl implements ProductService {
                 .stockQuantity(product.getStockQuantity())
                 .price(product.getPrice())
                 .build();
+        log.trace("Exiting mapToProductResponse method in ProductServiceImpl class");
+        return response;
     }
 }
