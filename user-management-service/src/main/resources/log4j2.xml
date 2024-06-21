@@ -1,30 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration>
+<Configuration status="WARN" monitorInterval="30">
     <Properties>
-        <Property name="LOG_PATTERN">
-            %d{yyyy-MM-dd HH:mm:ss.SSS} --- thread_id="%tid" thread_name="%tn" thread_priority="%tp" --- [%p] %m%n
-        </Property>
+        <!-- Define the log file location -->
+        <Property name="LOG_FILE">logs/app.log</Property>
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %c{1} - %msg%n</Property>
+        <Property name="CONSOLE_LOG_PATTERN">%style{%d{yyyy-MM-dd HH:mm:ss.SSS}}{bright,cyan} [%style{%thread}{bright,green}] %highlight{%-5level} %style{%c{1}}{bright,yellow} - %msg%n</Property>
     </Properties>
+
     <Appenders>
-        <RollingFile name="RollingName" filename="logs/app.log"
-                     filePattern="$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log">
-            <PatternLayout>
-                <Pattern>${LOG_PATTERN}</Pattern>
-            </PatternLayout>
+        <!-- Console Appender -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${CONSOLE_LOG_PATTERN}" />
+        </Console>
+
+        <!-- File Appender -->
+        <File name="File" fileName="${LOG_FILE}" append="true">
+            <PatternLayout pattern="${LOG_PATTERN}" />
+        </File>
+
+        <!-- Rolling File Appender -->
+        <RollingFile name="RollingFile" fileName="${LOG_FILE}" filePattern="logs/app-%d{yyyy-MM-dd}.log.gz">
+            <PatternLayout pattern="${LOG_PATTERN}" />
             <Policies>
-                <SizeBasedTriggeringPolicy size="20MB"/>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="10MB" />
             </Policies>
         </RollingFile>
-        <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="${LOG_PATTERN}"/>
-        </Console>
     </Appenders>
+
     <Loggers>
-        <Logger name="com.log" level="trace">
-            <AppenderRef ref="Console"/>
-        </Logger>
-        <Root level="error">
-            <AppenderRef ref="RollingName"/>
+        <!-- Root Logger -->
+        <Root level="info">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="RollingFile" />
         </Root>
+
+        <!-- Application Loggers -->
+        <Logger name="com.bit" level="debug" additivity="false">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="RollingFile" />
+        </Logger>
     </Loggers>
 </Configuration>
