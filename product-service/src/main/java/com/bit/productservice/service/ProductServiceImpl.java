@@ -102,7 +102,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @CachePut(cacheNames = "product_id", key = "#id", unless = "#result == null")
     public ProductResponse updateProduct(Long id, ProductRequest productRequest) throws AlgorithmNotFoundException {
         logger.info("Updating product with ID {}: {}", id, productRequest);
         Product existingProduct = productRepository.findById(id)
@@ -115,13 +114,13 @@ public class ProductServiceImpl implements ProductService {
         existingProduct.setPrice(productRequest.getPrice());
 
         productRepository.save(existingProduct);
+        updateProductCache(existingProduct);
 
         logger.info("Updated product with ID {}: {}", id, existingProduct);
         return mapToProductResponse(existingProduct);
     }
 
     @Override
-    @Cacheable(cacheNames = "product_id", key = "#id", unless = "#result == null")
     public ProductResponse restoreProduct(Long id) {
         if (!productRepository.existsByIdAndDeletedTrue(id))
             throw new ProductNotSoftDeletedException("Product with id " + id + " is not soft-deleted and cannot be restored.");
@@ -129,6 +128,7 @@ public class ProductServiceImpl implements ProductService {
         productRepository.restoreProduct(id);
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Couldn't restore the product with id " + id));
+        createProductCache(product);
         return mapToProductResponse(product);
     }
 
@@ -153,24 +153,37 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @RabbitListener(queues = "${rabbitmq.queue}")
-    @CachePut(cacheNames = "product_id", key = "#request.id", unless = "#result == null")
-    public ProductResponse reduceProductStock(ProductStockReduceRequest request) {
+    public void reduceProductStock(ProductStockReduceRequest request) {
         Product product = productRepository.findById(request.getId())
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + request.getId()));
 
         product.setStockQuantity(product.getStockQuantity() - request.getRequestedQuantity());
         productRepository.save(product);
-        return mapToProductResponse(product);
+        updateProductCache(product);
     }
 
     @Override
-    @CachePut(cacheNames = "product_id", key = "#request.id", unless = "#result == null")
     public ProductResponse returnProducts(ProductStockReturnRequest request) {
         Product product = productRepository.findById(request.getId())
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + request.getId()));
 
         product.setStockQuantity(product.getStockQuantity() + request.getReturnedQuantity());
         productRepository.save(product);
+        updateProductCache(product);
+        return mapToProductResponse(product);
+    }
+
+    @Cacheable(cacheNames = "product_id", key = "#product.id", unless = "#result == null")
+    @ExcludeFromGeneratedCoverage
+    public ProductResponse createProductCache(Product product) {
+
+        return mapToProductResponse(product);
+    }
+
+    @CachePut(cacheNames = "product_id", key = "#product.id", unless = "#result == null")
+    @ExcludeFromGeneratedCoverage
+    public ProductResponse updateProductCache(Product product) {
+
         return mapToProductResponse(product);
     }
 
