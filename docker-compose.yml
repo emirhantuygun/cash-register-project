@@ -158,11 +158,13 @@ services:
     networks:
       - registry
       - postgres
+      - redis
       - rabbitmq
       - zipkin
     depends_on:
       - service-registry
       - api-gateway
+      - redis
       - postgres-product
       - rabbitmq
       - zipkin
@@ -176,11 +178,13 @@ services:
     networks:
       - registry
       - postgres
+      - redis
       - rabbitmq
       - zipkin
     depends_on:
       - service-registry
       - api-gateway
+      - redis
       - postgres-sale
       - product-service
       - rabbitmq
