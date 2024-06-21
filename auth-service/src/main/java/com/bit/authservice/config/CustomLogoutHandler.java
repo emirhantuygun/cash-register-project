@@ -33,16 +33,16 @@ public class CustomLogoutHandler implements LogoutHandler {
 
     @PostConstruct
     protected void init() {
-        log.info("Entering init method in CustomLogoutHandler");
+        log.trace("Entering init method in CustomLogoutHandler");
         this.jedis = new Jedis(redisHost, Integer.parseInt(redisPort));
-        log.info("Exiting init method in CustomLogoutHandler");
+        log.trace("Exiting init method in CustomLogoutHandler");
     }
 
     @Override
     public void logout(HttpServletRequest request,
                        HttpServletResponse response,
                        Authentication authentication) {
-        log.info("Entering logout method in CustomLogoutHandler");
+        log.trace("Entering logout method in CustomLogoutHandler");
         try {
             String authHeader = request.getHeader("Authorization");
 
@@ -73,7 +73,7 @@ public class CustomLogoutHandler implements LogoutHandler {
             log.error("Error during logout: {}", e.getMessage());
             throw e;
         } finally {
-            log.info("Exiting logout method in CustomLogoutHandler");
+            log.trace("Exiting logout method in CustomLogoutHandler");
         }
     }
 }

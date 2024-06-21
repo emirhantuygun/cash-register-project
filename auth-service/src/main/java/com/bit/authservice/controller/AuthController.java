@@ -24,7 +24,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) throws RedisOperationException {
-        log.info("Entering login method in AuthController");
+        log.trace("Entering login method in AuthController");
         try {
             var tokens = authService.login(authRequest);
             var authResponse = new AuthResponse(tokens.get(0), tokens.get(1), AuthStatus.LOGIN_SUCCESS);
@@ -33,13 +33,13 @@ public class AuthController {
             log.error("Error during login: {}", e.getMessage());
             throw e;
         } finally {
-            log.info("Exiting login method in AuthController");
+            log.trace("Exiting login method in AuthController");
         }
     }
 
     @GetMapping("/refresh-token")
     public ResponseEntity<AuthResponse> refreshToken(HttpServletRequest request) throws InvalidRefreshTokenException, RedisOperationException, UsernameExtractionException {
-        log.info("Entering refreshToken method in AuthController");
+        log.trace("Entering refreshToken method in AuthController");
         try {
             var tokens = authService.refreshToken(request);
             var authResponse = new AuthResponse(tokens.get(0), tokens.get(1), AuthStatus.TOKEN_REFRESHED_SUCCESSFULLY);
@@ -48,7 +48,7 @@ public class AuthController {
             log.error("Error during token refresh: {}", e.getMessage());
             throw e;
         } finally {
-            log.info("Exiting refreshToken method in AuthController");
+            log.trace("Exiting refreshToken method in AuthController");
         }
     }
 }

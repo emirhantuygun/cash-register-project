@@ -54,19 +54,19 @@ public class AuthServiceImpl implements AuthService {
 
     @PostConstruct
     public void init() {
-        log.info("Entering init method in AuthServiceImpl");
+        log.trace("Entering init method in AuthServiceImpl");
         this.jedis = new Jedis(redisHost, Integer.parseInt(redisPort));
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             jedis.flushAll();        // Remove all keys from Redis
             jedis.close();           // Close the Redis connection
         }));
-        log.info("Exiting init method in AuthServiceImpl");
+        log.trace("Exiting init method in AuthServiceImpl");
     }
 
     @Override
     public List<String> login(AuthRequest authRequest) throws RedisOperationException {
-        log.info("Entering login method in AuthServiceImpl");
+        log.trace("Entering login method in AuthServiceImpl");
         try {
             var authToken = new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword());
             authenticationManager.authenticate(authToken);
@@ -87,13 +87,13 @@ public class AuthServiceImpl implements AuthService {
         revokeAllTokensByUser(appUser.getId());
         saveUserToken(appUser, accessToken);
 
-        log.info("Exiting login method in AuthServiceImpl");
+        log.trace("Exiting login method in AuthServiceImpl");
         return Arrays.asList(accessToken, refreshToken);
     }
 
     @Override
     public List<String> refreshToken(HttpServletRequest request) throws InvalidRefreshTokenException, UsernameExtractionException, UserNotFoundException, RedisOperationException {
-        log.info("Entering refreshToken method in AuthServiceImpl");
+        log.trace("Entering refreshToken method in AuthServiceImpl");
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -115,7 +115,7 @@ public class AuthServiceImpl implements AuthService {
                     revokeAllTokensByUser(appUser.getId());
                     saveUserToken(appUser, accessToken);
 
-                    log.info("Exiting refreshToken method in AuthServiceImpl");
+                    log.trace("Exiting refreshToken method in AuthServiceImpl");
                     return Arrays.asList(accessToken, refreshToken);
                 } else {
                     log.error("User not found");
@@ -133,7 +133,7 @@ public class AuthServiceImpl implements AuthService {
 
     @RabbitListener(queues = "${rabbitmq.queue.create}")
     public void createUser(AuthUserRequest authUserRequest) throws RoleNotFoundException {
-        log.info("Entering createUser method in AuthServiceImpl");
+        log.trace("Entering createUser method in AuthServiceImpl");
         var encodedPassword = passwordEncoder.encode(authUserRequest.getPassword());
 
         var appUser = AppUser.builder()
@@ -143,12 +143,12 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         userRepository.save(appUser);
-        log.info("Exiting createUser method in AuthServiceImpl");
+        log.trace("Exiting createUser method in AuthServiceImpl");
     }
 
     @RabbitListener(queues = "${rabbitmq.queue.update}")
     public void updateUser(UpdateUserMessage updateUserMessage) throws RoleNotFoundException {
-        log.info("Entering updateUser method in AuthServiceImpl");
+        log.trace("Entering updateUser method in AuthServiceImpl");
         Long id = updateUserMessage.getId();
         AuthUserRequest authUserRequest = updateUserMessage.getAuthUserRequest();
 
@@ -161,33 +161,33 @@ public class AuthServiceImpl implements AuthService {
         existingUser.setRoles(getRolesAsRole(authUserRequest.getRoles()));
 
         userRepository.save(existingUser);
-        log.info("Exiting updateUser method in AuthServiceImpl");
+        log.trace("Exiting updateUser method in AuthServiceImpl");
     }
 
     @RabbitListener(queues = "${rabbitmq.queue.restore}")
     public void restoreUser(Long id) {
-        log.info("Entering restoreUser method in AuthServiceImpl");
+        log.trace("Entering restoreUser method in AuthServiceImpl");
         userRepository.restoreUser(id);
-        log.info("Exiting restoreUser method in AuthServiceImpl");
+        log.trace("Exiting restoreUser method in AuthServiceImpl");
     }
 
     @RabbitListener(queues = "${rabbitmq.queue.delete}")
     public void deleteUser(Long id) {
-        log.info("Entering deleteUser method in AuthServiceImpl");
+        log.trace("Entering deleteUser method in AuthServiceImpl");
         userRepository.deleteById(id);
-        log.info("Exiting deleteUser method in AuthServiceImpl");
+        log.trace("Exiting deleteUser method in AuthServiceImpl");
     }
 
     @RabbitListener(queues = "${rabbitmq.queue.deletePermanent}")
     public void deleteUserPermanently(Long id) {
-        log.info("Entering deleteUserPermanently method in AuthServiceImpl");
+        log.trace("Entering deleteUserPermanently method in AuthServiceImpl");
         userRepository.deleteRolesForUser(id);
         userRepository.deletePermanently(id);
-        log.info("Exiting deleteUserPermanently method in AuthServiceImpl");
+        log.trace("Exiting deleteUserPermanently method in AuthServiceImpl");
     }
 
     protected void saveUserToken(AppUser user, String jwtToken) throws RedisOperationException {
-        log.debug("Saving user token in Redis");
+        log.trace("Entering saveUserToken method in AuthServiceImpl");
         var token = Token.builder()
                 .token(jwtToken)
                 .user(user)
@@ -202,10 +202,11 @@ public class AuthServiceImpl implements AuthService {
             log.error("Failed to set token status in Redis: {}", e.getMessage());
             throw new RedisOperationException("Failed to set token status in Redis", e);
         }
+        log.trace("Exiting saveUserToken method in AuthServiceImpl");
     }
 
     private void revokeAllTokensByUser(long id) throws RedisOperationException {
-        log.debug("Revoking all tokens for user");
+        log.trace("Entering revokeAllTokensByUser method in AuthServiceImpl");
         List<Token> validTokens = tokenRepository.findAllTokensByUser(id);
         if (validTokens.isEmpty()) {
             return;
@@ -222,23 +223,29 @@ public class AuthServiceImpl implements AuthService {
         }
 
         tokenRepository.saveAll(validTokens);
+        log.trace("Exiting revokeAllTokensByUser method in AuthServiceImpl");
     }
 
     private List<String> getRolesAsString(List<Role> roles) {
-        log.debug("Getting roles as string");
-        return roles.stream()
-                .map(Role::getRoleName)
-                .collect(Collectors.toList());
+        log.trace("Entering getRolesAsString method in AuthServiceImpl");
+        try {
+            return roles.stream()
+                    .map(Role::getRoleName)
+                    .collect(Collectors.toList());
+        } finally {
+            log.trace("Exiting getRolesAsString method in AuthServiceImpl");
+        }
     }
 
     private List<Role> getRolesAsRole(List<String> roles) throws RoleNotFoundException {
-        log.debug("Getting roles as role entity");
+        log.trace("Entering getRolesAsRole method in AuthServiceImpl");
         List<Role> rolesList = new ArrayList<>();
         for (String roleName : roles) {
             Role role = roleRepository.findByRoleName(roleName)
                     .orElseThrow(() -> new RoleNotFoundException("Role " + roleName + " not found"));
             rolesList.add(role);
         }
+        log.trace("Exiting getRolesAsRole method in AuthServiceImpl");
         return rolesList;
     }
 

@@ -27,7 +27,7 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
 
     @Override
     public GatewayFilter apply(Config config) {
-        log.info("Entering apply method in AuthGatewayFilterFactory class");
+        log.trace("Entering apply method in AuthGatewayFilterFactory class");
 
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
@@ -74,7 +74,7 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
                         }
                     }
 
-                    log.info("Exiting apply method in AuthGatewayFilterFactory class with successful authentication");
+                    log.trace("Exiting apply method in AuthGatewayFilterFactory class with successful authentication");
                     return chain.filter(exchange);
 
                 } else {
