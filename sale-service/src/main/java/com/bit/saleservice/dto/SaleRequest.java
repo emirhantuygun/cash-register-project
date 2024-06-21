@@ -23,7 +23,7 @@ public class SaleRequest {
     @NotBlank(message = "Payment Method is required and should not be blank!")
     private String paymentMethod;
     private List<Long> campaignIds;
-    private List<ProductRequest> products;
+    private List<SaleProductRequest> products;
 
     @PositiveOrZero(message = "Cash must be a positive number!")
     private BigDecimal cash;

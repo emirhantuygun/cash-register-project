@@ -306,24 +306,24 @@ public class SaleServiceImpl implements SaleService {
     }
 
     @ExcludeFromGeneratedCoverage
-    private List<Product> getProducts(List<ProductRequest> productRequests) throws HeaderProcessingException {
+    private List<Product> getProducts(List<SaleProductRequest> saleProductRequests) throws HeaderProcessingException {
 
         List<Product> products = new ArrayList<>();
 
-        for (var productRequest : productRequests) {
+        for (var productRequest : saleProductRequests) {
             try {
-                ProductServiceResponse productServiceResponse = gatewayService.getProduct(productRequest.getId());
+                ProductResponse productResponse = gatewayService.getProduct(productRequest.getId());
 
-                if (productServiceResponse != null) {
-                    boolean areEnoughProductsInStock = Boolean.TRUE.equals(productServiceResponse.getStockQuantity() >= productRequest.getQuantity());
+                if (productResponse != null) {
+                    boolean areEnoughProductsInStock = Boolean.TRUE.equals(productResponse.getStockQuantity() >= productRequest.getQuantity());
 
                     if (areEnoughProductsInStock) {
-                        BigDecimal totalPrice = productServiceResponse.getPrice().multiply(BigDecimal.valueOf(productRequest.getQuantity()));
+                        BigDecimal totalPrice = productResponse.getPrice().multiply(BigDecimal.valueOf(productRequest.getQuantity()));
                         products.add(Product.builder()
-                                .productId(productServiceResponse.getId())
-                                .name(productServiceResponse.getName())
-                                .barcodeNumber(productServiceResponse.getBarcodeNumber())
-                                .price(productServiceResponse.getPrice())
+                                .productId(productResponse.getId())
+                                .name(productResponse.getName())
+                                .barcodeNumber(productResponse.getBarcodeNumber())
+                                .price(productResponse.getPrice())
                                 .quantity(productRequest.getQuantity())
                                 .totalPrice(totalPrice)
                                 .build());
@@ -364,9 +364,9 @@ public class SaleServiceImpl implements SaleService {
         return new CampaignProcessResult(campaigns, products, totalWithCampaign);
     }
 
-    private List<ProductResponse> mapToProductResponse(List<Product> products) {
+    private List<SaleProductResponse> mapToProductResponse(List<Product> products) {
         return products.stream()
-                .map(product -> ProductResponse.builder()
+                .map(product -> SaleProductResponse.builder()
                         .id(product.getId())
                         .productId(product.getProductId())
                         .name(product.getName())
@@ -447,7 +447,7 @@ public class SaleServiceImpl implements SaleService {
     }
 
     private SaleResponse mapToSaleResponse(Sale sale) {
-        List<ProductResponse> productResponses = mapToProductResponse(sale.getProducts());
+        List<SaleProductResponse> saleProductRespons = mapToProductResponse(sale.getProducts());
         List<String> campaignNames = getCampaignNames(sale);
 
         return SaleResponse.builder()
@@ -456,7 +456,7 @@ public class SaleServiceImpl implements SaleService {
                 .date(sale.getDate())
                 .paymentMethod(sale.getPaymentMethod().toString())
                 .campaignNames(campaignNames)
-                .products(productResponses)
+                .products(saleProductRespons)
                 .cash(sale.getCash())
                 .change(sale.getChange())
                 .total(sale.getTotal())

@@ -1,10 +1,6 @@
 package com.bit.saleservice.dto;
 
-import com.bit.saleservice.entity.Campaign;
 import com.bit.saleservice.entity.MixedPayment;
-import com.bit.saleservice.entity.Payment;
-import com.bit.saleservice.entity.Product;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,7 +21,7 @@ public class SaleResponse {
     private Date date;
     private String paymentMethod;
     private List<String> campaignNames;
-    private List<ProductResponse> products;
+    private List<SaleProductResponse> products;
     private BigDecimal cash;
     private BigDecimal change;
     private BigDecimal total;

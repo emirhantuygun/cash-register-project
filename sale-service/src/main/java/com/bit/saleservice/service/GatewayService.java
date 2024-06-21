@@ -1,7 +1,7 @@
 package com.bit.saleservice.service;
 
 import com.bit.saleservice.annotation.ExcludeFromGeneratedCoverage;
-import com.bit.saleservice.dto.ProductServiceResponse;
+import com.bit.saleservice.dto.ProductResponse;
 import com.bit.saleservice.exception.HeaderProcessingException;
 import com.bit.saleservice.exception.ProductNotFoundException;
 import com.bit.saleservice.exception.ProductReturnException;
@@ -48,18 +48,18 @@ public class GatewayService {
 
 
     @Cacheable(cacheNames = "product_id", key = "#id", unless = "#result == null")
-    public ProductServiceResponse getProduct(Long id) throws HeaderProcessingException {
+    public ProductResponse getProduct(Long id) throws HeaderProcessingException {
         try {
             String getUrl = GATEWAY_URL + GET_PRODUCT_ENDPOINT;
 
             HttpHeaders headers = getHttpHeaders();
             HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
-            ResponseEntity<ProductServiceResponse> responseEntity = restTemplate.exchange(
+            ResponseEntity<ProductResponse> responseEntity = restTemplate.exchange(
                     getUrl,
                     HttpMethod.GET,
                     requestEntity,
-                    ProductServiceResponse.class,
+                    ProductResponse.class,
                     id
             );
 

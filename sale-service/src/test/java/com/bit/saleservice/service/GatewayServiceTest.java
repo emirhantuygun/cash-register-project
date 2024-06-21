@@ -1,6 +1,6 @@
 package com.bit.saleservice.service;
 
-import com.bit.saleservice.dto.ProductServiceResponse;
+import com.bit.saleservice.dto.ProductResponse;
 import com.bit.saleservice.exception.HeaderProcessingException;
 import com.bit.saleservice.exception.ProductNotFoundException;
 import com.bit.saleservice.exception.ProductReturnException;
@@ -43,19 +43,19 @@ class GatewayServiceTest {
     void testGetProduct_WhenProductExists_ReturnsProductServiceResponse() throws HeaderProcessingException {
         // Arrange
         Long productId = 1L;
-        ProductServiceResponse mockResponse = new ProductServiceResponse();
+        ProductResponse mockResponse = new ProductResponse();
         mockResponse.setId(productId);
 
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(ProductServiceResponse.class), anyLong()))
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(ProductResponse.class), anyLong()))
                 .thenReturn(new ResponseEntity<>(mockResponse, HttpStatus.OK));
 
         // Act
-        ProductServiceResponse response = gatewayService.getProduct(productId);
+        ProductResponse response = gatewayService.getProduct(productId);
 
         // Assert
         assertNotNull(response);
         assertEquals(productId, response.getId());
-        verify(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(ProductServiceResponse.class), eq(productId));
+        verify(restTemplate).exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(ProductResponse.class), eq(productId));
     }
 
     @Test
@@ -63,7 +63,7 @@ class GatewayServiceTest {
         // Arrange
         Long productId = 1L;
 
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(ProductServiceResponse.class), eq(productId)))
+        when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(HttpEntity.class), eq(ProductResponse.class), eq(productId)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
         // Act & Assert
@@ -114,7 +114,7 @@ class GatewayServiceTest {
         // Arrange
         ReflectionTestUtils.setField(gatewayService, "GATEWAY_URL", "http://some-domain/");
         Long id = 1L;
-        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(ProductServiceResponse.class), eq(id)))
+        when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), eq(ProductResponse.class), eq(id)))
                 .thenThrow(new RestClientException("REST client error"));
 
         // Act and Assert

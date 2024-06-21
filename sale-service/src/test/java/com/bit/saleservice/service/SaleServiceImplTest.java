@@ -133,7 +133,7 @@ class SaleServiceImplTest {
     void testCreateSale_ValidSaleRequest_ReturnsSaleResponse() throws HeaderProcessingException {
         // Arrange
         SaleRequest saleRequest = new SaleRequest();
-        saleRequest.setProducts(List.of(new ProductRequest()));
+        saleRequest.setProducts(List.of(new SaleProductRequest()));
         saleRequest.setPaymentMethod("paypal");
         when(saleRepository.save(any())).thenReturn(new Sale());
 
@@ -151,10 +151,10 @@ class SaleServiceImplTest {
         SaleRequest saleRequest = new SaleRequest();
         saleRequest.setCashier("New Cashier");
         saleRequest.setPaymentMethod("paypal");
-        ProductRequest productRequest = new ProductRequest();
-        productRequest.setId(id);
-        productRequest.setQuantity(1);
-        saleRequest.setProducts(List.of(productRequest));
+        SaleProductRequest saleProductRequest = new SaleProductRequest();
+        saleProductRequest.setId(id);
+        saleProductRequest.setQuantity(1);
+        saleRequest.setProducts(List.of(saleProductRequest));
         Sale existingSale = new Sale();
         existingSale.setId(id);
         existingSale.setCashier("Old Cashier");
