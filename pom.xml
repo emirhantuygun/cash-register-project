@@ -127,6 +127,7 @@
                                 <exclude>**/repository/**</exclude>
                                 <exclude>**/wrapper/**</exclude>
                                 <exclude>**/RabbitMQConfig.class</exclude>
+                                <exclude>**/RedisConfig.class</exclude>
                                 <exclude>**/RestTemplateConfig.class</exclude>
                                 <exclude>**/AuthenticationConfig.class</exclude>
                                 <exclude>**/Resilience4JConfig.class</exclude>
