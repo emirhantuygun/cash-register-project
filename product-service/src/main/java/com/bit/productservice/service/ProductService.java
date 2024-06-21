@@ -22,5 +22,5 @@ public interface ProductService {
     void deleteProduct (Long id);
     ProductResponse restoreProduct(Long id);
     void deleteProductPermanently(Long id);
-    void returnProducts(ProductStockReturnRequest request);
+    ProductResponse returnProducts(ProductStockReturnRequest request);
 }

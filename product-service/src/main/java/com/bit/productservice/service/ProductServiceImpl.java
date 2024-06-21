@@ -25,7 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.cache.annotation.CachePut;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,6 +100,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @CachePut(cacheNames = "product_id", key = "#id", unless = "#result == null")
     public ProductResponse updateProduct(Long id, ProductRequest productRequest) throws AlgorithmNotFoundException {
         logger.info("Updating product with ID {}: {}", id, productRequest);
         Product existingProduct = productRepository.findById(id)
@@ -147,21 +148,25 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @RabbitListener(queues = "${rabbitmq.queue}")
-    public void reduceProductStock(ProductStockReduceRequest request) {
+    @CachePut(cacheNames = "product_id", key = "#request.id", unless = "#result == null")
+    public ProductResponse reduceProductStock(ProductStockReduceRequest request) {
         Product product = productRepository.findById(request.getId())
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + request.getId()));
 
         product.setStockQuantity(product.getStockQuantity() - request.getRequestedQuantity());
         productRepository.save(product);
+        return mapToProductResponse(product);
     }
 
     @Override
-    public void returnProducts(ProductStockReturnRequest request) {
+    @CachePut(cacheNames = "product_id", key = "#request.id", unless = "#result == null")
+    public ProductResponse returnProducts(ProductStockReturnRequest request) {
         Product product = productRepository.findById(request.getId())
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + request.getId()));
 
         product.setStockQuantity(product.getStockQuantity() + request.getReturnedQuantity());
         productRepository.save(product);
+        return mapToProductResponse(product);
     }
 
     @ExcludeFromGeneratedCoverage
