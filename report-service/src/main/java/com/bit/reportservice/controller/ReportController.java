@@ -1,13 +1,11 @@
 package com.bit.reportservice.controller;
 
-import com.bit.reportservice.ReportServiceApplication;
 import com.bit.reportservice.dto.SaleResponse;
 import com.bit.reportservice.exception.HeaderProcessingException;
 import com.bit.reportservice.exception.ReceiptGenerationException;
 import com.bit.reportservice.service.ReportService;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,38 +20,44 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.math.BigDecimal;
 import java.util.List;
 
+@Log4j2
 @Controller
 @RequestMapping("/reports")
 @RequiredArgsConstructor
 public class ReportController {
 
-    private final Logger logger = LogManager.getLogger(ReportServiceApplication.class);
     private final ReportService reportService;
 
     @GetMapping("/{id}")
     public ResponseEntity<SaleResponse> getSale(@PathVariable("id") Long id) throws HeaderProcessingException {
-        logger.info("Received request to fetch sale with ID: {}", id);
+        log.trace("Entering getSale method in ReportController with id: {}", id);
+
         SaleResponse saleResponse = reportService.getSale(id);
 
-        logger.info("Returning sale response: {}", saleResponse);
+        log.info("Returning sale response for id: {}", id);
+        log.trace("Exiting getSale method in ReportController with id: {}", id);
         return new ResponseEntity<>(saleResponse, HttpStatus.OK);
     }
 
     @GetMapping()
     public ResponseEntity<List<SaleResponse>> getAllSales() throws HeaderProcessingException {
-        logger.info("Received request to fetch all sales");
+        log.trace("Entering getAllSales method in ReportController");
+
         List<SaleResponse> saleResponses = reportService.getAllSales();
 
-        logger.info("Returning {} sale responses", saleResponses.size());
+        log.info("Returning all sales response with count: {}", saleResponses.size());
+        log.trace("Exiting getAllSales method in ReportController");
         return new ResponseEntity<>(saleResponses, HttpStatus.OK);
     }
 
     @GetMapping("/deleted")
     public ResponseEntity<List<SaleResponse>> getDeletedSales() throws HeaderProcessingException {
-        logger.info("Received request to fetch all deleted sales");
+        log.trace("Entering getDeletedSales method in ReportController");
+
         List<SaleResponse> deletedSaleResponses = reportService.getDeletedSales();
 
-        logger.info("Returning {} deleted sale responses", deletedSaleResponses.size());
+        log.info("Returning deleted sales response with count: {}", deletedSaleResponses.size());
+        log.trace("Exiting getDeletedSales method in ReportController");
         return new ResponseEntity<>(deletedSaleResponses, HttpStatus.OK);
     }
 
@@ -70,26 +74,29 @@ public class ReportController {
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate
     ) throws HeaderProcessingException {
-        logger.info("Received request to fetch all sales with filters and sorting: page={}, size={}, sortBy={}, direction={}, cashier={}, paymentMethod={}, minPrice={}, maxPrice={}, startDate={}, endDate={}",
+        log.trace("Entering getAllSalesFilteredAndSorted method in ReportController with parameters: page={}, size={}, sortBy={}, direction={}, cashier={}, paymentMethod={}, minTotal={}, maxTotal={}, startDate={}, endDate={}",
                 page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
+
         Page<SaleResponse> saleResponses = reportService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
 
-        logger.info("Returning {} sale responses filtered and sorted", saleResponses.getTotalElements());
+        log.info("Returning filtered and sorted sales response with page size: {}", saleResponses.getSize());
+        log.trace("Exiting getAllSalesFilteredAndSorted method in ReportController");
         return new ResponseEntity<>(saleResponses, HttpStatus.OK);
     }
 
     @GetMapping("/receipt/{id}")
     public ResponseEntity<byte[]> getReceipt(@PathVariable("id") Long id) throws HeaderProcessingException, ReceiptGenerationException {
-        logger.info("Received request to generate receipt for sale with ID: {}", id);
-        byte[] pdfBytes = reportService.getReceipt(id);
+        log.trace("Entering getReceipt method in ReportController with id: {}", id);
 
-        logger.info("Receipt ready!");
+        byte[] pdfBytes = reportService.getReceipt(id);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDispositionFormData("filename", "receipt" + id + ".pdf");
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
 
+        log.info("Returning receipt PDF for id: {}", id);
+        log.trace("Exiting getReceipt method in ReportController with id: {}", id);
         return new ResponseEntity<>(pdfBytes, headers, HttpStatus.CREATED);
     }
 }
