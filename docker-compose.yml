@@ -47,7 +47,7 @@ services:
       POSTGRES_PASSWORD: emirhan
       PGDATA: /data/postgres
     volumes:
-      - ./postgres-product:/data/postgres
+      - ./postgres/product:/data/postgres
     expose:
       - "${POSTGRES_PRODUCT_PORT}"
     ports:
@@ -66,7 +66,7 @@ services:
       POSTGRES_PASSWORD: emirhan
       PGDATA: /data/postgres
     volumes:
-      - ./postgres-sale:/data/postgres
+      - ./postgres/sale:/data/postgres
     expose:
       - "${POSTGRES_SALE_PORT}"
     ports:
@@ -85,7 +85,7 @@ services:
       POSTGRES_PASSWORD: emirhan
       PGDATA: /data/postgres
     volumes:
-      - ./postgres-user:/data/postgres
+      - ./postgres/user:/data/postgres
     expose:
       - "${POSTGRES_USER_PORT}"
     ports:
@@ -104,7 +104,7 @@ services:
       POSTGRES_PASSWORD: emirhan
       PGDATA: /data/postgres
     volumes:
-      - ./postgres-auth:/data/postgres
+      - ./postgres/auth:/data/postgres
     expose:
       - "${POSTGRES_AUTH_PORT}"
     ports:

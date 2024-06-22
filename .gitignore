@@ -3,10 +3,7 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-/postgres-auth/
-/postgres-user/
-/postgres-product/
-/postgres-sale/
+/postgres/
 /redis/
 /logs/
 
