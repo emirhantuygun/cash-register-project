@@ -97,7 +97,7 @@ class SaleControllerTest {
         response.setPageNumber(page);
         response.setPageSize(size);
         response.setTotalElements(saleResponses.getTotalElements());
-        when(saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate)).thenReturn(saleResponses);
+        when(saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate)).thenReturn(response);
 
         // Act
         ResponseEntity<PageWrapper<SaleResponse>> result = saleController.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate);

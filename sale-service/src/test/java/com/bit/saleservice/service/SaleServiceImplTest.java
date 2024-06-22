@@ -5,6 +5,7 @@ import com.bit.saleservice.entity.*;
 import com.bit.saleservice.exception.*;
 import com.bit.saleservice.repository.ProductRepository;
 import com.bit.saleservice.repository.SaleRepository;
+import com.bit.saleservice.wrapper.PageWrapper;
 import com.bit.saleservice.wrapper.ProductStockReduceRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -120,10 +121,12 @@ class SaleServiceImplTest {
         String endDate = "2022-01-31";
 
         Page<Sale> salesPage = Page.empty();
+        PageWrapper<SaleResponse> response = new PageWrapper<>();
+        response.setTotalElements(salesPage.getTotalElements());
         when(saleRepository.findAll((Specification<Sale>) any(), any())).thenReturn(salesPage);
 
         // Act
-        Page<SaleResponse> saleResponses = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
+        PageWrapper<SaleResponse> saleResponses = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
 
         // Assert
         assertEquals(salesPage.getTotalElements(), saleResponses.getTotalElements());
@@ -412,10 +415,15 @@ class SaleServiceImplTest {
         sale.setPaymentMethod(Payment.PAYPAL);
         sale.setProducts(List.of(Product.builder().sale(sale).build()));
         Page<Sale> salePage = new PageImpl<>(Collections.singletonList(sale));
+        PageWrapper<SaleResponse> response = new PageWrapper<>();
+        response.setContent(response.getContent());
+        response.setPageNumber(page);
+        response.setPageSize(size);
+        response.setTotalElements(salePage.getTotalElements());
         when(saleRepository.findAll((Specification<Sale>) any(), any(Pageable.class))).thenReturn(salePage);
 
         // Act
-        Page<SaleResponse> result = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
+        PageWrapper<SaleResponse> result = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
 
         // Assert
         assertNotNull(result);
@@ -459,10 +467,14 @@ class SaleServiceImplTest {
         sale.setPaymentMethod(Payment.PAYPAL);
         sale.setProducts(List.of(Product.builder().sale(sale).build()));
         Page<Sale> salePage = new PageImpl<>(Collections.singletonList(sale));
+        PageWrapper<SaleResponse> response = new PageWrapper<>();
+        response.setPageNumber(page);
+        response.setPageSize(size);
+        response.setTotalElements(response.getTotalElements());
         when(saleRepository.findAll((Specification<Sale>) any(), any(Pageable.class))).thenReturn(salePage);
 
         // Act
-        Page<SaleResponse> result = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
+        PageWrapper<SaleResponse> result = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
 
         // Assert
         assertNotNull(result);
@@ -485,10 +497,14 @@ class SaleServiceImplTest {
         String endDate = "";
 
         Page<Sale> salePage = Page.empty();
+        PageWrapper<SaleResponse> response = new PageWrapper<>();
+        response.setPageNumber(page);
+        response.setPageSize(size);
+        response.setTotalElements(salePage.getTotalElements());
         when(saleRepository.findAll((Specification<Sale>) any(), any(Pageable.class))).thenReturn(salePage);
 
         // Act
-        Page<SaleResponse> result = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
+        PageWrapper<SaleResponse> result = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
 
         // Assert
         assertNotNull(result);
