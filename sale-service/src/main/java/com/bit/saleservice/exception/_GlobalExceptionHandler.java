@@ -118,4 +118,9 @@ public class _GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("RabbitMQ exception: {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    @ExceptionHandler(ParsingException.class)
+    public ResponseEntity<String> handleParsingException(ParsingException ex) {
+        log.error("Parsing exception: {}", ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }
