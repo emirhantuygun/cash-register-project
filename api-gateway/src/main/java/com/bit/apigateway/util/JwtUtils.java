@@ -16,6 +16,13 @@ import redis.clients.jedis.Jedis;
 import javax.crypto.SecretKey;
 import java.util.List;
 
+/**
+ * Utility class for handling JWT (JSON Web Tokens) and Redis operations.
+ * This class provides methods for validating JWT tokens, checking if a token is logged out,
+ * and retrieving user roles from the token claims.
+ *
+ * @author Emirhan Tuygun
+ */
 @Log4j2
 @Component
 public class JwtUtils {
@@ -33,6 +40,12 @@ public class JwtUtils {
     private String redisPort;
     private Jedis jedis;
 
+    /**
+     * This method initializes the Jedis instance for Redis operations.
+     * It is annotated with {@link PostConstruct} to ensure it is called after all dependencies are injected.
+     *
+     * @throws NumberFormatException If the redisPort value cannot be parsed to an integer.
+     */
     @PostConstruct
     public void init() {
         log.trace("Entering init method in JwtUtils");
@@ -40,6 +53,13 @@ public class JwtUtils {
         log.trace("Exiting init method in JwtUtils");
     }
 
+    /**
+     * This method verifies and parses the given JWT token.
+     *
+     * @param token The JWT token to be validated and parsed.
+     * @return The claims extracted from the validated token.
+     * @throws InvalidTokenException If the token is invalid or cannot be parsed.
+     */
     public Claims getClaimsAndValidate(String token) {
         log.trace("Entering getClaimsAndValidate method in JwtUtils");
         try {
@@ -52,6 +72,14 @@ public class JwtUtils {
         }
     }
 
+    /**
+     * This method checks if the given JWT token is logged out.
+     * It retrieves the token ID from Redis and checks if the corresponding logout status is stored in Redis.
+     *
+     * @param token The JWT token to be checked.
+     * @return {@code true} if the token is logged out, {@code false} otherwise.
+     * @throws TokenNotFoundException If the token is not found in Redis or if the logout status information is not found.
+     */
     public boolean isLoggedOut(String token) {
         log.trace("Entering isLoggedOut method in JwtUtils");
         try {
@@ -76,6 +104,12 @@ public class JwtUtils {
         }
     }
 
+    /**
+     * Retrieves the roles from the given JWT claims.
+     *
+     * @param claims The JWT claims containing the roles information.
+     * @return A list of roles extracted from the claims.
+     */
     public List<String> getRoles(Claims claims) {
         log.trace("Entering getRoles method in JwtUtils");
         try {
@@ -85,6 +119,13 @@ public class JwtUtils {
         }
     }
 
+    /**
+     * This method retrieves the secret key used for signing and validating JWT tokens.
+     * The key is obtained from the {@code jwt.signerKey} property and is decoded using the BASE64URL decoder.
+     * The decoded key is then used to create a secret key using the HMAC SHA algorithm.
+     *
+     * @return The secret key used for signing and validating JWT tokens.
+     */
     protected SecretKey getSignInKey() {
         log.trace("Entering getSignInKey method in JwtUtils");
         try {
