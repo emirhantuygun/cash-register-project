@@ -9,10 +9,21 @@ import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JConfigB
 import org.springframework.cloud.client.circuitbreaker.Customizer;
 import java.time.Duration;
 
-
+/**
+ * This class is responsible for configuring the default settings for Resilience4J Circuit Breaker and Time Limiter.
+ * It uses Spring Cloud's ReactiveResilience4JCircuitBreakerFactory and Resilience4JConfigBuilder to achieve this.
+ *
+ * @author Emirhan Tuygun
+ */
 @Configuration
 public class Resilience4JConfig {
 
+    /**
+     * This method is a customizer for the default configuration of Resilience4J Circuit Breaker and Time Limiter.
+     * It uses Spring Cloud's ReactiveResilience4JCircuitBreakerFactory and Resilience4JConfigBuilder to achieve this.
+     *
+     * @return a Customizer object that configures the default settings for the Circuit Breaker and Time Limiter.
+     */
     @Bean
     public Customizer<ReactiveResilience4JCircuitBreakerFactory> defaultCustomizer(){
         return factory -> factory.configureDefault(id -> new Resilience4JConfigBuilder(id)

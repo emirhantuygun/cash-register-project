@@ -10,6 +10,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class is responsible for configuring the routes of the API Gateway.
+ * It uses Spring Cloud Gateway to define the routes and apply filters.
+ * The routes are configured to forward requests to the respective microservices based on the path.
+ * It also applies authentication and authorization filters using the AuthGatewayFilterFactory.
+ * Circuit breakers are configured for each route to handle failures gracefully.
+ *
+ * @author Emirhan Tuygun
+ */
 @Configuration
 public class GatewayConfig {
 
@@ -25,6 +34,11 @@ public class GatewayConfig {
     private String REPORT_URI;
     private final Map<String, List<String>> endpointRoleMapping = new HashMap<>();
 
+    /**
+     * Constructor for GatewayConfig class.
+     * Initializes the endpointRoleMapping with predefined roles for each endpoint.
+     * This mapping is used in the authentication filter to check the user's role and allow or deny access to the endpoint.
+     */
     public GatewayConfig() {
         endpointRoleMapping.put("/users", List.of("ADMIN"));
         endpointRoleMapping.put("/sales", List.of("CASHIER", "MANAGER"));
@@ -32,6 +46,17 @@ public class GatewayConfig {
         endpointRoleMapping.put("/reports", List.of("MANAGER"));
     }
 
+    /**
+     * This method configures the routes for the API Gateway.
+     * It uses Spring Cloud Gateway to define the routes and apply filters.
+     * The routes are configured to forward requests to the respective microservices based on the path.
+     * It also applies authentication and authorization filters using the AuthGatewayFilterFactory.
+     * Circuit breakers are configured for each route to handle failures gracefully.
+     *
+     * @param builder The RouteLocatorBuilder instance to build the routes.
+     * @param authGatewayFilterFactory The AuthGatewayFilterFactory instance to create authentication and authorization filters.
+     * @return The configured RouteLocator instance.
+     */
     @Bean
     public RouteLocator routes(RouteLocatorBuilder builder, AuthGatewayFilterFactory authGatewayFilterFactory) {
         return builder.routes()

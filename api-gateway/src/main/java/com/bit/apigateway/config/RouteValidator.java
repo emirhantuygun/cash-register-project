@@ -5,6 +5,11 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.function.Predicate;
 
+/**
+ * This class is responsible for validating routes and checking if they require security or role-based authorization.
+ *
+ * @author Emirhan Tuygun
+ */
 @Component
 public class RouteValidator {
 
