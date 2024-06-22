@@ -7,6 +7,7 @@ import com.bit.saleservice.entity.*;
 import com.bit.saleservice.exception.*;
 import com.bit.saleservice.repository.ProductRepository;
 import com.bit.saleservice.repository.SaleRepository;
+import com.bit.saleservice.wrapper.PageWrapper;
 import com.bit.saleservice.wrapper.ProductStockReduceRequest;
 import com.bit.saleservice.wrapper.ProductStockReturnRequest;
 import io.micrometer.common.util.StringUtils;
@@ -82,10 +83,10 @@ public class SaleServiceImpl implements SaleService {
     }
 
     @Override
-    public Page<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction,
-                                                           String cashier, String paymentMethod,
-                                                           BigDecimal minTotal, BigDecimal maxTotal,
-                                                           String startDate, String endDate) {
+    public PageWrapper<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction,
+                                                                  String cashier, String paymentMethod,
+                                                                  BigDecimal minTotal, BigDecimal maxTotal,
+                                                                  String startDate, String endDate) {
         logger.info("Fetching all sales with filters and sorting");
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
         Page<Sale> salesPage = saleRepository.findAll((root, query, criteriaBuilder) -> {
@@ -94,7 +95,15 @@ public class SaleServiceImpl implements SaleService {
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         }, pageable);
 
-        return salesPage.map(this::mapToSaleResponse);
+        Page<SaleResponse> saleResponsePage =  salesPage.map(this::mapToSaleResponse);
+
+        PageWrapper<SaleResponse> saleResponsePageWrapper = new PageWrapper<>();
+        saleResponsePageWrapper.setContent(saleResponsePage.getContent());
+        saleResponsePageWrapper.setPageNumber(page);
+        saleResponsePageWrapper.setPageSize(size);
+        saleResponsePageWrapper.setTotalElements(saleResponsePage.getTotalElements());
+
+        return saleResponsePageWrapper;
     }
 
 
