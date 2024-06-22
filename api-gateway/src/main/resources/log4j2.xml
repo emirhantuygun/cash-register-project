@@ -2,24 +2,22 @@
 <Configuration status="WARN" monitorInterval="30">
     <Properties>
         <!-- Define the log file location -->
-        <Property name="LOG_FILE">logs/app.log</Property>
+        <Property name="LOG_DIR">logs</Property>
+        <Property name="SERVICE">api-gateway</Property>
         <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %c{1} - %msg%n</Property>
         <Property name="CONSOLE_LOG_PATTERN">%style{%d{yyyy-MM-dd HH:mm:ss.SSS}}{bright,cyan} [%style{%thread}{bright,green}] %highlight{%-5level} %style{%c{1}}{bright,yellow} - %msg%n</Property>
+        <Property name="CURRENT_DATE">${date:yyyy-MM-dd}</Property>
     </Properties>
 
     <Appenders>
         <!-- Console Appender -->
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="${CONSOLE_LOG_PATTERN}" />
+            <PatternLayout pattern="${CONSOLE_LOG_PATTERN}" disableAnsi="false"/>
         </Console>
 
-        <!-- File Appender -->
-        <File name="File" fileName="${LOG_FILE}" append="true">
-            <PatternLayout pattern="${LOG_PATTERN}" />
-        </File>
-
         <!-- Rolling File Appender -->
-        <RollingFile name="RollingFile" fileName="${LOG_FILE}" filePattern="logs/app-%d{yyyy-MM-dd}.log.gz">
+        <RollingFile name="RollingFile" fileName="${LOG_DIR}/${SERVICE}/${CURRENT_DATE}.log"
+                     filePattern="${LOG_DIR}/${SERVICE}-%d{yyyy-MM-dd}-%i.log">
             <PatternLayout pattern="${LOG_PATTERN}" />
             <Policies>
                 <TimeBasedTriggeringPolicy />
@@ -30,13 +28,13 @@
 
     <Loggers>
         <!-- Root Logger -->
-        <Root level="info">
+        <Root level="INFO">
             <AppenderRef ref="Console" />
             <AppenderRef ref="RollingFile" />
         </Root>
 
         <!-- Application Loggers -->
-        <Logger name="com.bit" level="debug" additivity="false">
+        <Logger name="com.bit" level="DEBUG" additivity="false">
             <AppenderRef ref="Console" />
             <AppenderRef ref="RollingFile" />
         </Logger>
