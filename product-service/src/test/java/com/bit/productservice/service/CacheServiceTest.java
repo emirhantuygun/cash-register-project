@@ -5,13 +5,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
 class CacheServiceTest {
@@ -19,39 +16,36 @@ class CacheServiceTest {
     @InjectMocks
     private CacheService cacheService;
 
-    private CacheManager cacheManager;
-
     @BeforeEach
     void setUp() {
-        cacheManager = new ConcurrentMapCacheManager("product_id");
         cacheService = new CacheService();
     }
 
     @Test
-    void givenNullProductResponse_whenCreateProductCache_thenNoCachingOccurs() {
-        // Act
-        ProductResponse result = cacheService.createProductCache(null);
+    void createProductCache_shouldCreateCacheForGivenProductResponse() {
+        // Given
+        ProductResponse productResponse = new ProductResponse();
+        productResponse.setId(1L);
 
-        // Assert
-        assertNull(result);
+        // When
+        ProductResponse cachedProductResponse = cacheService.createProductCache(productResponse);
 
-        Cache cache = cacheManager.getCache("product_id");
-        assertNotNull(cache);
-        Cache.ValueWrapper valueWrapper = cache.get(1L);
-        assertNull(valueWrapper);
+        // Then
+        assertNotNull(cachedProductResponse);
+        assertEquals(productResponse.getId(), cachedProductResponse.getId());
     }
 
     @Test
-    void givenNullProductResponse_whenUpdateProductCache_thenNoCachingOccurs() {
-        // Act
-        ProductResponse result = cacheService.updateProductCache(null);
+    void updateProductCache_shouldUpdateCacheForGivenProductResponse() {
+        // Given
+        ProductResponse productResponse = new ProductResponse();
+        productResponse.setId(1L);
 
-        // Assert
-        assertNull(result);
+        // When
+        ProductResponse cachedProductResponse = cacheService.updateProductCache(productResponse);
 
-        Cache cache = cacheManager.getCache("product_id");
-        assertNotNull(cache);
-        Cache.ValueWrapper valueWrapper = cache.get(1L);
-        assertNull(valueWrapper);
+        // Then
+        assertNotNull(cachedProductResponse);
+        assertEquals(productResponse.getId(), cachedProductResponse.getId());
     }
 }

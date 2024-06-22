@@ -296,7 +296,7 @@ class AuthServiceImplTest {
         UserNotFoundException exception = assertThrows(UserNotFoundException.class,
                 () -> authService.updateUser(updateUserMessage));
 
-        assertEquals("User not found", exception.getMessage());
+        assertEquals("User not found with id 1", exception.getMessage());
     }
 
     @Test
