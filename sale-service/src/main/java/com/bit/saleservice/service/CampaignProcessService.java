@@ -148,7 +148,10 @@ public class CampaignProcessService {
         log.trace("Entering isCampaignValidAndNotExpired method in CampaignProcessService with id: {}", id);
 
         Campaign campaign = campaignRepository.findById(id)
-                .orElseThrow(() -> new CampaignNotFoundException("Campaign not found with id: " + id));
+                .orElseThrow(() -> {
+                    log.warn("Campaign not found with id: {}", id);
+                    return new CampaignNotFoundException("Campaign not found with id: " + id);
+                });
 
         boolean isExpired = campaign.getExpiration().before(new Date());
         if (isExpired) {
