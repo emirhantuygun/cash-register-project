@@ -475,12 +475,9 @@ public class SaleServiceImpl implements SaleService {
     private List<String> getCampaignNames(Sale sale) {
         log.trace("Entering getCampaignNames method in SaleServiceImpl class");
 
-        List<String> campaignNames;
+        List<String> campaignNames = null;
         if (sale.getCampaigns() != null && !sale.getCampaigns().isEmpty()) {
             campaignNames = sale.getCampaigns().stream().map(Campaign::getName).toList();
-        } else {
-            log.warn("Campaigns not found");
-            throw new CampaignNotFoundException("Campaigns not found");
         }
 
         log.trace("Exiting getCampaignNames method in SaleServiceImpl class");
