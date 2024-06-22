@@ -47,7 +47,8 @@ public class BarcodeService {
             }
 
             String barcode = String.format("%013d", Math.abs(finalValue));
-            log.info("Generated barcode: {}", barcode);
+            log.info("Generated barcode for product: {}, {} ", productName, barcode);
+
             log.trace("Exiting generateBarcodeNumber method in BarcodeService class");
             return barcode;
 
