@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN" monitorInterval="30">
+<Configuration status="info" monitorInterval="30">
     <Properties>
         <!-- Define the log file location -->
         <Property name="LOG_FILE">logs/app.log</Property>
@@ -19,7 +19,8 @@
         </File>
 
         <!-- Rolling File Appender -->
-        <RollingFile name="RollingFile" fileName="${LOG_FILE}" filePattern="logs/app-%d{yyyy-MM-dd}.log.gz">
+        <RollingFile name="RollingFile" fileName="${LOG_FILE}"
+                     filePattern="logs/app-%d{yyyy-MM-dd}.log.gz">
             <PatternLayout pattern="${LOG_PATTERN}" />
             <Policies>
                 <TimeBasedTriggeringPolicy />
@@ -30,13 +31,13 @@
 
     <Loggers>
         <!-- Root Logger -->
-        <Root level="info">
+        <Root level="INFO">
             <AppenderRef ref="Console" />
             <AppenderRef ref="RollingFile" />
         </Root>
 
         <!-- Application Loggers -->
-        <Logger name="com.bit" level="debug" additivity="false">
+        <Logger name="com.bit" level="DEBUG" additivity="false">
             <AppenderRef ref="Console" />
             <AppenderRef ref="RollingFile" />
         </Logger>
