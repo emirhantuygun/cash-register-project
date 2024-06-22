@@ -43,7 +43,6 @@ public class AuthenticationConfig {
                 .build();
     }
 
-
     @Bean
     public UserDetailsService userDetailsService() {
         return new UserDetailsServiceImpl(userRepository);
@@ -53,7 +52,6 @@ public class AuthenticationConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
 
     @Bean
     public AuthenticationProvider authenticationProvider() {

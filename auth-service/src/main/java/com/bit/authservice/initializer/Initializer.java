@@ -16,7 +16,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class Initializer implements CommandLineRunner {
 
-
     @Value("#{'${default-roles}'.split(', ')}")
     private final List<String> DEFAULT_ROLES;
 

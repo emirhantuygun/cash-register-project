@@ -153,7 +153,10 @@ public class AuthServiceImpl implements AuthService {
         AuthUserRequest authUserRequest = updateUserMessage.getAuthUserRequest();
 
         AppUser existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> {
+                    log.error("User not found with id " + id);
+                    return new UserNotFoundException("User not found with id " + id);
+                });
         var encodedPassword = passwordEncoder.encode(authUserRequest.getPassword());
 
         existingUser.setUsername(authUserRequest.getUsername());
@@ -181,8 +184,10 @@ public class AuthServiceImpl implements AuthService {
     @RabbitListener(queues = "${rabbitmq.queue.deletePermanent}")
     public void deleteUserPermanently(Long id) {
         log.trace("Entering deleteUserPermanently method in AuthServiceImpl");
+
         userRepository.deleteRolesForUser(id);
         userRepository.deletePermanently(id);
+
         log.trace("Exiting deleteUserPermanently method in AuthServiceImpl");
     }
 
@@ -209,6 +214,7 @@ public class AuthServiceImpl implements AuthService {
         log.trace("Entering revokeAllTokensByUser method in AuthServiceImpl");
         List<Token> validTokens = tokenRepository.findAllTokensByUser(id);
         if (validTokens.isEmpty()) {
+            log.debug("No valid token found");
             return;
         }
 
@@ -239,14 +245,18 @@ public class AuthServiceImpl implements AuthService {
 
     private List<Role> getRolesAsRole(List<String> roles) throws RoleNotFoundException {
         log.trace("Entering getRolesAsRole method in AuthServiceImpl");
+
         List<Role> rolesList = new ArrayList<>();
         for (String roleName : roles) {
             Role role = roleRepository.findByRoleName(roleName)
-                    .orElseThrow(() -> new RoleNotFoundException("Role " + roleName + " not found"));
+                    .orElseThrow(() -> {
+                        log.error("Role " + roleName + " not found");
+                        return new RoleNotFoundException("Role " + roleName + " not found");
+                    });
             rolesList.add(role);
         }
+
         log.trace("Exiting getRolesAsRole method in AuthServiceImpl");
         return rolesList;
     }
-
 }

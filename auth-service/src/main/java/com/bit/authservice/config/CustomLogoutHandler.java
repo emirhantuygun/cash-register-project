@@ -22,7 +22,6 @@ import redis.clients.jedis.Jedis;
 public class CustomLogoutHandler implements LogoutHandler {
 
     private final TokenRepository tokenRepository;
-
     private Jedis jedis;
 
     @Value("${redis.host}")

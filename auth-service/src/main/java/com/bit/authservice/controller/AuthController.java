@@ -25,30 +25,22 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) throws RedisOperationException {
         log.trace("Entering login method in AuthController");
-        try {
-            var tokens = authService.login(authRequest);
-            var authResponse = new AuthResponse(tokens.get(0), tokens.get(1), AuthStatus.LOGIN_SUCCESS);
-            return ResponseEntity.status(HttpStatus.OK).body(authResponse);
-        } catch (Exception e) {
-            log.error("Error during login: {}", e.getMessage());
-            throw e;
-        } finally {
-            log.trace("Exiting login method in AuthController");
-        }
+
+        var tokens = authService.login(authRequest);
+        var authResponse = new AuthResponse(tokens.get(0), tokens.get(1), AuthStatus.LOGIN_SUCCESS);
+
+        log.trace("Exiting login method in AuthController");
+        return ResponseEntity.status(HttpStatus.OK).body(authResponse);
     }
 
     @GetMapping("/refresh-token")
     public ResponseEntity<AuthResponse> refreshToken(HttpServletRequest request) throws InvalidRefreshTokenException, RedisOperationException, UsernameExtractionException {
         log.trace("Entering refreshToken method in AuthController");
-        try {
-            var tokens = authService.refreshToken(request);
-            var authResponse = new AuthResponse(tokens.get(0), tokens.get(1), AuthStatus.TOKEN_REFRESHED_SUCCESSFULLY);
-            return ResponseEntity.status(HttpStatus.OK).body(authResponse);
-        } catch (Exception e) {
-            log.error("Error during token refresh: {}", e.getMessage());
-            throw e;
-        } finally {
-            log.trace("Exiting refreshToken method in AuthController");
-        }
+
+        var tokens = authService.refreshToken(request);
+        var authResponse = new AuthResponse(tokens.get(0), tokens.get(1), AuthStatus.TOKEN_REFRESHED_SUCCESSFULLY);
+
+        log.trace("Exiting refreshToken method in AuthController");
+        return ResponseEntity.status(HttpStatus.OK).body(authResponse);
     }
 }
