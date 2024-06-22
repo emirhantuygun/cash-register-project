@@ -80,8 +80,8 @@ public class GatewayService {
                 log.error("Sale fetch failed in sale-service!");
                 throw new SaleServiceException("Sale fetch failed in sale-service!");
             }
-
             log.debug("Received successful response for getSale: {}", responseEntity.getBody());
+
             log.trace("Exiting getSale method in GatewayService");
             return responseEntity.getBody();
 
@@ -116,8 +116,8 @@ public class GatewayService {
                 log.error("Sales fetch failed in sale-service!");
                 throw new SaleServiceException("Sale fetch failed in sale-service!");
             }
-
             log.debug("Received successful response for getAllSales: {}", responseEntity.getBody());
+
             log.trace("Exiting getAllSales method in GatewayService");
             return responseEntity.getBody();
 
@@ -151,8 +151,8 @@ public class GatewayService {
                 log.error("Deleted sales fetch failed in sale-service!");
                 throw new SaleServiceException("Deleted sale fetch failed in sale-service!");
             }
-
             log.debug("Received successful response for getDeletedSales: {}", responseEntity.getBody());
+
             log.trace("Exiting getDeletedSales method in GatewayService");
             return responseEntity.getBody();
 
@@ -205,9 +205,9 @@ public class GatewayService {
             PageWrapper<SaleResponse> pageWrapper = responseEntity.getBody();
             if (pageWrapper != null) {
                 log.debug("Received successful response for getAllSalesFilteredAndSorted: {}", pageWrapper.getContent());
+
                 log.trace("Exiting getAllSalesFilteredAndSorted method in GatewayService");
                 return new PageImpl<>(pageWrapper.getContent(), PageRequest.of(page, size), pageWrapper.getTotalElements());
-
             } else {
                 log.error("Sales fetch failed in sale-service!");
                 throw new SaleServiceException("Sales fetch failed in sale-service!");
@@ -236,6 +236,7 @@ public class GatewayService {
                 HttpServletRequest httpServletRequest = attributes.getRequest();
                 String token = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
                 headers.set(HttpHeaders.AUTHORIZATION, token);
+
             } else {
                 log.error("No request attributes found");
                 throw new HeaderProcessingException("No request attributes found");

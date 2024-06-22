@@ -116,8 +116,8 @@ public class GatewayService {
                 log.warn("Product return failed with status code: {}", responseEntity.getStatusCode());
                 throw new ProductServiceException("Product return failed in product-service!");
             }
-
             log.info("Successfully returned products for request: {}", request);
+
             log.trace("Exiting returnProducts method in GatewayService with request: {}", request);
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {

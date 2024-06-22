@@ -120,8 +120,8 @@ public class SaleServiceImpl implements SaleService {
     @Transactional
     public SaleResponse createSale(SaleRequest saleRequest) throws HeaderProcessingException {
         log.trace("Entering createSale method in SaleServiceImpl class");
-        log.debug("SaleRequest: {}", saleRequest);
 
+        log.debug("SaleRequest: {}", saleRequest);
         List<Product> products = getProducts(saleRequest.getProducts());
         Payment paymentMethod = getPaymentMethod(saleRequest.getPaymentMethod());
         BigDecimal total = getTotal(products);
@@ -180,8 +180,8 @@ public class SaleServiceImpl implements SaleService {
     @Transactional
     public SaleResponse updateSale(Long id, SaleRequest saleRequest) throws HeaderProcessingException {
         log.trace("Entering updateSale method in SaleServiceImpl class with id: {}", id);
-        log.debug("SaleRequest: {}", saleRequest);
 
+        log.debug("SaleRequest: {}", saleRequest);
         Sale existingSale = saleRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Sale doesn't exist with id: {}", id);

@@ -33,8 +33,8 @@ public class ReportController {
         log.trace("Entering getSale method in ReportController with id: {}", id);
 
         SaleResponse saleResponse = reportService.getSale(id);
-
         log.info("Returning sale response for id: {}", id);
+
         log.trace("Exiting getSale method in ReportController with id: {}", id);
         return new ResponseEntity<>(saleResponse, HttpStatus.OK);
     }
@@ -44,8 +44,8 @@ public class ReportController {
         log.trace("Entering getAllSales method in ReportController");
 
         List<SaleResponse> saleResponses = reportService.getAllSales();
-
         log.info("Returning all sales response with count: {}", saleResponses.size());
+
         log.trace("Exiting getAllSales method in ReportController");
         return new ResponseEntity<>(saleResponses, HttpStatus.OK);
     }
@@ -55,8 +55,8 @@ public class ReportController {
         log.trace("Entering getDeletedSales method in ReportController");
 
         List<SaleResponse> deletedSaleResponses = reportService.getDeletedSales();
-
         log.info("Returning deleted sales response with count: {}", deletedSaleResponses.size());
+
         log.trace("Exiting getDeletedSales method in ReportController");
         return new ResponseEntity<>(deletedSaleResponses, HttpStatus.OK);
     }
@@ -78,8 +78,8 @@ public class ReportController {
                 page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
 
         Page<SaleResponse> saleResponses = reportService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
-
         log.info("Returning filtered and sorted sales response with page size: {}", saleResponses.getSize());
+
         log.trace("Exiting getAllSalesFilteredAndSorted method in ReportController");
         return new ResponseEntity<>(saleResponses, HttpStatus.OK);
     }
@@ -94,8 +94,8 @@ public class ReportController {
         headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDispositionFormData("filename", "receipt" + id + ".pdf");
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
-
         log.info("Returning receipt PDF for id: {}", id);
+
         log.trace("Exiting getReceipt method in ReportController with id: {}", id);
         return new ResponseEntity<>(pdfBytes, headers, HttpStatus.CREATED);
     }
