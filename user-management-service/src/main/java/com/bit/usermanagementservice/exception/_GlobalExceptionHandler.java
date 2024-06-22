@@ -1,8 +1,6 @@
 package com.bit.usermanagementservice.exception;
 
-import com.bit.usermanagementservice.UserManagementServiceApplication;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,53 +10,55 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import java.util.List;
 
+@Log4j2
 @ControllerAdvice
 public class _GlobalExceptionHandler {
-
-    private static final Logger logger = LogManager.getLogger(UserManagementServiceApplication.class);
 
     @ExceptionHandler(UserNotFoundException.class)
     @ResponseBody
     public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException ex) {
-        logger.error("User not found: {}", ex.getMessage());
+        log.error("User not found: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     @ExceptionHandler(UserNotSoftDeletedException.class)
     @ResponseBody
     public ResponseEntity<String> handleUserNotSoftDeletedException(UserNotSoftDeletedException ex) {
-        logger.error("User not soft-deleted: " + ex.getMessage());
+        log.error("User not soft-deleted: " + ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
     @ExceptionHandler(AuthServiceException.class)
     public ResponseEntity<String> handleAuthException(AuthServiceException ex) {
-        logger.error("Auth service connection failed: " + ex.getMessage());
+        log.error("Auth service connection failed: " + ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
     }
 
     @ExceptionHandler(InvalidRoleException.class)
     public ResponseEntity<Object> handleInvalidRoleException(InvalidRoleException ex) {
-        logger.error("Invalid role: " + ex.getMessage());
+        log.error("Invalid role: " + ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
+        log.error("Illegal argument exception: " + ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<String> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        log.error("Data integrity violation exception: " + ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body("Data integrity violation: " + ex.getMessage());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseBody
     public ResponseEntity<String> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
-        logger.error("Failed to read HTTP message: {}", ex.getMessage());
+        log.error("Failed to read HTTP message: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid request body.");
     }
 
@@ -70,15 +70,15 @@ public class _GlobalExceptionHandler {
                 .stream()
                 .map(FieldError::getDefaultMessage)
                 .toList();
-
         String errorMessage = "Validation errors: " + errors;
-        logger.error(errorMessage);
 
+        log.error(errorMessage);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
     }
 
     @ExceptionHandler(RabbitMQException.class)
     public ResponseEntity<String> handleRabbitMQException(RabbitMQException ex) {
+        log.error("RabbitMQ exception: {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
