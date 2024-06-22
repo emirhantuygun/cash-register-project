@@ -1,11 +1,11 @@
 package com.bit.apigateway.config;
 
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,5 +73,4 @@ public class GatewayConfig {
 
                 .build();
     }
-
 }

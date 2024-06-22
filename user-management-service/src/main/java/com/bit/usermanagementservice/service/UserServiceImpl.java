@@ -40,10 +40,6 @@ public class UserServiceImpl implements UserService {
     @Value("#{'${default-roles}'.split(', ')}")
     private final List<String> DEFAULT_ROLES;
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final RabbitTemplate rabbitTemplate;
-
     @Value("${rabbitmq.exchange}")
     private String EXCHANGE;
 
@@ -62,6 +58,9 @@ public class UserServiceImpl implements UserService {
     @Value("${rabbitmq.routingKey.restore}")
     private String ROUTING_KEY_RESTORE;
 
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final RabbitTemplate rabbitTemplate;
 
     @Override
     public UserResponse getUser(Long id) {

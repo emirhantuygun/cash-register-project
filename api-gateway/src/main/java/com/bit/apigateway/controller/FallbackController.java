@@ -13,6 +13,7 @@ public class FallbackController {
     public ResponseEntity<String> fallbackAuth() {
         log.trace("Entering fallbackAuth method in FallbackController");
         try {
+            log.warn("Auth Service is temporarily unavailable. Please try again later.");
             throw new AuthServiceUnavailableException("Auth Service is temporarily unavailable. Please try again later.");
         } finally {
             log.trace("Exiting fallbackAuth method in FallbackController");
@@ -23,6 +24,7 @@ public class FallbackController {
     public ResponseEntity<String> fallbackUser() {
         log.trace("Entering fallbackUser method in FallbackController");
         try {
+            log.warn("User Service is temporarily unavailable. Please try again later.");
             throw new UserServiceUnavailableException("User Service is temporarily unavailable. Please try again later.");
         } finally {
             log.trace("Exiting fallbackUser method in FallbackController");
@@ -33,6 +35,7 @@ public class FallbackController {
     public ResponseEntity<String> fallbackProduct() {
         log.trace("Entering fallbackProduct method in FallbackController");
         try {
+            log.warn("Product Service is temporarily unavailable. Please try again later.");
             throw new ProductServiceUnavailableException("Product Service is temporarily unavailable. Please try again later.");
         } finally {
             log.trace("Exiting fallbackProduct method in FallbackController");
@@ -43,6 +46,7 @@ public class FallbackController {
     public ResponseEntity<String> fallbackSale() {
         log.trace("Entering fallbackSale method in FallbackController");
         try {
+            log.warn("Sale Service is temporarily unavailable. Please try again later.");
             throw new SaleServiceUnavailableException("Sale Service is temporarily unavailable. Please try again later.");
         } finally {
             log.trace("Exiting fallbackSale method in FallbackController");
@@ -53,6 +57,7 @@ public class FallbackController {
     public ResponseEntity<String> fallbackReport() {
         log.trace("Entering fallbackReport method in FallbackController");
         try {
+            log.warn("Report Service is temporarily unavailable. Please try again later.");
             throw new ReportServiceUnavailableException("Report Service is temporarily unavailable. Please try again later.");
         } finally {
             log.trace("Exiting fallbackReport method in FallbackController");

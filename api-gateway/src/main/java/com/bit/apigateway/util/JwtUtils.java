@@ -12,6 +12,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
+
 import javax.crypto.SecretKey;
 import java.util.List;
 
@@ -35,11 +36,8 @@ public class JwtUtils {
     @PostConstruct
     public void init() {
         log.trace("Entering init method in JwtUtils");
-        try {
-            this.jedis = new Jedis(redisHost, Integer.parseInt(redisPort));
-        } finally {
-            log.trace("Exiting init method in JwtUtils");
-        }
+        this.jedis = new Jedis(redisHost, Integer.parseInt(redisPort));
+        log.trace("Exiting init method in JwtUtils");
     }
 
     public Claims getClaimsAndValidate(String token) {
