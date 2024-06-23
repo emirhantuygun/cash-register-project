@@ -29,6 +29,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service implementation for managing products.
+ *
+ * @author Emirhan Tuygun
+ */
 @Log4j2
 @Service
 @RequiredArgsConstructor
@@ -197,6 +202,13 @@ public class ProductServiceImpl implements ProductService {
         log.trace("Exiting deleteProductPermanently method in ProductServiceImpl class");
     }
 
+    /**
+     * This method is responsible for reducing the stock quantity of a product.
+     * It is triggered by a message received from a RabbitMQ queue.
+     *
+     * @param request The request containing the product ID and the quantity to reduce.
+     * @throws ProductNotFoundException If the product with the given ID does not exist.
+     */
     @Transactional
     @RabbitListener(queues = "${rabbitmq.queue}")
     public void reduceProductStock(ProductStockReduceRequest request) {
@@ -234,6 +246,19 @@ public class ProductServiceImpl implements ProductService {
         log.trace("Exiting returnProducts method in ProductServiceImpl class");
     }
 
+    /**
+     * This method is used to generate a list of predicates for filtering and sorting products.
+     *
+     * @param name The name of the product to filter by.
+     * @param description The description of the product to filter by.
+     * @param minPrice The minimum price of the product to filter by.
+     * @param maxPrice The maximum price of the product to filter by.
+     * @param minStock The minimum stock quantity of the product to filter by.
+     * @param maxStock The maximum stock quantity of the product to filter by.
+     * @param criteriaBuilder The CriteriaBuilder instance for creating predicates.
+     * @param root The Root instance representing the root entity of the query.
+     * @return A list of predicates for filtering and sorting products.
+     */
     @ExcludeFromGeneratedCoverage
     private List<Predicate> getPredicates(String name, String description, BigDecimal minPrice, BigDecimal maxPrice,
                                           Integer minStock, Integer maxStock,
@@ -265,6 +290,12 @@ public class ProductServiceImpl implements ProductService {
         return predicates;
     }
 
+    /**
+     * This method maps a Product entity to a ProductResponse DTO.
+     *
+     * @param product The Product entity to be mapped.
+     * @return The mapped ProductResponse DTO.
+     */
     private ProductResponse mapToProductResponse(Product product) {
         log.trace("Entering mapToProductResponse method in ProductServiceImpl class");
 
