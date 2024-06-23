@@ -15,6 +15,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
+/**
+ * Controller for handling campaign related operations.
+ *
+ * @author Emirhan Tuygun
+ */
 @Log4j2
 @Controller
 @RequiredArgsConstructor
@@ -23,6 +28,12 @@ public class CampaignController {
 
     private final CampaignService campaignService;
 
+    /**
+     * Retrieves a campaign by its unique identifier.
+     *
+     * @param id The unique identifier of the campaign to retrieve.
+     * @return A ResponseEntity containing the retrieved campaign data or an error status if the campaign is not found.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<CampaignResponse> getCampaign(@PathVariable("id") Long id) {
         log.trace("Entering getCampaign method in CampaignController with id: {}", id);
@@ -34,6 +45,11 @@ public class CampaignController {
         return new ResponseEntity<>(campaignResponse, HttpStatus.OK);
     }
 
+    /**
+     * Retrieves all campaigns from the system.
+     *
+     * @return A ResponseEntity containing a list of all campaigns or an error status if any issues occur.
+     */
     @GetMapping()
     public ResponseEntity<List<CampaignResponse>> getAllCampaigns() {
         log.trace("Entering getAllCampaigns method in CampaignController");
@@ -45,6 +61,18 @@ public class CampaignController {
         return new ResponseEntity<>(campaignResponses, HttpStatus.OK);
     }
 
+    /**
+     * Retrieves all campaigns from the system, applying filtering and sorting.
+     *
+     * @param page The page number to retrieve (default is 0).
+     * @param size The number of campaigns per page (default is 10).
+     * @param sortBy The field to sort by (default is "id").
+     * @param direction The sorting direction (default is "ASC").
+     * @param name The name of the campaign to filter by (optional).
+     * @param details The details of the campaign to filter by (optional).
+     * @param isExpired The expiration status of the campaign to filter by (optional).
+     * @return A ResponseEntity containing a paginated list of filtered and sorted campaigns or an error status if any issues occur.*
+     */
     @GetMapping("/filteredAndSorted")
     public ResponseEntity<Page<CampaignResponse>> getAllCampaignsFilteredAndSorted(
             @RequestParam(defaultValue = "0") int page,
