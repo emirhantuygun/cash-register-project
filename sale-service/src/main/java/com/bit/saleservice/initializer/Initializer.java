@@ -1,8 +1,5 @@
 package com.bit.saleservice.initializer;
 
-import com.bit.saleservice.dto.CampaignProcessRequest;
-import com.bit.saleservice.dto.CampaignProcessResponse;
-import com.bit.saleservice.dto.CampaignProcessResult;
 import com.bit.saleservice.entity.Campaign;
 import com.bit.saleservice.entity.Payment;
 import com.bit.saleservice.entity.Product;
@@ -10,16 +7,21 @@ import com.bit.saleservice.entity.Sale;
 import com.bit.saleservice.repository.CampaignRepository;
 import com.bit.saleservice.repository.ProductRepository;
 import com.bit.saleservice.repository.SaleRepository;
-import com.bit.saleservice.service.CampaignProcessService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
+/**
+ * This class is responsible for initializing the database with sample data.
+ * It uses Spring's CommandLineRunner interface to run the initialization logic when the application starts.
+ *
+ * @author Emirhan Tuygun
+ */
 @Component
 @RequiredArgsConstructor
 public class Initializer implements CommandLineRunner {
@@ -27,9 +29,13 @@ public class Initializer implements CommandLineRunner {
     private final CampaignRepository campaignRepository;
     private final SaleRepository saleRepository;
     private final ProductRepository productRepository;
-    private final CampaignProcessService campaignProcessService;
 
-
+    /**
+     * This method is called by Spring when the application starts.
+     * It initializes the campaigns and sales data.
+     *
+     * @param args Command line arguments.
+     */
     @Override
     @Transactional
     public void run(String... args) {
@@ -37,6 +43,9 @@ public class Initializer implements CommandLineRunner {
         initializeSales();
     }
 
+    /**
+     * This method initializes sample campaign data.
+     */
     private void initializeCampaigns() {
 
         long hour = 3600000L;
@@ -66,6 +75,9 @@ public class Initializer implements CommandLineRunner {
         campaignRepository.save(campaign_3);
     }
 
+    /**
+     * This method initializes sample sale data.
+     */
     private void initializeSales() {
 
         for (int i = 1; i <= 20; i++) {
@@ -102,5 +114,4 @@ public class Initializer implements CommandLineRunner {
             productRepository.save(product);
         }
     }
-
 }
