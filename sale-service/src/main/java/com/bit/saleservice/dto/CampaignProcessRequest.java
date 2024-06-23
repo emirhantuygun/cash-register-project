@@ -9,6 +9,12 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * This class represents a request for processing a list of campaigns and products.
+ * It contains the necessary data to perform the campaign processing operation.
+ *
+ * @author Emirhan Tuygun
+ */
 @Data
 @Builder
 @AllArgsConstructor

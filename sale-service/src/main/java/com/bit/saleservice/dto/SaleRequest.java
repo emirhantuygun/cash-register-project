@@ -11,6 +11,12 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * Represents a request for a sale operation.
+ * Contains information about the cashier, payment method, campaigns, products, cash, and mixed payment.
+ *
+ * @author Emirhan Tuygun
+ */
 @Data
 @Builder
 @AllArgsConstructor

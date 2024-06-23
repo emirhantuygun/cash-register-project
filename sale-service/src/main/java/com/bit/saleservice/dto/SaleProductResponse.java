@@ -7,7 +7,12 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
-
+/**
+ * This class represents a response object for a sale product.
+ * It contains details about a product sold in a sale.
+ *
+ * @author Emirhan Tuygun
+ */
 @Data
 @Builder
 @NoArgsConstructor

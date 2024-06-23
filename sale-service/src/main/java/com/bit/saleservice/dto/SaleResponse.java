@@ -10,6 +10,13 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * This class represents a response for a sale.
+ * It contains various attributes related to the sale, such as cashier, date, payment method,
+ * campaign names, products, cash, change, total, total with campaign, and mixed payment.
+ *
+ * @author Emirhan Tuygun
+ */
 @Data
 @Builder
 @NoArgsConstructor

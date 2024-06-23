@@ -7,6 +7,11 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
+/**
+ * This class represents a product in a campaign. It contains the price, quantity, and total price of the product.
+ *
+ * @author Emirhan Tuygun
+ */
 @Data
 @Builder
 @AllArgsConstructor
