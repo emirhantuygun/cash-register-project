@@ -6,6 +6,13 @@ package com.bit.apigateway.exception;
  * temporary unavailability or other reasons.
  */
 public class SaleServiceUnavailableException extends RuntimeException {
+
+    /**
+     * Constructs a new SaleServiceUnavailableException with the specified detail message.
+     *
+     * @param message the detail message (which is saved for later retrieval by the
+     *                {@link #getMessage()} method)
+     */
     public SaleServiceUnavailableException(String message) {
         super(message);
     }

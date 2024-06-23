@@ -6,6 +6,12 @@ package com.bit.apigateway.exception;
  * temporary unavailability or other reasons.
  */
 public class ReportServiceUnavailableException extends RuntimeException {
+
+    /**
+     * Constructs a new ReportServiceUnavailableException with the specified detail message.
+     *
+     * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method)
+     */
     public ReportServiceUnavailableException(String message) {
         super(message);
     }
