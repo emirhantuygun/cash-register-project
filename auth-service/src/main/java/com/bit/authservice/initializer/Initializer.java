@@ -12,6 +12,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
+/**
+ * This class is responsible for initializing default roles and users in the application.
+ * It implements the CommandLineRunner interface to run the initialization logic when the application starts.
+ *
+ * @author Emirhan Tuygun
+ */
 @Component
 @RequiredArgsConstructor
 public class Initializer implements CommandLineRunner {
@@ -23,6 +29,12 @@ public class Initializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * This method is responsible for running the initialization logic when the application starts.
+     * It initializes default roles and users in the application.
+     *
+     * @param args Command line arguments. Not used in this method.
+     */
     @Override
     @Transactional
     public void run(String... args) {
@@ -34,6 +46,11 @@ public class Initializer implements CommandLineRunner {
         initializeUsers();
     }
 
+    /**
+     * This method initializes the default roles in the application.
+     * It checks if a role with the given name exists in the database.
+     * If the role does not exist, it saves a new Role entity with the given name.
+     */
     private void initializeRoles() {
         for (String roleName : DEFAULT_ROLES) {
             if (roleRepository.findByRoleName(roleName).isEmpty()) {
@@ -42,6 +59,11 @@ public class Initializer implements CommandLineRunner {
         }
     }
 
+    /**
+     * This method initializes a cashier user in the application.
+     * It retrieves the encoded password for the cashier user, fetches the cashier role from the database,
+     * and saves a new AppUser entity with the cashier user details and the cashier role.
+     */
     private void initializeCashierUser() {
         var encodedPassword = passwordEncoder.encode("cashier");
         Role cashierRole = roleRepository.findByRoleName("CASHIER").orElseThrow();
@@ -52,6 +74,11 @@ public class Initializer implements CommandLineRunner {
                 .roles(List.of(cashierRole)).build());
     }
 
+    /**
+     * This method initializes a manager user in the application.
+     * It retrieves the encoded password for the manager user, fetches the manager role from the database,
+     * and saves a new AppUser entity with the manager user details and the manager role.
+     */
     private void initializeManagerUser() {
         var encodedPassword = passwordEncoder.encode("manager");
         Role managerRole = roleRepository.findByRoleName("MANAGER").orElseThrow();
@@ -62,6 +89,11 @@ public class Initializer implements CommandLineRunner {
                 .roles(List.of(managerRole)).build());
     }
 
+    /**
+     * This method initializes an admin user in the application.
+     * It retrieves the encoded password for the admin user, fetches the admin role from the database,
+     * and saves a new AppUser entity with the admin user details and the admin role.
+     */
     private void initializeAdminUser() {
         var encodedPassword = passwordEncoder.encode("admin");
         Role adminRole = roleRepository.findByRoleName("ADMIN").orElseThrow();
@@ -72,6 +104,11 @@ public class Initializer implements CommandLineRunner {
                 .roles(List.of(adminRole)).build());
     }
 
+    /**
+     * This method initializes a super user in the application.
+     * It retrieves the encoded password for the super user, fetches the cashier, manager, and admin roles from the database,
+     * and saves a new AppUser entity with the super user details and all three roles.
+     */
     private void initializeSuperUser() {
         var encodedPassword = passwordEncoder.encode("super");
         Role cashierRole = roleRepository.findByRoleName("CASHIER").orElseThrow();
@@ -84,6 +121,9 @@ public class Initializer implements CommandLineRunner {
                 .roles(List.of(cashierRole, managerRole, adminRole)).build());
     }
 
+    /**
+     * This method initializes additional users in the application.
+     */
     private void initializeUsers() {
 
         for (int i = 5; i <= 20; i++) {
