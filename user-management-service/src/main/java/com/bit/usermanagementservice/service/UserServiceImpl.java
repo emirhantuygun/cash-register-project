@@ -31,6 +31,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Service class for managing user operations.
+ *
+ * @author Emirhan Tuygun
+ */
 @Log4j2
 @Service
 @RequiredArgsConstructor
@@ -273,6 +278,17 @@ public class UserServiceImpl implements UserService {
         log.trace("Exiting deleteUserPermanently method in UserServiceImpl");
     }
 
+    /**
+     * This method generates predicates for filtering users based on the given parameters.
+     *
+     * @param name The name of the user to filter.
+     * @param username The username of the user to filter.
+     * @param email The email of the user to filter.
+     * @param roleName The role name of the user to filter.
+     * @param root The root of the CriteriaQuery.
+     * @param criteriaBuilder The CriteriaBuilder for creating the predicates.
+     * @return A list of predicates for filtering users.
+     */
     @ExcludeFromGeneratedCoverage
     private List<Predicate> getPredicates(String name, String username, String email, String roleName, Root<AppUser> root, CriteriaBuilder criteriaBuilder) {
         log.trace("Entering getPredicates method in UserServiceImpl with parameters: name={}, username={}, email={}, roleName={}", name, username, email, roleName);
@@ -297,6 +313,13 @@ public class UserServiceImpl implements UserService {
         return predicates;
     }
 
+    /**
+     * This method checks the uniqueness of the username and email in the database.
+     * If the username or email already exists in the database, it throws an IllegalArgumentException.
+     *
+     * @param userRequest The user request object containing the username and email to check.
+     * @throws IllegalArgumentException If the username or email already exists in the database.
+     */
     @ExcludeFromGeneratedCoverage
     private void checkUniqueness(UserRequest userRequest) {
         log.trace("Entering checkUniqueness method in UserServiceImpl with userRequest: {}", userRequest);
@@ -313,6 +336,14 @@ public class UserServiceImpl implements UserService {
         log.trace("Exiting checkUniqueness method in UserServiceImpl");
     }
 
+    /**
+     * This method checks the uniqueness of the username and email in the database when updating a user.
+     * If the username or email already exists in the database for another user, it throws a DataIntegrityViolationException.
+     *
+     * @param appUser The existing user object to check against.
+     * @param userRequest The user request object containing the username and email to check.
+     * @throws DataIntegrityViolationException If the username or email already exists in the database for another user.
+     */
     @ExcludeFromGeneratedCoverage
     private void checkUniquenessForUpdate(AppUser appUser, UserRequest userRequest) {
         log.trace("Entering checkUniquenessForUpdate method in UserServiceImpl with existingUser: {} and userRequest: {}", appUser, userRequest);
@@ -330,6 +361,12 @@ public class UserServiceImpl implements UserService {
         log.trace("Exiting checkUniquenessForUpdate method in UserServiceImpl");
     }
 
+    /**
+     * Validates the roles provided in the user request.
+     *
+     * @param roles The list of roles to validate.
+     * @throws InvalidRoleException If any of the roles in the list are not found in the default roles.
+     */
     @ExcludeFromGeneratedCoverage
     protected void validateRoles(List<String> roles) {
         log.trace("Entering validateRoles method in UserServiceImpl with roleNames");
@@ -344,6 +381,12 @@ public class UserServiceImpl implements UserService {
         log.trace("Exiting validateRoles method in UserServiceImpl");
     }
 
+    /**
+     * Maps the given user request to an authentication user request.
+     *
+     * @param userRequest The user request object to map.
+     * @return The mapped authentication user request object.
+     */
     private AuthUserRequest mapToAuthUserRequest(UserRequest userRequest) {
         log.trace("Entering mapToAuthUserRequest method in UserServiceImpl with userRequest: {}", userRequest);
 
@@ -354,6 +397,12 @@ public class UserServiceImpl implements UserService {
                 userRequest.getRoles());
     }
 
+    /**
+     * Maps the given user object to a user response object.
+     *
+     * @param user The user object to map.
+     * @return The mapped user response object.
+     */
     private UserResponse mapToUserResponse(AppUser user) {
         log.trace("Entering mapToUserResponse method in UserServiceImpl with user: {}", user);
 
@@ -368,6 +417,12 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+    /**
+     * Maps the given user object to a user response object without including the password.
+     *
+     * @param user The user object to map.
+     * @return The mapped user response object without the password.
+     */
     private UserResponse mapToUserResponseWithoutPassword(AppUser user) {
         log.trace("Entering mapToUserResponseWithoutPassword method in UserServiceImpl with user: {}", user);
 
@@ -381,6 +436,12 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+    /**
+     * This method maps the given list of Role objects to a list of role names.
+     *
+     * @param roles The list of Role objects to map.
+     * @return A list of role names extracted from the given Role objects.
+     */
     private List<String> getRolesAsString(List<Role> roles) {
         log.trace("Entering getRolesAsString method in UserServiceImpl with roleNames");
 
@@ -390,6 +451,14 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * This method maps the given list of role names to a list of Role objects.
+     * It retrieves each Role object from the database based on the role name.
+     * If a role name is not found in the database, it throws a RuntimeException.
+     *
+     * @param roles The list of role names to map.
+     * @return A list of Role objects extracted from the database based on the given role names.
+     */
     private List<Role> getRolesAsRole(List<String> roles) {
         log.trace("Entering getRolesAsRole method in UserServiceImpl with roleNames");
 
