@@ -6,6 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents an authentication request with username and password.
+ * This class is used to encapsulate the necessary data for authentication.
+ *
+ * @author Emirhan Tuygun
+ */
 @Data
 @Builder
 @NoArgsConstructor

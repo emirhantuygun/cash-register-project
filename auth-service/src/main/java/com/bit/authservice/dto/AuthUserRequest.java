@@ -7,6 +7,12 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * This class represents a request for authentication.
+ * It contains the username, password, and roles of the user.
+ *
+ * @author Emirhan Tuygun
+ */
 @Data
 @Builder
 @NoArgsConstructor
