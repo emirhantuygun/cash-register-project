@@ -9,6 +9,12 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a Role entity in the application.
+ * This entity is mapped to the 'roles' table in the database.
+ *
+ * @author Emirhan Tuygun
+ */
 @Table(name = "roles")
 @Entity
 @Data

@@ -6,6 +6,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represents a token entity in the application.
+ * This entity is mapped to the "tokens" table in the database.
+ *
+ * @author Emirhan Tuygun
+ */
 @Table(name = "tokens")
 @Entity
 @Data
