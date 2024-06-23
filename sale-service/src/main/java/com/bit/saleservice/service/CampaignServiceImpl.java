@@ -22,6 +22,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * This class implements the CampaignService interface and provides methods for managing campaigns.
+ *
+ * @author Emirhan Tuygun
+ */
 @Log4j2
 @Service
 @RequiredArgsConstructor
@@ -72,6 +77,17 @@ public class CampaignServiceImpl implements CampaignService{
         return campaignsPage.map(this::mapToCampaignResponse);
     }
 
+    /**
+     * This method generates a list of predicates based on the provided parameters.
+     * It is used to filter and sort campaigns in the getAllCampaignsFilteredAndSorted method.
+     *
+     * @param name The name of the campaign to filter by.
+     * @param details The details of the campaign to filter by.
+     * @param isExpired A boolean indicating whether to filter expired or not expired campaigns.
+     * @param root The root of the campaign entity.
+     * @param criteriaBuilder The criteria builder for creating predicates.
+     * @return A list of predicates based on the provided parameters.
+     */
     @ExcludeFromGeneratedCoverage
     private List<Predicate> getPredicates(String name, String details, Boolean isExpired, Root<Campaign> root, CriteriaBuilder criteriaBuilder){
         log.trace("Entering getPredicates method in CampaignServiceImpl with name: {}, details: {}, isExpired: {}", name, details, isExpired);
@@ -98,6 +114,13 @@ public class CampaignServiceImpl implements CampaignService{
         return predicates;
     }
 
+    /**
+     * This method maps a Campaign entity to a CampaignResponse DTO.
+     * It extracts the necessary information from the Campaign entity and populates a CampaignResponse object.
+     *
+     * @param campaign The Campaign entity to be mapped.
+     * @return A CampaignResponse object containing the mapped data.
+     */
     private CampaignResponse mapToCampaignResponse(Campaign campaign) {
         log.trace("Entering mapToCampaignResponse method in CampaignServiceImpl with campaign: {}", campaign);
 

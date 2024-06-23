@@ -17,6 +17,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Optional;
 
+/**
+ * Service class for processing campaigns.
+ *
+ * @author Emirhan Tuygun
+ */
 @Log4j2
 @Service
 @RequiredArgsConstructor
@@ -24,6 +29,12 @@ public class CampaignProcessService {
 
     private final CampaignRepository campaignRepository;
 
+    /**
+     * Retrieves a list of campaigns based on their IDs.
+     *
+     * @param ids The IDs of the campaigns to retrieve.
+     * @return A list of campaigns.
+     */
     protected List<Campaign> getCampaigns(List<Long> ids) {
         log.trace("Entering getCampaigns method in CampaignProcessService with ids: {}", ids);
 
@@ -44,6 +55,15 @@ public class CampaignProcessService {
         return campaigns;
     }
 
+    /**
+     * Processes the campaigns based on the given request.
+     *
+     * @param campaignProcessRequest The request containing the campaign IDs and products.
+     * @return The response after processing the campaigns.
+     * @throws DuplicateCampaignException If the same campaign is used more than once.
+     * @throws CampaignNotFoundException If a campaign with the given ID is not found.
+     * @throws CampaignNotApplicableException If a campaign is not applicable due to conditions like total amount, product quantity, etc.
+     */
     protected CampaignProcessResponse processCampaigns(CampaignProcessRequest campaignProcessRequest) {
         log.trace("Entering processCampaigns method in CampaignProcessService with campaignProcessRequest: {}", campaignProcessRequest);
 
@@ -86,7 +106,13 @@ public class CampaignProcessService {
         return campaignProcessResponse;
     }
 
-    // Spend $200, Save $50
+    /**
+     * Campaign 1: Spend $200, Save $50
+     * Applies campaign 1 to the given {@link CampaignProcessResponse}.
+     *
+     * @param campaignProcessResponse The response containing the products and total amount.
+     * @throws CampaignNotApplicableException If the total amount is less than the required limit.
+     */
     protected void campaign_1(CampaignProcessResponse campaignProcessResponse) {
         log.trace("Entering campaign_1 method in CampaignProcessService with campaignProcessResponse: {}", campaignProcessResponse);
 
@@ -105,7 +131,13 @@ public class CampaignProcessService {
         log.trace("Exiting campaign_1 method in CampaignProcessService with campaignProcessResponse: {}", campaignProcessResponse);
     }
 
-    // Buy 2, Get 1 Free
+    /**
+     * Campaign 2: Buy 2, Get 1 Free campaign.
+     * Applies campaign 2 to the given {@link CampaignProcessResponse}.
+     *
+     * @param campaignProcessResponse The response containing the products and total amount.
+     * @throws CampaignNotApplicableException If the required conditions for the campaign are not met.
+     */
     protected void campaign_2(CampaignProcessResponse campaignProcessResponse) {
         log.trace("Entering campaign_2 method in CampaignProcessService with campaignProcessResponse: {}", campaignProcessResponse);
 
@@ -127,13 +159,19 @@ public class CampaignProcessService {
             }
         }
         if (!isApplicable) {
-            log.warn("Campaign 2 not applicable. No product with quantity greter than or equal to 3 found in campaignProcessResponse: {}", campaignProcessResponse);
+            log.warn("Campaign 2 not applicable. No product with quantity greater than or equal to 3 found in campaignProcessResponse: {}", campaignProcessResponse);
             throw new CampaignNotApplicableException("Campaign cannot be applied. Requires a minimum purchase of the same 3 products to be applied.");
         }
         log.trace("Exiting campaign_2 method in CampaignProcessService with campaignProcessResponse: {}", campaignProcessResponse);
     }
 
-    // 20% Off Your Entire Purchase
+    /**
+     * Campaign 3: 20% Off Your Entire Purchase
+     * Applies campaign 3 to the given {@link CampaignProcessResponse}.
+     *
+     * @param campaignProcessResponse The response containing the products and total amount.
+     * @throws CampaignNotApplicableException If the required conditions for the campaign are not met.
+     */
     protected void campaign_3(CampaignProcessResponse campaignProcessResponse) {
         log.trace("Entering campaign_3 method in CampaignProcessService with campaignProcessResponse: {}", campaignProcessResponse);
 
@@ -144,6 +182,13 @@ public class CampaignProcessService {
         log.trace("Exiting campaign_3 method in CampaignProcessService with campaignProcessResponse: {}", campaignProcessResponse);
     }
 
+    /**
+     * Checks if the campaign with the given ID is valid and not expired.
+     *
+     * @param id The ID of the campaign to check.
+     * @throws CampaignNotFoundException If a campaign with the given ID is not found.
+     * @throws CampaignNotApplicableException If the campaign is expired.
+     */
     protected void isCampaignValidAndNotExpired(Long id) {
         log.trace("Entering isCampaignValidAndNotExpired method in CampaignProcessService with id: {}", id);
 

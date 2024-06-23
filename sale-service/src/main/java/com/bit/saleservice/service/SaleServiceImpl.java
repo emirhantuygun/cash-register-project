@@ -34,6 +34,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Service class for managing sales.
+ *
+ * @author Emirhan Tuygun
+ */
 @Log4j2
 @Service
 @RequiredArgsConstructor
@@ -331,6 +336,19 @@ public class SaleServiceImpl implements SaleService {
         log.trace("Exiting deleteSalePermanently method in SaleServiceImpl class");
     }
 
+    /**
+     * This method generates a list of predicates for filtering sales based on the given parameters.
+     *
+     * @param cashier The cashier name to filter sales by.
+     * @param paymentMethod The payment method to filter sales by.
+     * @param minTotal The minimum total amount to filter sales by.
+     * @param maxTotal The maximum total amount to filter sales by.
+     * @param startDate The start date to filter sales by.
+     * @param endDate The end date to filter sales by.
+     * @param root The root of the CriteriaQuery.
+     * @param criteriaBuilder The CriteriaBuilder for creating predicates.
+     * @return A list of predicates for filtering sales.
+     */
     @ExcludeFromGeneratedCoverage
     private List<Predicate> getPredicates(String cashier, String paymentMethod,
                                           BigDecimal minTotal, BigDecimal maxTotal,
@@ -387,6 +405,21 @@ public class SaleServiceImpl implements SaleService {
         return predicates;
     }
 
+    /**
+     * This method retrieves a list of products for a sale based on the given product requests.
+     * It calls the Product service to fetch the details of each product and checks if there is enough stock.
+     * If there is enough stock, it creates a Product object and adds it to the list.
+     * If there is not enough stock, it throws a ProductOutOfStockException.
+     * If the Product service returns a 404 Not Found status, it throws a ProductNotFoundException.
+     * If any other error occurs during the process, it throws a ProductServiceException.
+     *
+     * @param saleProductRequests The list of product requests for the sale.
+     * @return A list of Product objects representing the products for the sale.
+     * @throws HeaderProcessingException If there is an error processing the header.
+     * @throws ProductOutOfStockException If there is not enough stock for a product.
+     * @throws ProductNotFoundException If the Product service returns a 404 Not Found status.
+     * @throws ProductServiceException If any other error occurs during the process.
+     */
     @ExcludeFromGeneratedCoverage
     private List<Product> getProducts(List<SaleProductRequest> saleProductRequests) throws HeaderProcessingException {
         log.trace("Entering getProducts method in SaleServiceImpl class");
@@ -430,6 +463,12 @@ public class SaleServiceImpl implements SaleService {
         return products;
     }
 
+    /**
+     * This method calculates the total price of all products in the given list.
+     *
+     * @param products The list of products for which the total price needs to be calculated.
+     * @return The total price of all products in the given list.
+     */
     private BigDecimal getTotal(List<Product> products) {
         log.trace("Entering getTotal method in SaleServiceImpl class");
         log.trace("Exiting getTotal method in SaleServiceImpl class");
@@ -438,6 +477,16 @@ public class SaleServiceImpl implements SaleService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    /**
+     * This method processes the campaigns for a sale. It calls the Campaign service to apply the campaigns
+     * to the products and calculates the total price after applying the campaigns.
+     *
+     * @param campaignIds The list of campaign IDs to apply to the products.
+     * @param products The list of products for which the campaigns need to be applied.
+     * @param total The total price of the products before applying the campaigns.
+     * @return A CampaignProcessResult object containing the list of applied campaigns, the updated list of products,
+     * and the total price after applying the campaigns.
+     */
     protected CampaignProcessResult processCampaigns(List<Long> campaignIds, List<Product> products, BigDecimal total) {
         log.trace("Entering processCampaigns method in SaleServiceImpl class");
 
@@ -455,6 +504,13 @@ public class SaleServiceImpl implements SaleService {
         return new CampaignProcessResult(campaigns, products, totalWithCampaign);
     }
 
+    /**
+     * This method maps a list of Product objects to a list of SaleProductResponse objects.
+     * Each SaleProductResponse object represents a product in a sale, and contains the necessary information.
+     *
+     * @param products The list of Product objects to be mapped.
+     * @return A list of SaleProductResponse objects representing the products in a sale.
+     */
     private List<SaleProductResponse> mapToProductResponse(List<Product> products) {
         log.trace("Entering mapToProductResponse method in SaleServiceImpl class");
         log.trace("Exiting mapToProductResponse method in SaleServiceImpl class");
@@ -472,6 +528,13 @@ public class SaleServiceImpl implements SaleService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * This method retrieves the names of the campaigns applied to a sale.
+     *
+     * @param sale The sale object for which the campaign names need to be retrieved.
+     * @return A list of strings representing the names of the campaigns applied to the sale.
+     *         If no campaigns are applied, it returns null.
+     */
     private List<String> getCampaignNames(Sale sale) {
         log.trace("Entering getCampaignNames method in SaleServiceImpl class");
 
@@ -484,6 +547,19 @@ public class SaleServiceImpl implements SaleService {
         return campaignNames;
     }
 
+    /**
+     * This method processes the cash payment for a sale.
+     * It checks if the cash amount is provided and if it is enough to cover the total amount of the sale.
+     * If the cash amount is not provided, it throws a CashNotProvidedException.
+     * If the cash amount is not enough, it throws an InsufficientCashException.
+     * If the cash amount is sufficient, it calculates and returns the change amount.
+     *
+     * @param cash The cash amount provided by the customer.
+     * @param totalWithCampaign The total amount of the sale after applying the campaigns.
+     * @return The change amount after processing the cash payment.
+     * @throws CashNotProvidedException If the cash amount is not provided.
+     * @throws InsufficientCashException If the cash amount is not enough to cover the sale amount.
+     */
     protected BigDecimal processCashPayment(BigDecimal cash, BigDecimal totalWithCampaign) {
         log.trace("Entering processCashPayment method in SaleServiceImpl class");
 
@@ -501,6 +577,21 @@ public class SaleServiceImpl implements SaleService {
         return cash.subtract(totalWithCampaign);
     }
 
+    /**
+     * This method processes the mixed payment for a sale.
+     * It checks if the mixed payment object is provided and if the cash and credit card amounts are valid.
+     * If the mixed payment object is not provided or if the cash or credit card amounts are not valid, it throws an exception.
+     * It calculates the total amount paid by the customer and checks if it is enough to cover the sale amount.
+     * If the total amount paid is not enough, it throws an exception.
+     * Finally, it calculates and returns the change amount to be given to the customer.
+     *
+     * @param mixedPayment The mixed payment object provided by the customer.
+     * @param totalWithCampaign The total amount of the sale after applying the campaigns.
+     * @return The change amount to be given to the customer after processing the mixed payment.
+     * @throws MixedPaymentNotFoundException If the mixed payment object is not provided.
+     * @throws InvalidMixedPaymentException If the cash or credit card amounts in the mixed payment object are not valid.
+     * @throws InsufficientMixedPaymentException If the total amount paid by the customer is not enough to cover the sale amount.
+     */
     protected BigDecimal processMixedPayment(MixedPayment mixedPayment, BigDecimal totalWithCampaign) {
         log.trace("Entering processMixedPayment method in SaleServiceImpl class");
 
@@ -529,6 +620,15 @@ public class SaleServiceImpl implements SaleService {
         return cashAmount.subtract(amountToBePaidByCash);
     }
 
+    /**
+     * This method retrieves the payment method for a sale.
+     * It converts the given payment method string to an enum value and returns it.
+     * If the given payment method string is not a valid enum value, it throws an InvalidPaymentMethodException.
+     *
+     * @param paymentMethod The payment method string to be converted to an enum value.
+     * @return The payment method enum value corresponding to the given payment method string.
+     * @throws InvalidPaymentMethodException If the given payment method string is not a valid enum value.
+     */
     @ExcludeFromGeneratedCoverage
     private Payment getPaymentMethod(String paymentMethod) {
         log.trace("Entering getPaymentMethod method in SaleServiceImpl class");
@@ -545,6 +645,13 @@ public class SaleServiceImpl implements SaleService {
         }
     }
 
+    /**
+     * This method reduces the stock quantity of the products in the given list.
+     * It sends a message to RabbitMQ to reduce the stock for each product.
+     * If an exception occurs during the process, it logs the error and throws a custom exception.
+     *
+     * @param products The list of products for which the stock needs to be reduced.
+     */
     protected void reduceStocks(List<Product> products) {
         log.trace("Entering reduceStocks method in SaleServiceImpl class with products: {}", products);
 
@@ -564,6 +671,13 @@ public class SaleServiceImpl implements SaleService {
         log.trace("Exiting reduceStocks method in SaleServiceImpl class");
     }
 
+    /**
+     * This method returns the products to the inventory after a sale.
+     * It sends a request to the Product service to return the products.
+     * If any exception occurs during the process, it logs the error and throws a RuntimeException.
+     *
+     * @param products The list of products to be returned to the inventory.
+     */
     private void returnProducts(List<Product> products) {
         log.trace("Entering returnProducts method in SaleServiceImpl class");
 
@@ -581,6 +695,15 @@ public class SaleServiceImpl implements SaleService {
         log.trace("Exiting returnProducts method in SaleServiceImpl class");
     }
 
+    /**
+     * This method maps a Sale object to a SaleResponse object.
+     * It extracts the necessary information from the Sale object and creates a SaleResponse object.
+     * It includes the sale ID, cashier, date, payment method, names of applied campaigns, list of products,
+     * cash amount, change amount, total amount, total amount after applying campaigns, and mixed payment details.
+     *
+     * @param sale The Sale object to be mapped to a SaleResponse object.
+     * @return A SaleResponse object representing the sale.
+     */
     private SaleResponse mapToSaleResponse(Sale sale) {
         log.trace("Entering mapToSaleResponse method in SaleServiceImpl class");
 
@@ -601,5 +724,4 @@ public class SaleServiceImpl implements SaleService {
                 .totalWithCampaign(sale.getTotalWithCampaign())
                 .mixedPayment(sale.getMixedPayment()).build();
     }
-
 }

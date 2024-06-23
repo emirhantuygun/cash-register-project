@@ -21,6 +21,12 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+/**
+ * This class is responsible for handling communication with the product-service via the gateway.
+ * It provides methods for fetching product details and returning products.
+ *
+ * @author Emirhan Tuygun
+ */
 @Log4j2
 @Service
 @RequiredArgsConstructor
@@ -41,6 +47,10 @@ public class GatewayService {
     private String GATEWAY_URL;
     private final RestTemplate restTemplate;
 
+    /**
+     * This method initializes the GATEWAY_URL by combining the GATEWAY_HOST and GATEWAY_PORT.
+     * It logs the trace, info, and trace messages at the respective levels.
+     */
     @PostConstruct
     protected void initGatewayUrl() {
         log.trace("Entering initGatewayUrl method in GatewayService");
@@ -51,6 +61,17 @@ public class GatewayService {
         log.trace("Exiting initGatewayUrl method in GatewayService");
     }
 
+    /**
+     * This method is responsible for fetching a product from the product-service via the gateway.
+     * It constructs the URL using the GATEWAY_URL and GET_PRODUCT_ENDPOINT, sends a GET request with the product ID,
+     * and processes the response.
+     *
+     * @param id The ID of the product to fetch.
+     * @return The fetched product details.
+     * @throws HeaderProcessingException If there is an error processing the HTTP headers.
+     * @throws ProductNotFoundException If the product with the given ID is not found.
+     * @throws ProductServiceException If there is an error fetching the product from the product-service.
+     */
     public ProductResponse getProduct(Long id) throws HeaderProcessingException {
         log.trace("Entering getProduct method in GatewayService with id: {}", id);
 
@@ -95,6 +116,15 @@ public class GatewayService {
         }
     }
 
+    /**
+     * This method is responsible for returning products to the product-service via the gateway.
+     * It constructs the URL using the GATEWAY_URL and RETURN_PRODUCTS_ENDPOINT, sends a POST request with the product stock return request,
+     * and processes the response.
+     *
+     * @param request The product stock return request containing the details of the products to be returned.
+     * @throws HeaderProcessingException If there is an error processing the HTTP headers.
+     * @throws ProductReturnException If there is an error returning the products to the product-service.
+     */
     protected void returnProducts(ProductStockReturnRequest request) throws HeaderProcessingException, ProductReturnException {
         log.trace("Entering returnProducts method in GatewayService with request: {}", request);
 
@@ -136,6 +166,13 @@ public class GatewayService {
         }
     }
 
+    /**
+     * This method retrieves HTTP headers for the REST API calls.
+     * It retrieves the authorization token from the current HTTP request and sets it in the headers.
+     *
+     * @return The HTTP headers with the authorization token set.
+     * @throws HeaderProcessingException If there is an error processing the HTTP headers.
+     */
     @ExcludeFromGeneratedCoverage
     protected HttpHeaders getHttpHeaders() throws HeaderProcessingException {
         log.trace("Entering getHttpHeaders method in GatewayService");
