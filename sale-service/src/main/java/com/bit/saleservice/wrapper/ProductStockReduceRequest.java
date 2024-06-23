@@ -5,6 +5,12 @@ import lombok.Data;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
+/**
+ * This class represents a request to reduce the stock of a product.
+ * It contains the product ID and the requested quantity to reduce.
+ *
+ * @author Emirhan Tuygun
+ */
 @Data
 @AllArgsConstructor
 public class ProductStockReduceRequest {
