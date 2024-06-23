@@ -6,6 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.List;
 
+/**
+ * This class represents a UserResponse object. It is used to send user data in a response format.
+ *
+ * @author Emirhan Tuygun
+ */
 @Data
 @Builder
 @NoArgsConstructor
