@@ -16,13 +16,18 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import redis.clients.jedis.Jedis;
 
+/**
+ * CustomLogoutHandler is a class that implements LogoutHandler interface.
+ * It is responsible for handling the logout process in the application.
+ * It retrieves the token from the Authorization header, validates it,
+ * updates the token status in the database and Redis, and logs the user out.
+ *
+ * @author Emirhan Tuygun
+ */
 @Log4j2
 @Configuration
 @RequiredArgsConstructor
 public class CustomLogoutHandler implements LogoutHandler {
-
-    private final TokenRepository tokenRepository;
-    private Jedis jedis;
 
     @Value("${redis.host}")
     private String redisHost;
@@ -30,6 +35,13 @@ public class CustomLogoutHandler implements LogoutHandler {
     @Value("${redis.port}")
     private String redisPort;
 
+    private final TokenRepository tokenRepository;
+    private Jedis jedis;
+
+    /**
+     * This method initializes the Jedis instance for Redis operations.
+     * It is called after the bean is created and all the properties are set.
+     */
     @PostConstruct
     protected void init() {
         log.trace("Entering init method in CustomLogoutHandler");
@@ -37,6 +49,18 @@ public class CustomLogoutHandler implements LogoutHandler {
         log.trace("Exiting init method in CustomLogoutHandler");
     }
 
+    /**
+     * This method handles the logout process in the application.
+     * It retrieves the token from the Authorization header, validates it,
+     * updates the token status in the database and Redis, and logs the user out.
+     *
+     * @param request The HttpServletRequest object representing the incoming request.
+     * @param response The HttpServletResponse object representing the outgoing response.
+     * @param authentication The Authentication object representing the authenticated user.
+     * @throws MissingAuthorizationHeaderException If the Authorization header is missing.
+     * @throws InvalidAuthorizationHeaderException If the Authorization header format is invalid.
+     * @throws TokenNotFoundException If the token is not found in the database.
+     */
     @Override
     public void logout(HttpServletRequest request,
                        HttpServletResponse response,
