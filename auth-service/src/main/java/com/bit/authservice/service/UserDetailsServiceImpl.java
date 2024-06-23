@@ -15,12 +15,25 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * This class implements the UserDetailsService interface provided by Spring Security.
+ * It is responsible for loading user-specific data from the database and providing it to the Spring Security framework.
+ * @author Emirhan Tuygun
+ */
 @Log4j2
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
 
+    /**
+     * This method is responsible for loading user-specific data from the database based on the provided username.
+     * It is called by the Spring Security framework during the authentication process.
+     *
+     * @param username The username of the user to be loaded.
+     * @return A UserDetails object containing the loaded user's information and authorities.
+     * @throws UsernameNotFoundException If the user with the given username is not found in the database.
+     */
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

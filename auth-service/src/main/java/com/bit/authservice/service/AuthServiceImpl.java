@@ -32,6 +32,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of the AuthService interface.
+ * Manages user authentication, token generation, and user data manipulation.
+ *
+ * @author Emirhan Tuygun
+ */
 @Log4j2
 @Service
 @RequiredArgsConstructor
@@ -52,6 +58,11 @@ public class AuthServiceImpl implements AuthService {
     private final UserDetailsService userDetailsService;
     private Jedis jedis;
 
+    /**
+     * Initializes the Jedis instance for Redis operations.
+     * This method is called after the bean is created and all properties are set.
+     * It sets up a shutdown hook to flush all keys from Redis and close the connection when the JVM exits.
+     */
     @PostConstruct
     public void init() {
         log.trace("Entering init method in AuthServiceImpl");
@@ -131,6 +142,13 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    /**
+     * Listens to the RabbitMQ queue for creating new user requests.
+     * When a new user request is received, it creates a new user in the database.
+     *
+     * @param authUserRequest The request containing the username, password, and roles for the new user.
+     * @throws RoleNotFoundException If any of the roles specified in the request are not found in the database.
+     */
     @RabbitListener(queues = "${rabbitmq.queue.create}")
     public void createUser(AuthUserRequest authUserRequest) throws RoleNotFoundException {
         log.trace("Entering createUser method in AuthServiceImpl");
@@ -146,6 +164,13 @@ public class AuthServiceImpl implements AuthService {
         log.trace("Exiting createUser method in AuthServiceImpl");
     }
 
+    /**
+     * Listens to the RabbitMQ queue for updating user requests.
+     * When an update user request is received, it updates the user in the database.
+     *
+     * @param updateUserMessage The message containing the user ID and the updated user request.
+     * @throws RoleNotFoundException If any of the roles specified in the request are not found in the database.
+     */
     @RabbitListener(queues = "${rabbitmq.queue.update}")
     public void updateUser(UpdateUserMessage updateUserMessage) throws RoleNotFoundException {
         log.trace("Entering updateUser method in AuthServiceImpl");
@@ -167,6 +192,12 @@ public class AuthServiceImpl implements AuthService {
         log.trace("Exiting updateUser method in AuthServiceImpl");
     }
 
+    /**
+     * Listens to the RabbitMQ queue for restoring user requests.
+     * When a restore user request is received, it restores the user in the database.
+     *
+     * @param id The unique identifier of the user to be restored.
+     */
     @RabbitListener(queues = "${rabbitmq.queue.restore}")
     public void restoreUser(Long id) {
         log.trace("Entering restoreUser method in AuthServiceImpl");
@@ -174,6 +205,12 @@ public class AuthServiceImpl implements AuthService {
         log.trace("Exiting restoreUser method in AuthServiceImpl");
     }
 
+    /**
+     * Listens to the RabbitMQ queue for deleting user requests.
+     * When a delete user request is received, it deletes the user in the database.
+     *
+     * @param id The unique identifier of the user to be deleted.
+     */
     @RabbitListener(queues = "${rabbitmq.queue.delete}")
     public void deleteUser(Long id) {
         log.trace("Entering deleteUser method in AuthServiceImpl");
@@ -181,6 +218,12 @@ public class AuthServiceImpl implements AuthService {
         log.trace("Exiting deleteUser method in AuthServiceImpl");
     }
 
+    /**
+     * Listens to the RabbitMQ queue for permanently deleting user requests.
+     * When a delete user permanently request is received, it deletes the user and their associated roles in the database.
+     *
+     * @param id The unique identifier of the user to be permanently deleted.
+     */
     @RabbitListener(queues = "${rabbitmq.queue.deletePermanent}")
     public void deleteUserPermanently(Long id) {
         log.trace("Entering deleteUserPermanently method in AuthServiceImpl");
@@ -191,6 +234,13 @@ public class AuthServiceImpl implements AuthService {
         log.trace("Exiting deleteUserPermanently method in AuthServiceImpl");
     }
 
+    /**
+     * Saves the user's JWT token in the database and Redis.
+     *
+     * @param user The user associated with the token.
+     * @param jwtToken The JWT token to be saved.
+     * @throws RedisOperationException If there is an error while saving the token status in Redis.
+     */
     protected void saveUserToken(AppUser user, String jwtToken) throws RedisOperationException {
         log.trace("Entering saveUserToken method in AuthServiceImpl");
         var token = Token.builder()
@@ -210,6 +260,14 @@ public class AuthServiceImpl implements AuthService {
         log.trace("Exiting saveUserToken method in AuthServiceImpl");
     }
 
+    /**
+     * Revokes all tokens associated with a specific user.
+     * This method sets the 'loggedOut' flag to true for all valid tokens of the user in the database.
+     * It also updates the corresponding Redis key to reflect the logged out status.
+     *
+     * @param id The unique identifier of the user whose tokens need to be revoked.
+     * @throws RedisOperationException If there is an error while saving the token status in Redis.
+     */
     private void revokeAllTokensByUser(long id) throws RedisOperationException {
         log.trace("Entering revokeAllTokensByUser method in AuthServiceImpl");
         List<Token> validTokens = tokenRepository.findAllTokensByUser(id);
@@ -232,6 +290,12 @@ public class AuthServiceImpl implements AuthService {
         log.trace("Exiting revokeAllTokensByUser method in AuthServiceImpl");
     }
 
+    /**
+     * Converts a list of Role objects to a list of role names.
+     *
+     * @param roles The list of Role objects to be converted.
+     * @return A list of role names extracted from the input list of Role objects.
+     */
     private List<String> getRolesAsString(List<Role> roles) {
         log.trace("Entering getRolesAsString method in AuthServiceImpl");
         try {
@@ -243,6 +307,13 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    /**
+     * Converts a list of role names to a list of Role objects.
+     *
+     * @param roles The list of role names to be converted.
+     * @return A list of Role objects corresponding to the input list of role names.
+     * @throws RoleNotFoundException If any of the roles specified in the input list are not found in the database.
+     */
     private List<Role> getRolesAsRole(List<String> roles) throws RoleNotFoundException {
         log.trace("Entering getRolesAsRole method in AuthServiceImpl");
 
