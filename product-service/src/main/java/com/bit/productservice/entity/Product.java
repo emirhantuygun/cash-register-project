@@ -6,6 +6,11 @@ import lombok.*;
 import org.hibernate.annotations.*;
 import java.math.BigDecimal;
 
+/**
+ * Represents a product entity in the system.
+ *
+ * @author Emirhan Tuygun
+ */
 @Entity
 @Table(name = "products")
 @SoftDelete

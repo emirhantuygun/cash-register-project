@@ -14,6 +14,7 @@ import java.math.BigDecimal;
  * This class represents a request for creating or updating a product.
  * It contains fields for product name, description, stock quantity, and price.
  * The class is annotated with Lombok annotations to generate boilerplate code.
+ *
  * @author Emirhan Tuygun
  */
 @Data
