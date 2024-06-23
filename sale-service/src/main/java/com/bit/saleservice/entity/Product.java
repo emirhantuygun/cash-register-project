@@ -8,6 +8,11 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SoftDelete;
 import java.math.BigDecimal;
 
+/**
+ * Represents a product entity in the sale service.
+ *
+ * @author Emirhan Tuygun
+ */
 @Entity
 @Table(name = "products")
 @SoftDelete

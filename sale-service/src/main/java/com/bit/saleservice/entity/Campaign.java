@@ -11,6 +11,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Represents a campaign entity in the sale service.
+ *
+ * @author Emirhan Tuygun
+ */
 @Table(name = "campaigns")
 @Entity
 @SoftDelete

@@ -11,6 +11,13 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Represents a Sale entity in the SaleService application.
+ * This entity is mapped to the 'sales' table in the database.
+ * It uses Hibernate's SoftDelete annotation to handle deleted records.
+ *
+ * @author Emirhan Tuygun
+ */
 @Entity
 @Table(name = "sales")
 @SoftDelete

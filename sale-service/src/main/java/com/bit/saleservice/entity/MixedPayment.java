@@ -8,6 +8,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
+/**
+ * Represents a mixed payment entity that consists of cash and credit card amounts.
+ * This class is designed to be used as an embedded entity in JPA-based applications.
+ *
+ * @author Emirhan Tuygun
+ */
 @Embeddable
 @Data
 @AllArgsConstructor
