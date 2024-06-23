@@ -20,6 +20,7 @@ public interface AuthService {
    *
    * @param authRequest The authentication request containing the username and password.
    * @return A list containing the access token and refresh token.
+   * @throws RedisOperationException If there is an error while interacting with Redis.
    */
   List<String> login(AuthRequest authRequest) throws RedisOperationException;
 
@@ -28,7 +29,9 @@ public interface AuthService {
    *
    * @param request The HTTP request containing the refresh token in the Authorization header.
    * @return A list containing the new access token and refresh token.
+   * @throws InvalidRefreshTokenException If the refresh token is invalid or expired.
+   * @throws UsernameExtractionException If the username cannot be extracted from the refresh token.
+   * @throws RedisOperationException If there is an error while interacting with Redis.
    */
   List<String> refreshToken(HttpServletRequest request) throws InvalidRefreshTokenException, UsernameExtractionException, RedisOperationException;
-
 }

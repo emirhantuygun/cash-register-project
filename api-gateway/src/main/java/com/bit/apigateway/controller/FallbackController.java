@@ -19,8 +19,8 @@ public class FallbackController {
      * This method is a fallback handler for the Auth service. It logs a warning message and throws a custom exception
      * when the Auth service is temporarily unavailable.
      *
-     * @return ResponseEntity<String> - Returns a ResponseEntity with a warning message and HTTP status code 503 (Service Unavailable)
-     * @throws AuthServiceUnavailableException - Throws a custom exception when the Auth service is unavailable
+     * @return Returns a ResponseEntity with a warning message and HTTP status code 503 (Service Unavailable)
+     * @throws AuthServiceUnavailableException Throws a custom exception when the Auth service is unavailable
      */
     @RequestMapping(value = "/fallback/auth", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<String> fallbackAuth() {
@@ -37,8 +37,8 @@ public class FallbackController {
      * This method is a fallback handler for the User service. It logs a warning message and throws a custom exception
      * when the User service is temporarily unavailable.
      *
-     * @return ResponseEntity<String> - Returns a ResponseEntity with a warning message and HTTP status code 503 (Service Unavailable)
-     * @throws UserServiceUnavailableException - Throws a custom exception when the User service is unavailable
+     * @return Returns a ResponseEntity with a warning message and HTTP status code 503 (Service Unavailable)
+     * @throws UserServiceUnavailableException Throws a custom exception when the User service is unavailable
      */
     @RequestMapping(value = "/fallback/user", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<String> fallbackUser() {
@@ -55,8 +55,8 @@ public class FallbackController {
      * This method is a fallback handler for the Product service. It logs a warning message and throws a custom exception
      * when the Product service is temporarily unavailable.
      *
-     * @return ResponseEntity<String> - Returns a ResponseEntity with a warning message and HTTP status code 503 (Service Unavailable)
-     * @throws ProductServiceUnavailableException - Throws a custom exception when the Product service is unavailable
+     * @return Returns a ResponseEntity with a warning message and HTTP status code 503 (Service Unavailable)
+     * @throws ProductServiceUnavailableException Throws a custom exception when the Product service is unavailable
      */
     @RequestMapping(value = "/fallback/product", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<String> fallbackProduct() {
@@ -73,8 +73,8 @@ public class FallbackController {
      * This method is a fallback handler for the Sale service. It logs a warning message and throws a custom exception
      * when the Sale service is temporarily unavailable.
      *
-     * @return ResponseEntity<String> - Returns a ResponseEntity with a warning message and HTTP status code 503 (Service Unavailable)
-     * @throws SaleServiceUnavailableException - Throws a custom exception when the Sale service is unavailable
+     * @return Returns a ResponseEntity with a warning message and HTTP status code 503 (Service Unavailable)
+     * @throws SaleServiceUnavailableException Throws a custom exception when the Sale service is unavailable
      */
     @RequestMapping(value = "/fallback/sale", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<String> fallbackSale() {
@@ -91,8 +91,8 @@ public class FallbackController {
      * This method is a fallback handler for the Report service. It logs a warning message and throws a custom exception
      * when the Report service is temporarily unavailable.
      *
-     * @return ResponseEntity<String> - Returns a ResponseEntity with a warning message and HTTP status code 503 (Service Unavailable)
-     * @throws ReportServiceUnavailableException - Throws a custom exception when the Report service is unavailable
+     * @return Returns a ResponseEntity with a warning message and HTTP status code 503 (Service Unavailable)
+     * @throws ReportServiceUnavailableException Throws a custom exception when the Report service is unavailable
      */
     @RequestMapping(value = "/fallback/report", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<String> fallbackReport() {
