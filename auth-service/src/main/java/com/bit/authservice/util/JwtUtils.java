@@ -13,6 +13,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * Utility class for handling JWT (JSON Web Tokens) related operations.
+ * This class provides methods for extracting and validating JWT claims,
+ * generating access and refresh tokens, and retrieving the signing key.
+ *
+ * @author Emirhan Tuygun
+ */
 @Log4j2
 @Service
 public class JwtUtils {
@@ -29,6 +36,12 @@ public class JwtUtils {
     @Value("${jwt.refresh-token-expiration}")
     private long REFRESH_TOKEN_EXPIRATION;
 
+    /**
+     * Extracts the username from the given JWT token.
+     *
+     * @param token The JWT token from which to extract the username.
+     * @return The username extracted from the JWT token.
+     */
     public String extractUsername(String token) {
         log.trace("Entering extractUsername method in JwtUtils class");
 
@@ -38,6 +51,13 @@ public class JwtUtils {
         return username;
     }
 
+    /**
+     * Validates the given JWT token against the provided user details.
+     *
+     * @param token The JWT token to be validated.
+     * @param user The user details against which the token will be validated.
+     * @return {@code true} if the token is valid and not expired, {@code false} otherwise.
+     */
     public boolean isValid(String token, UserDetails user) {
         log.trace("Entering isValid method in JwtUtils class with token and user: {}", user.getUsername());
 
@@ -48,6 +68,12 @@ public class JwtUtils {
         return isValid;
     }
 
+    /**
+     * Checks if the given JWT token is expired.
+     *
+     * @param token The JWT token to be checked.
+     * @return {@code true} if the token is expired, {@code false} otherwise.
+     */
     private boolean isTokenExpired(String token) {
         log.trace("Entering isTokenExpired method in JwtUtils class");
         boolean isExpired = extractExpiration(token).before(new Date());
@@ -56,6 +82,12 @@ public class JwtUtils {
         return isExpired;
     }
 
+    /**
+     * Extracts the expiration date from the given JWT token.
+     *
+     * @param token The JWT token from which to extract the expiration date.
+     * @return The expiration date extracted from the JWT token.
+     */
     private Date extractExpiration(String token) {
         log.trace("Entering extractExpiration method in JwtUtils class");
         Date expiration = extractClaim(token, Claims::getExpiration);
@@ -64,6 +96,14 @@ public class JwtUtils {
         return expiration;
     }
 
+    /**
+     * Extracts a claim from the given JWT token using a provided resolver function.
+     *
+     * @param <T> The type of the claim to be extracted.
+     * @param token The JWT token from which to extract the claim.
+     * @param resolver A function that resolves the claim from the parsed JWT claims.
+     * @return The extracted claim.
+     */
     protected <T> T extractClaim(String token, Function<Claims, T> resolver) {
         log.trace("Entering extractClaim method in JwtUtils class");
 
@@ -74,6 +114,12 @@ public class JwtUtils {
         return claim;
     }
 
+    /**
+     * Extracts all claims from the given JWT token.
+     *
+     * @param token The JWT token from which to extract the claims.
+     * @return The extracted claims.
+     */
     private Claims extractAllClaims(String token) {
         log.trace("Entering extractAllClaims method in JwtUtils class");
 
@@ -88,6 +134,13 @@ public class JwtUtils {
         return claims;
     }
 
+    /**
+     * Generates an access token for the given username and roles.
+     *
+     * @param username The username for which the access token will be generated.
+     * @param roles The list of roles associated with the user.
+     * @return The generated access token as a string.
+     */
     public String generateAccessToken(String username, List<String> roles) {
         log.trace("Entering generateAccessToken method in JwtUtils class with username: {}", username);
 
@@ -98,6 +151,12 @@ public class JwtUtils {
         return accessToken;
     }
 
+    /**
+     * Generates a refresh token for the given username.
+     *
+     * @param username The username for which the refresh token will be generated.
+     * @return The generated refresh token as a string.
+     */
     public String generateRefreshToken(String username) {
         log.trace("Entering generateRefreshToken method in JwtUtils class with username: {}", username);
 
@@ -108,6 +167,13 @@ public class JwtUtils {
         return refreshToken;
     }
 
+    /**
+     * Builds a JWT token with the provided claims and expiration time.
+     *
+     * @param claims The claims to be included in the token.
+     * @param expiration The expiration time of the token in milliseconds.
+     * @return The generated JWT token as a string.
+     */
     protected String buildToken(Claims claims, long expiration) {
         log.trace("Entering buildToken method in JwtUtils class with claims and expiration: {}", expiration);
 
@@ -122,6 +188,12 @@ public class JwtUtils {
         return token;
     }
 
+    /**
+     * Retrieves the secret key used for signing JWT tokens.
+     * The key is obtained from the {@link #SIGNER_KEY} property, which is expected to be a base64-encoded string.
+     *
+     * @return The secret key used for signing JWT tokens.
+     */
     private SecretKey getSignInKey() {
         log.trace("Entering getSignInKey method in JwtUtils class");
 
