@@ -18,6 +18,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 
+/**
+ * This class is responsible for generating receipts from sales.
+ *
+ * @author Emirhan Tuygun
+ */
 @Log4j2
 @Service
 public class ReceiptService {
@@ -37,7 +42,13 @@ public class ReceiptService {
     @Value("${receipt.phone-number}")
     private String PHONE_NUMBER;
 
-
+    /**
+     * Generates a receipt for a given sale.
+     *
+     * @param sale The sale for which the receipt is being generated.
+     * @return A byte array containing the generated receipt.
+     * @throws ReceiptGenerationException If an error occurs while generating the receipt.
+     */
     protected byte[] generateReceipt(SaleResponse sale) throws ReceiptGenerationException {
         log.trace("Entering generateReceipt method in ReceiptService");
 

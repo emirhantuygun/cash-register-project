@@ -27,6 +27,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * This class is responsible for making HTTP requests to the sale-service using the Spring RestTemplate.
+ * It handles various operations related to sales, such as fetching a single sale, all sales, deleted sales,
+ * and sales filtered and sorted.
+ *
+ * @author Emirhan Tuygun
+ */
 @Log4j2
 @Service
 @RequiredArgsConstructor
@@ -52,6 +59,10 @@ public class GatewayService {
     private String GATEWAY_URL;
     private final RestTemplate restTemplate;
 
+    /**
+     * This method initializes the GATEWAY_URL by combining the GATEWAY_HOST and GATEWAY_PORT.
+     * It is called automatically after the GatewayService object is created.
+     */
     @PostConstruct
     protected void initGatewayUrl() {
         log.trace("Entering initGatewayUrl method in GatewayService");
@@ -59,6 +70,14 @@ public class GatewayService {
         log.trace("Exiting initGatewayUrl method in GatewayService");
     }
 
+    /**
+     * This method is responsible for making a GET request to the sale-service to fetch a single sale by its ID.
+     *
+     * @param id The ID of the sale to be fetched.
+     * @return The SaleResponse object representing the fetched sale.
+     * @throws HeaderProcessingException If there is an issue processing the HTTP headers.
+     * @throws SaleServiceException If there is an error fetching the sale from the sale-service.
+     */
     protected SaleResponse getSale(Long id) throws HeaderProcessingException {
         log.trace("Entering getSale method in GatewayService");
         try {
@@ -95,6 +114,13 @@ public class GatewayService {
         }
     }
 
+    /**
+     * This method is responsible for making a GET request to the sale-service to fetch all sales.
+     *
+     * @return A list of SaleResponse objects representing all fetched sales.
+     * @throws HeaderProcessingException If there is an issue processing the HTTP headers.
+     * @throws SaleServiceException If there is an error fetching the sales from the sale-service.
+     */
     protected List<SaleResponse> getAllSales() throws HeaderProcessingException {
         log.trace("Entering getAllSales method in GatewayService");
 
@@ -131,6 +157,13 @@ public class GatewayService {
         }
     }
 
+    /**
+     * This method is responsible for making a GET request to the sale-service to fetch all deleted sales.
+     *
+     * @return A list of SaleResponse objects representing all fetched deleted sales.
+     * @throws HeaderProcessingException If there is an issue processing the HTTP headers.
+     * @throws SaleServiceException If there is an error fetching the deleted sales from the sale-service.
+     */
     protected List<SaleResponse> getDeletedSales() throws HeaderProcessingException {
         log.trace("Entering getDeletedSales method in GatewayService");
         try {
@@ -166,6 +199,24 @@ public class GatewayService {
         }
     }
 
+    /**
+     * This method is responsible for making a GET request to the sale-service to fetch all sales,
+     * filtered and sorted based on the provided parameters.
+     *
+     * @param page The page number for pagination.
+     * @param size The number of sales per page.
+     * @param sortBy The field to sort the sales by.
+     * @param direction The sorting direction (asc or desc).
+     * @param cashier The cashier's name to filter sales by.
+     * @param paymentMethod The payment method to filter sales by.
+     * @param minTotal The minimum total amount to filter sales by.
+     * @param maxTotal The maximum total amount to filter sales by.
+     * @param startDate The start date to filter sales by.
+     * @param endDate The end date to filter sales by.
+     * @return A Page object containing SaleResponse objects representing the fetched sales.
+     * @throws HeaderProcessingException If there is an issue processing the HTTP headers.
+     * @throws SaleServiceException If there is an error fetching the sales from the sale-service.
+     */
     protected Page<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction, String cashier,
                                                               String paymentMethod, BigDecimal minTotal, BigDecimal maxTotal,
                                                               String startDate, String endDate) throws HeaderProcessingException {
@@ -223,6 +274,13 @@ public class GatewayService {
         }
     }
 
+    /**
+     * This method retrieves HTTP headers for making requests to the sale-service.
+     * It retrieves the authorization token from the current HTTP request and sets it in the headers.
+     *
+     * @return HttpHeaders object containing the authorization token.
+     * @throws HeaderProcessingException If there is an issue processing the HTTP headers.
+     */
     @ExcludeFromGeneratedCoverage
     protected HttpHeaders getHttpHeaders() throws HeaderProcessingException {
         log.trace("Entering getAllSalesFilteredAndSorted method in GatewayService");

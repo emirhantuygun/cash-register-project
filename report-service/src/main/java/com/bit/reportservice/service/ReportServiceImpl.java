@@ -11,6 +11,12 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * This class implements the ReportService interface and provides methods for generating sales reports.
+ * It uses the GatewayService and ReceiptService to fetch and process data.
+ *
+ * @author Emirhan Tuygun
+ */
 @Log4j2
 @Service
 @RequiredArgsConstructor
