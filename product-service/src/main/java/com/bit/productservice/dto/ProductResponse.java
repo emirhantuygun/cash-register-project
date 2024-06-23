@@ -9,6 +9,12 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+/**
+ * This class represents a response object for product details.
+ * It contains various attributes related to a product.
+ *
+ * @author Emirhan Tuygun
+ */
 @Data
 @Builder
 @AllArgsConstructor
