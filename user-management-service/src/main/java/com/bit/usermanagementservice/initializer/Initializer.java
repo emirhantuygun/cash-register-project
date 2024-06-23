@@ -10,13 +10,17 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * This class is responsible for initializing default roles and users at application startup.
+ * It implements the CommandLineRunner interface to run the initialization logic.
+ *
+ * @author Emirhan Tuygun
+ */
 @Component
 @RequiredArgsConstructor
 public class Initializer implements CommandLineRunner {
-
 
     @Value("#{'${default-roles}'.split(', ')}")
     private final List<String> DEFAULT_ROLES;
@@ -24,6 +28,12 @@ public class Initializer implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
 
+    /**
+     * This method is called by Spring Boot when the application starts.
+     * It initializes the default roles and users.
+     *
+     * @param args Command line arguments
+     */
     @Override
     @Transactional
     public void run(String... args) {
@@ -35,6 +45,10 @@ public class Initializer implements CommandLineRunner {
         initializeUsers();
     }
 
+    /**
+     * This method initializes the default roles from the DEFAULT_ROLES list.
+     * If a role does not exist in the database, it is saved.
+     */
     private void initializeRoles() {
         for (String roleName : DEFAULT_ROLES) {
             if (roleRepository.findByRoleName(roleName).isEmpty()) {
@@ -43,6 +57,9 @@ public class Initializer implements CommandLineRunner {
         }
     }
 
+    /**
+     * This method initializes a cashier user with the specified details.
+     */
     private void initializeCashierUser() {
 
         Role cashierRole = roleRepository.findByRoleName("CASHIER").orElseThrow();
@@ -55,6 +72,9 @@ public class Initializer implements CommandLineRunner {
                 .roles(List.of(cashierRole)).build());
     }
 
+    /**
+     * This method initializes a manager user with the specified details.
+     */
     private void initializeManagerUser() {
 
         Role managerRole = roleRepository.findByRoleName("MANAGER").orElseThrow();
@@ -67,6 +87,9 @@ public class Initializer implements CommandLineRunner {
                 .roles(List.of(managerRole)).build());
     }
 
+    /**
+     * This method initializes an admin user with the specified details.
+     */
     private void initializeAdminUser() {
 
         Role adminRole = roleRepository.findByRoleName("ADMIN").orElseThrow();
@@ -79,6 +102,9 @@ public class Initializer implements CommandLineRunner {
                 .roles(List.of(adminRole)).build());
     }
 
+    /**
+     * This method initializes the super user that has all the roles.
+     */
     private void initializeSuperUser() {
 
         Role cashierRole = roleRepository.findByRoleName("CASHIER").orElseThrow();
@@ -93,6 +119,9 @@ public class Initializer implements CommandLineRunner {
                 .roles(List.of(cashierRole, managerRole, adminRole)).build());
     }
 
+    /**
+     * This method initializes additional users with random roles.
+     */
     private void initializeUsers() {
 
         for (int i = 5; i <= 20; i++) {
