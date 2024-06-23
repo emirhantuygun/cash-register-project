@@ -20,6 +20,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * Controller for handling report-related requests.
+ *
+ * @author Emirhan Tuygun
+ */
 @Log4j2
 @Controller
 @RequestMapping("/reports")
@@ -28,6 +33,13 @@ public class ReportController {
 
     private final ReportService reportService;
 
+    /**
+     * Retrieves a sale by its unique identifier.
+     *
+     * @param id The unique identifier of the sale.
+     * @return A ResponseEntity containing the SaleResponse object for the specified sale.
+     * @throws HeaderProcessingException If there is an error processing the request headers.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<SaleResponse> getSale(@PathVariable("id") Long id) throws HeaderProcessingException {
         log.trace("Entering getSale method in ReportController with id: {}", id);
@@ -39,6 +51,12 @@ public class ReportController {
         return new ResponseEntity<>(saleResponse, HttpStatus.OK);
     }
 
+    /**
+     * Retrieves all sales from the system.
+     *
+     * @return A ResponseEntity containing a list of SaleResponse objects representing all sales.
+     * @throws HeaderProcessingException If there is an error processing the request headers.
+     */
     @GetMapping()
     public ResponseEntity<List<SaleResponse>> getAllSales() throws HeaderProcessingException {
         log.trace("Entering getAllSales method in ReportController");
@@ -50,6 +68,12 @@ public class ReportController {
         return new ResponseEntity<>(saleResponses, HttpStatus.OK);
     }
 
+    /**
+     * Retrieves all deleted sales from the system.
+     *
+     * @return A ResponseEntity containing a list of SaleResponse objects representing all deleted sales.
+     * @throws HeaderProcessingException If there is an error processing the request headers.
+     */
     @GetMapping("/deleted")
     public ResponseEntity<List<SaleResponse>> getDeletedSales() throws HeaderProcessingException {
         log.trace("Entering getDeletedSales method in ReportController");
@@ -61,6 +85,22 @@ public class ReportController {
         return new ResponseEntity<>(deletedSaleResponses, HttpStatus.OK);
     }
 
+    /**
+     * Retrieves all sales from the system, applying filtering and sorting.
+     *
+     * @param page The page number to retrieve (default is 0).
+     * @param size The number of sales to retrieve per page (default is 10).
+     * @param sortBy The field to sort by (default is 'id').
+     * @param direction The sorting direction (default is 'ASC').
+     * @param cashier The cashier's name to filter by (optional).
+     * @param paymentMethod The payment method to filter by (optional).
+     * @param minTotal The minimum total amount to filter by (optional).
+     * @param maxTotal The maximum total amount to filter by (optional).
+     * @param startDate The start date to filter by (optional).
+     * @param endDate The end date to filter by (optional).
+     * @return A ResponseEntity containing a Page of SaleResponse objects representing the filtered and sorted sales.
+     * @throws HeaderProcessingException If there is an error processing the request headers.
+     */
     @GetMapping("/filteredAndSorted")
     public ResponseEntity<Page<SaleResponse>> getAllSalesFilteredAndSorted(
             @RequestParam(defaultValue = "0") int page,
@@ -84,6 +124,14 @@ public class ReportController {
         return new ResponseEntity<>(saleResponses, HttpStatus.OK);
     }
 
+    /**
+     * Retrieves a receipt PDF for a sale by its unique identifier.
+     *
+     * @param id The unique identifier of the sale.
+     * @return A ResponseEntity containing the byte array of the receipt PDF and appropriate headers.
+     * @throws HeaderProcessingException If there is an error processing the request headers.
+     * @throws ReceiptGenerationException If there is an error generating the receipt PDF.
+     */
     @GetMapping("/receipt/{id}")
     public ResponseEntity<byte[]> getReceipt(@PathVariable("id") Long id) throws HeaderProcessingException, ReceiptGenerationException {
         log.trace("Entering getReceipt method in ReportController with id: {}", id);
