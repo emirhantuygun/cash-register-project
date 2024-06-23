@@ -10,6 +10,11 @@ import org.hibernate.annotations.SoftDelete;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents the user entity in the application.
+ *
+ * @author Emirhan Tuygun
+ */
 @Entity
 @Table(name = "users")
 @SoftDelete
