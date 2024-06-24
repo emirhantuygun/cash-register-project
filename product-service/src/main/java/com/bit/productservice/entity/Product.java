@@ -32,5 +32,4 @@ public class Product {
     @Column(name = "stock_quantity")
     private Integer stockQuantity;
     private BigDecimal price;
-
 }
