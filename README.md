@@ -21,15 +21,13 @@
 - [Features](#features)
 - [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
-    - [Installation](#installation)
-    - [Configuration](#configuration)
+    - [Usage](#usage)
 - [Ports](#ports)
 - [Endpoints](#endpoints)
 - [Required Roles](#required-roles)
 - [Endpoints](#endpoints)
 
 ## Technologies Used
-
 - Java 17
 - Spring Boot
 - Spring Framework
@@ -44,17 +42,24 @@
 - Resilience4J
 - Redis
 - RabbitMQ
+- Google Jib
 - Log4j2
 
-## Features
 
+## Features
 - Soft Deletion
 - Pagination, Filtering & Sorting
 - Role Based Authentication & Authorization
 - Token Based Authentication & Authorization
+- Microservices
 - Unit Testing
+- Caching
+- Token Storing
+- Circuit Breaking
+- Message Queueing
 - Logging
 - JavaDocs
+
 
 ## Getting Started
 
@@ -126,6 +131,12 @@ An example of login request:
 }
 ```
 
+## Authentication and Authorization
+
+All endpoints in this application require a JSON Web Token (JWT) for authentication except auth/login. 
+To access these endpoints, include the JWT in the Authorization header of your HTTP requests as a Bearer token.
+
+
 ## Endpoints
 
 All requests should be made to the API-GATEWAY's url which is http://localhost:8080.
@@ -193,4 +204,44 @@ All requests require authentication, so you need to log in first.
 | GET         | /reports/receipt/{id}      | Get receipt by sale ID                 |
 
 
-##
+## Request Body Examples
+
+### Auth Service
+
+**Endpoint:**
+POST /auth/login
+```json
+{
+  "username": "super",
+  "password": "super"
+}
+```
+
+### User Service
+
+**Endpoint:**
+POST /auth/login
+```json
+{
+  "username": "super",
+  "password": "super"
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
