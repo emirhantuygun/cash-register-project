@@ -89,6 +89,28 @@ docker-compose down
 
 ## Services
 
+### Service Registry
+Service Registry acts as a **central directory** for all the microservices in the application. It maintains a list of available services and their instances, allowing for service discovery. When a service starts, it **registers** itself with the Service Registry, and other services can query the registry to find the network location of service instances.
+
+### API Gateway
+The API Gateway is the entry point for all client requests. It **routes** requests to the appropriate backend services and performs functions such as **load balancing** and rate limiting. Crucially, the API Gateway also handles **authorization** by verifying the JWT in the Authorization header of incoming requests to ensure they are **valid** and that the user has the necessary **roles**.
+
+### Auth Service
+Auth Service is responsible for managing authentication and authorization. It handles user login, registration, and token generation. The service verifies user credentials and issues JWT tokens for authenticated users, which are used to access protected endpoints in other services.
+
+### User Service
+User Service manages user-related operations, including creating, updating, retrieving, and deleting user accounts. It handles user data and ensures that user information is securely stored and accessible to other services that require user details.
+
+### Product Service
+Product Service manages product-related operations. It handles the creation, update, retrieval, and deletion of products. This service is responsible for maintaining product information, such as product names, descriptions, prices, and stock levels.
+
+### Sale Service
+Sale Service is responsible for handling sales transactions and managing campaigns. It allows for the creation, retrieval, and management of sales records. Additionally, this service enables viewing and managing sales campaigns, helping to promote products and track their performance.
+
+### Report Service
+Report Service is responsible for generating reports related to sales and transactions. It allows users to view detailed sales information and generate receipts for completed transactions. This service provides insights into sales performance, helping businesses make informed decisions based on sales data.
+
+
 ## Ports
 
 | Container        | Port |
@@ -104,7 +126,13 @@ docker-compose down
 | Auth DB          | 5436 |
 
 
-## Required Roles
+## Roles & Users
+
+### Default Roles
+> There are three default roles in the system:
+> - CASHIER
+> - MANAGER
+> - ADMIN
 
 To make requests to the relevant service, you need to have the following role.
 
@@ -116,8 +144,7 @@ To make requests to the relevant service, you need to have the following role.
 | Sale Service    | CASHIER | 
 | Report Service  | MANAGER | 
 
-
-## Default Users
+### Default Users
 
 To make requests to the relevant service, you need to have the following role.
 
