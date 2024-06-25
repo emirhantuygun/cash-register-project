@@ -173,7 +173,6 @@ All requests require authentication, so you need to log in first.
 | GET         | /products/deleted           | Get all deleted products                  |
 | GET         | /products/filteredAndSorted | Get all products with filters and sorting |
 | POST        | /products                   | Create a new product                      |
-| POST        | /products/return            | Return products                           |
 | PUT         | /products/{id}              | Update product by ID                      |
 | PUT         | /products/restore/{id}      | Restore soft deleted product              |
 | DELETE      | /products/{id}              | Soft delete product by ID                 |
@@ -220,17 +219,130 @@ POST /auth/login
 ### User Service
 
 **Endpoint:**
-POST /auth/login
+POST /users
 ```json
 {
-  "username": "super",
-  "password": "super"
+  "name": "John Doe",
+  "username": "johndoe",
+  "email": "johndoe@gmail.com",
+  "password": "johndoe54",
+  "roles": ["ADMIN", "CASHIER"]
+}
+```
+
+**Endpoint:**
+PUT /users/{id}
+```json
+{
+  "name": "Jane Doe",
+  "username": "janedoe",
+  "email": "janedoe@gmail.com",
+  "password": "janedoe54",
+  "roles": ["ADMIN", "CASHIER"]
+}
+```
+
+### Product Service
+
+**Endpoint:**
+POST /products
+```json
+{
+  "name": "new_product",
+  "description": "a product",
+  "stockQuantity": "20",
+  "price": 150
+}
+```
+
+**Endpoint:**
+PUT /products/{id}
+```json
+{
+  "name": "updated_product",
+  "description": "a product",
+  "stockQuantity": "20",
+  "price": 150
 }
 ```
 
 
+### Sale Service
 
+**Endpoint:**
+POST /sales
+```json
+{
+  "cashier": "Jack",
+  "paymentMethod": "mixed",
+  "campaignIds": [2,3],
+  "products": [
+    {
+      "id": 12,
+      "quantity": 2
+    },
+    {
+      "id": 10,
+      "quantity": 1
+    },
+    {
+      "id": 9,
+      "quantity": 1
+    }
+  ],
+  "cash": null,
+  "mixedPayment": {
+    "cashAmount": 1500.00,
+    "creditCardAmount": 1200.00
+  }
+}
+```
 
+**Endpoint:**
+PUT /sales/{id}
+```json
+{
+  "cashier": "Jack",
+  "paymentMethod": "mixed",
+  "campaignIds": [2,3],
+  "products": [
+    {
+      "id": 12,
+      "quantity": 2
+    },
+    {
+      "id": 10,
+      "quantity": 1
+    }
+  ],
+  "cash": null,
+  "mixedPayment": {
+    "cashAmount": 1500.00,
+    "creditCardAmount": 1200.00
+  }
+}
+```
+
+> **⚠️ Note:** Since there are 4 types of payment methods, these JSON objects can vary. Below is also valid.
+```json
+{
+  "cashier": "Jack",
+  "paymentMethod": "cash",
+  "campaignIds": [2,3],
+  "products": [
+    {
+      "id": 12,
+      "quantity": 2
+    },
+    {
+      "id": 10,
+      "quantity": 1
+    }
+  ],
+  "cash": 2500,
+  "mixedPayment": null
+}
+```
 
 
 
