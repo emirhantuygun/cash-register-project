@@ -78,6 +78,7 @@ Ensure you have the following installed:
 | Auth DB          | 5436 |
 
 ## Required Roles
+
 To make requests to the relevant service, you need to have the following role.
 
 | Service         | Role    |
@@ -88,19 +89,37 @@ To make requests to the relevant service, you need to have the following role.
 | Sale Service    | CASHIER | 
 | Report Service  | MANAGER | 
 
+## Default Users
 
+To make requests to the relevant service, you need to have the following role.
+
+| User         | Username | Password | Roles                   |
+|--------------|----------|----------|-------------------------|
+| SUPER User   | super    | super    | CASHIER, MANAGER, ADMIN |
+| CASHIER User | cashier  | cashier  | CASHIER                 |
+| MANAGER User | manager  | manager  | MANAGER                 |
+| ADMIN User   | admin    | admin    | ADMIN                   |
+
+An example of login request:
+
+```json
+{
+  "username": "super",
+  "password": "super"
+}
+```
 
 ## Endpoints
 
 All requests should be made to the API-GATEWAY's url which is http://localhost:8080.
-All requests require authentication, so you need to login first.
+All requests require authentication, so you need to log in first.
 
 ### Auth Service
 
-| HTTP Method | Endpoint           | Description                        |
-|-------------|--------------------|------------------------------------|
-| POST        | /auth/login        | Authenticate user and generate JWT |
-| POST        | /auth/refreshToken | Refresh JWT                        |
+| HTTP Method | Endpoint            | Description                        |
+|-------------|---------------------|------------------------------------|
+| POST        | /auth/login         | Authenticate user and generate JWT |
+| POST        | /auth/refresh-token | Refresh JWT                        |
 
 ### User Service
 

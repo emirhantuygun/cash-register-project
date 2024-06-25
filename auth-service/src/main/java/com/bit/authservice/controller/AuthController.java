@@ -50,7 +50,7 @@ public class AuthController {
      * @param request The HTTP request containing the refresh token in the Authorization header.
      * @return A ResponseEntity containing the new access token, refresh token, and the status of the refresh operation.
      */
-    @GetMapping("/refresh-token")
+    @GetMapping("/refresh")
     public ResponseEntity<AuthResponse> refreshToken(HttpServletRequest request) throws InvalidRefreshTokenException, RedisOperationException, UsernameExtractionException {
         log.trace("Entering refreshToken method in AuthController");
 
