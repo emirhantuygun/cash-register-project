@@ -116,10 +116,11 @@ All requests require authentication, so you need to log in first.
 
 ### Auth Service
 
-| HTTP Method | Endpoint            | Description                        |
-|-------------|---------------------|------------------------------------|
-| POST        | /auth/login         | Authenticate user and generate JWT |
-| POST        | /auth/refresh-token | Refresh JWT                        |
+| HTTP Method | Endpoint      | Description                        |
+|-------------|---------------|------------------------------------|
+| GET         | /auth/refresh | Refresh JWT                        | 
+| POST        | /auth/login   | Authenticate user and generate JWT |
+| POST        | /auth/logout  | logout and terminate JWT           | 
 
 ### User Service
 
@@ -144,27 +145,35 @@ All requests require authentication, so you need to log in first.
 | GET         | /products/deleted           | Get all deleted products                  |
 | GET         | /products/filteredAndSorted | Get all products with filters and sorting |
 | POST        | /products                   | Create a new product                      |
+| POST        | /products/return            | Return products                           |
 | PUT         | /products/{id}              | Update product by ID                      |
 | PUT         | /products/restore/{id}      | Restore soft deleted product              |
 | DELETE      | /products/{id}              | Soft delete product by ID                 |
 | DELETE      | /products/permanent/{id}    | Permanently delete product by ID          |
-| PATCH       | /products/stock/reduce      | Reduce product stock                      |
-| PATCH       | /products/stock/return      | Return product stock                      |
 
-### Campaign Service
+### Sale Service
 
 | HTTP Method | Endpoint                     | Description                                |
 |-------------|------------------------------|--------------------------------------------|
 | GET         | /campaigns/{id}              | Get campaign by ID                         |
 | GET         | /campaigns                   | Get all campaigns                          |
 | GET         | /campaigns/filteredAndSorted | Get all campaigns with filters and sorting |
+| POST        | /sales                       | Create a new sale                          |
+| PUT         | /sales/{id}                  | Update sale by ID                          |
+| PUT         | /sales/cancel/{id}           | Cancel sale by ID                          |
+| PUT         | /sales/restore/{id}          | Restore sale by ID                         |
+| DELETE      | /sales/{id}                  | Soft delete sale by ID                     |
+| DELETE      | /sales/permanent/{id}        | Permanently delete sale by ID              |
 
-### Sale Service
+### Report Service
 
-| HTTP Method | Endpoint                 | Description                            |
-|-------------|--------------------------|----------------------------------------|
-| GET         | /sales                   | Get all sales                          |
-| GET         | /sales/filteredAndSorted | Get all sales with filters and sorting |
-| POST        | /sales                   | Create a new sale                      |
-| PUT         | /sales/{id}              | Update sale by ID                      |
-| DELETE      | /sales/{id}              | Delete sale by ID                      |
+| HTTP Method | Endpoint                   | Description                            |
+|-------------|----------------------------|----------------------------------------|
+| GET         | /reports/{id}              | Get sale by ID                         |
+| GET         | /reports                   | Get all sales                          |
+| GET         | /reports/deleted           | Get all deleted sales                  |
+| GET         | /reports/filteredAndSorted | Get all sales with filters and sorting |
+| GET         | /reports/receipt/{id}      | Get receipt by sale ID                 |
+
+
+##
