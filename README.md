@@ -35,6 +35,8 @@
 - JWT Based Authentication & Authorization
 - Docker
 - PostgreSQL
+- Spring Cloud
+- Netflix Eureka
 - Mockito
 - JUnit 5
 - JaCoCo
@@ -59,6 +61,8 @@
 - Message Queueing
 - Logging
 - JavaDocs
+- Load Balancing
+- Gateway
 
 
 ## Getting Started
@@ -82,6 +86,8 @@ To stop all running services, use:
 ```bash
 docker-compose down
 ```
+
+## Services
 
 ## Ports
 
@@ -122,6 +128,12 @@ To make requests to the relevant service, you need to have the following role.
 | MANAGER User | manager  | manager  | MANAGER                 |
 | ADMIN User   | admin    | admin    | ADMIN                   |
 
+
+## Authentication and Authorization
+
+> **⚠️Important:** All endpoints require a **JSON Web Token (JWT)** for authentication except auth/login, so **you need to log in first**.
+To access the endpoints, include the JWT in the Authorization header of your HTTP requests as a **Bearer token**.
+
 An example of login request:
 
 ```json
@@ -131,16 +143,10 @@ An example of login request:
 }
 ```
 
-## Authentication and Authorization
-
-All endpoints in this application require a JSON Web Token (JWT) for authentication except auth/login. 
-To access these endpoints, include the JWT in the Authorization header of your HTTP requests as a Bearer token.
-
 
 ## Endpoints
 
-All requests should be made to the API-GATEWAY's url which is http://localhost:8080.
-All requests require authentication, so you need to log in first.
+All requests should be made to the **API Gateway's url** which is **http://localhost:8080**.
 
 ### Auth Service
 
@@ -218,8 +224,10 @@ POST /auth/login
 
 ### User Service
 
-**Endpoint:**
-POST /users
+**Endpoints:**
+- POST /users
+- PUT /users/{id}
+
 ```json
 {
   "name": "John Doe",
@@ -230,36 +238,16 @@ POST /users
 }
 ```
 
-**Endpoint:**
-PUT /users/{id}
-```json
-{
-  "name": "Jane Doe",
-  "username": "janedoe",
-  "email": "janedoe@gmail.com",
-  "password": "janedoe54",
-  "roles": ["ADMIN", "CASHIER"]
-}
-```
 
 ### Product Service
 
-**Endpoint:**
-POST /products
-```json
-{
-  "name": "new_product",
-  "description": "a product",
-  "stockQuantity": "20",
-  "price": 150
-}
-```
+**Endpoints:**
+- POST /products
+- PUT /products/{id}
 
-**Endpoint:**
-PUT /products/{id}
 ```json
 {
-  "name": "updated_product",
+  "name": "product",
   "description": "a product",
   "stockQuantity": "20",
   "price": 150
@@ -269,37 +257,9 @@ PUT /products/{id}
 
 ### Sale Service
 
-**Endpoint:**
-POST /sales
-```json
-{
-  "cashier": "Jack",
-  "paymentMethod": "mixed",
-  "campaignIds": [2,3],
-  "products": [
-    {
-      "id": 12,
-      "quantity": 2
-    },
-    {
-      "id": 10,
-      "quantity": 1
-    },
-    {
-      "id": 9,
-      "quantity": 1
-    }
-  ],
-  "cash": null,
-  "mixedPayment": {
-    "cashAmount": 1500.00,
-    "creditCardAmount": 1200.00
-  }
-}
-```
-
-**Endpoint:**
-PUT /sales/{id}
+**Endpoints:**
+- POST /sales 
+- PUT /sales/{id}
 ```json
 {
   "cashier": "Jack",
@@ -323,7 +283,7 @@ PUT /sales/{id}
 }
 ```
 
-> **⚠️ Note:** Since there are 4 types of payment methods, these JSON objects can vary. Below is also valid.
+> **⚠️ Note:** Since there are **4 types of payment methods**, this JSON object can vary. Below is also valid.
 ```json
 {
   "cashier": "Jack",
