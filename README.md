@@ -52,6 +52,9 @@
 - Pagination, Filtering & Sorting
 - Role Based Authentication & Authorization
 - Token Based Authentication & Authorization
+- Unit Testing
+- Logging
+- JavaDocs
 
 ## Getting Started
 
@@ -61,7 +64,19 @@ Ensure you have the following installed:
 
 - Java 17
 - Maven or Gradle
-- Docker (optional, for running Redis and RabbitMQ locally)
+- Docker 
+
+### Usage
+To start all services defined in docker-compose.yml, use the following command:
+
+```bash
+docker-compose up -d
+```
+To stop all running services, use:
+
+```bash
+docker-compose down
+```
 
 ## Ports
 
@@ -77,6 +92,7 @@ Ensure you have the following installed:
 | User DB          | 5435 |
 | Auth DB          | 5436 |
 
+
 ## Required Roles
 
 To make requests to the relevant service, you need to have the following role.
@@ -88,6 +104,7 @@ To make requests to the relevant service, you need to have the following role.
 | Product Service |         | 
 | Sale Service    | CASHIER | 
 | Report Service  | MANAGER | 
+
 
 ## Default Users
 
