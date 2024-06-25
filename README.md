@@ -25,9 +25,11 @@
     - [Configuration](#configuration)
 - [Ports](#ports)
 - [Endpoints](#endpoints)
-
+- [Required Roles](#required-roles)
+- [Endpoints](#endpoints)
 
 ## Technologies Used
+
 - Java 17
 - Spring Boot
 - Spring Framework
@@ -44,13 +46,12 @@
 - RabbitMQ
 - Log4j2
 
-
 ## Features
+
 - Soft Deletion
 - Pagination, Filtering & Sorting
 - Role Based Authentication & Authorization
 - Token Based Authentication & Authorization
-
 
 ## Getting Started
 
@@ -61,7 +62,6 @@ Ensure you have the following installed:
 - Java 17
 - Maven or Gradle
 - Docker (optional, for running Redis and RabbitMQ locally)
-
 
 ## Ports
 
@@ -77,9 +77,23 @@ Ensure you have the following installed:
 | User DB          | 5435 |
 | Auth DB          | 5436 |
 
+## Required Roles
+To make requests to the relevant service, you need to have the following role.
+
+| Service         | Role    |
+|-----------------|---------|
+| Auth Service    |         | 
+| User Service    | ADMIN   | 
+| Product Service |         | 
+| Sale Service    | CASHIER | 
+| Report Service  | MANAGER | 
+
+
+
 ## Endpoints
 
 All requests should be made to the API-GATEWAY's url which is http://localhost:8080.
+All requests require authentication, so you need to login first.
 
 ### Auth Service
 
