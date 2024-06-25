@@ -2,10 +2,22 @@
 
 ## Project Description
 
-This project is made for 32bit's Backend Competition. 
+<div style="display: flex; align-items: center;">
+  <div style="flex: 1;">
+    This project is made for 32bit's Backend Competition. The cash register project is designed to facilitate the process of a cashier handling sales transactions.
+  </div>
+  <div style="flex: 1; text-align: right;">
+    <img src="~images/32bit.png" alt="Project Logo" style="max-width: 200px;">
+  </div>
+</div>
+
+
+## Project Architecture
+
+![Project Logo](~images/architecture.png)
+
 
 ## Table of Contents
-- [Features](#features)
 - [Technologies Used](#technologies-used)
 - [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
@@ -16,13 +28,6 @@ This project is made for 32bit's Backend Competition.
 - [Contributing](#contributing)
 - [License](#license)
 
-
-## Features
-
-- List your project's main features here.
-- Feature 1
-- Feature 2
-- Feature 3
 
 ## Technologies Used
 
@@ -43,20 +48,9 @@ This project is made for 32bit's Backend Competition.
 ### Prerequisites
 
 Ensure you have the following installed:
-
 - Java 17
 - Maven or Gradle
 - Docker (optional, for running Redis and RabbitMQ locally)
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/yourproject.git
-   cd yourproject
-
-
-
 
 ## API Endpoints
 
