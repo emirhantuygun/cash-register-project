@@ -6,7 +6,6 @@ target/
 /postgres/
 /redis/
 /logs/
-README.md
 
 ### STS ###
 .apt_generated
