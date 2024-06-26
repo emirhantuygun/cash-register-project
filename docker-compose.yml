@@ -38,78 +38,25 @@ services:
     restart: always
 
 
-  postgres-product:
-    container_name: postgres-product
+  postgres:
+    container_name: postgres
     image: postgres:alpine
     environment:
-      POSTGRES_DB: product-service
+      POSTGRES_DB:
+        - auth-service
+        - user-service
+        - product-service
+        - sale-service
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: emirhan
       PGDATA: /data/postgres
     volumes:
-      - ./postgres/product:/data/postgres
+      - ./postgres:/data/postgres
     expose:
-      - "${POSTGRES_PRODUCT_PORT}"
+      - "${POSTGRES_PORT}"
     ports:
-      - "${POSTGRES_PRODUCT_PORT}:${POSTGRES_PRODUCT_PORT}"
-    command: -p ${POSTGRES_PRODUCT_PORT}
-    networks:
-      - postgres
-    restart: always
-
-  postgres-sale:
-    container_name: postgres-sale
-    image: postgres:alpine
-    environment:
-      POSTGRES_DB: sale-service
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: emirhan
-      PGDATA: /data/postgres
-    volumes:
-      - ./postgres/sale:/data/postgres
-    expose:
-      - "${POSTGRES_SALE_PORT}"
-    ports:
-      - "${POSTGRES_SALE_PORT}:${POSTGRES_SALE_PORT}"
-    command: -p ${POSTGRES_SALE_PORT}
-    networks:
-      - postgres
-    restart: always
-
-  postgres-user:
-    container_name: postgres-user
-    image: postgres:alpine
-    environment:
-      POSTGRES_DB: user-service
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: emirhan
-      PGDATA: /data/postgres
-    volumes:
-      - ./postgres/user:/data/postgres
-    expose:
-      - "${POSTGRES_USER_PORT}"
-    ports:
-      - "${POSTGRES_USER_PORT}:${POSTGRES_USER_PORT}"
-    command: -p ${POSTGRES_USER_PORT}
-    networks:
-      - postgres
-    restart: always
-
-  postgres-auth:
-    container_name: postgres-auth
-    image: postgres:alpine
-    environment:
-      POSTGRES_DB: auth-service
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: emirhan
-      PGDATA: /data/postgres
-    volumes:
-      - ./postgres/auth:/data/postgres
-    expose:
-      - "${POSTGRES_AUTH_PORT}"
-    ports:
-      - "${POSTGRES_AUTH_PORT}:${POSTGRES_AUTH_PORT}"
-    command: -p ${POSTGRES_AUTH_PORT}
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    command: -p ${POSTGRES_PORT}
     networks:
       - postgres
     restart: always
@@ -165,7 +112,7 @@ services:
       - service-registry
       - api-gateway
       - redis
-      - postgres-product
+      - postgres
       - rabbitmq
       - zipkin
 
@@ -183,7 +130,7 @@ services:
     depends_on:
       - service-registry
       - api-gateway
-      - postgres-sale
+      - postgres
       - product-service
       - rabbitmq
       - zipkin
@@ -218,7 +165,7 @@ services:
     depends_on:
       - service-registry
       - api-gateway
-      - postgres-auth
+      - postgres
       - redis
       - rabbitmq
       - zipkin
@@ -237,7 +184,7 @@ services:
     depends_on:
       - service-registry
       - api-gateway
-      - postgres-user
+      - postgres
       - auth-service
       - rabbitmq
       - zipkin
