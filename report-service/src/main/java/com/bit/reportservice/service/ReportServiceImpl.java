@@ -98,6 +98,7 @@ public class ReportServiceImpl implements ReportService {
                 null, null, null, null, startDate, endDate);
 
         List<SaleResponse> saleResponses = saleResponsePage.getContent();
+        log.info("Got saleResponses: {}", saleResponses);
 
         Map<String, Integer> productQuantityMap = saleResponses.stream()
                 .flatMap(saleResponse -> saleResponse.getProducts().stream())

@@ -42,16 +42,13 @@ services:
     container_name: postgres
     image: postgres:alpine
     environment:
-      POSTGRES_DB:
-        - auth-service
-        - user-service
-        - product-service
-        - sale-service
+      POSTGRES_DB: auth-service
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: emirhan
       PGDATA: /data/postgres
     volumes:
       - ./postgres:/data/postgres
+      - ./init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
     expose:
       - "${POSTGRES_PORT}"
     ports:
