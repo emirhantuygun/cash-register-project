@@ -30,6 +30,7 @@ public class ReportServiceImpl implements ReportService {
 
     private final GatewayService gatewayService;
     private final ReceiptService receiptService;
+    private final ChartService chartService;
 
     @Override
     public SaleResponse getSale(Long id) throws HeaderProcessingException {
@@ -98,20 +99,15 @@ public class ReportServiceImpl implements ReportService {
 
         List<SaleResponse> saleResponses = saleResponsePage.getContent();
 
-        Map<String, Integer> productStockMap = saleResponses.stream()
-                .flatMap(saleResponse -> saleResponse.getProducts().stream()) // Flatten the list of products
+        Map<String, Integer> productQuantityMap = saleResponses.stream()
+                .flatMap(saleResponse -> saleResponse.getProducts().stream())
                 .collect(Collectors.toMap(
                         SaleProductResponse::getName,
                         SaleProductResponse::getQuantity,
-                        Integer::sum // Merge function to sum quantities of duplicate product names
+                        Integer::sum
                 ));
 
-        // Do something with saleResponses
-        saleResponses.forEach(saleResponse -> {
-            System.out.println(saleResponse);
-        });
-
-        byte[] pdfBytes = chartService.generateReceipt(saleResponse);
+        byte[] pdfBytes = chartService.generateChart(productQuantityMap);
         log.trace("Exiting getChart method in ReportServiceImpl");
         return pdfBytes;
     }
