@@ -56,6 +56,12 @@ public class _GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(ChartGenerationException.class)
+    public ResponseEntity<String> handleChartGenerationException(ChartGenerationException ex) {
+        log.error("Handling ChartGenerationException: {}", ex.getMessage(), ex);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @ExceptionHandler(InvalidTimeUnitException.class)
     public ResponseEntity<String> handleInvalidTimeUnitException(InvalidTimeUnitException ex) {
         log.error("Handling InvalidTimeUnitException: {}", ex.getMessage(), ex);
