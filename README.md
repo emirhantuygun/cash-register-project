@@ -4,7 +4,7 @@
 
 <div>
   <div>
-    <img src="~images/32bit.png" alt="Project Logo" style="max-width: 150px" align="right">
+    <img src="~images/32bit.png" alt="Project Logo" style="height:20%;width:20%;" align="right">
   </div>
   <div>
     This project is made for 32bit's Backend Competition. The cash register project is designed to facilitate the process of a cashier handling sales transactions.
