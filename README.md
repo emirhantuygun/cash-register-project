@@ -2,12 +2,12 @@
 
 ## Project Description
 
-<div style="display: flex; align-items: center;">
-  <div style="flex: 1;">
-    This project is made for 32bit's Backend Competition. The cash register project is designed to facilitate the process of a cashier handling sales transactions.
+<div>
+  <div>
+    <img src="~images/32bit.png" alt="Project Logo" style="max-width: 150px" align="right">
   </div>
-  <div style="flex: 1; text-align: right;">
-    <img src="~images/32bit.png" alt="Project Logo" style="max-width: 200px;">
+  <div>
+    This project is made for 32bit's Backend Competition. The cash register project is designed to facilitate the process of a cashier handling sales transactions.
   </div>
 </div>
 
