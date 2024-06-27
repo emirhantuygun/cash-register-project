@@ -71,4 +71,6 @@ public interface ReportService {
      * @throws ReceiptGenerationException If there is an error generating the receipt.
      */
     byte[] getReceipt(Long id) throws HeaderProcessingException, ReceiptGenerationException;
+
+    byte[] getChart(String unit) throws HeaderProcessingException, ReceiptGenerationException;
 }

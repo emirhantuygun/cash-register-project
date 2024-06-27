@@ -70,5 +70,16 @@ public class ReportServiceImpl implements ReportService {
         log.trace("Exiting getReceipt method in ReportServiceImpl");
         return pdfBytes;
     }
+
+    @Override
+    public byte[] getChart(String unit) throws HeaderProcessingException, ReceiptGenerationException {
+        log.trace("Entering getReceipt method in ReportServiceImpl");
+//        SaleResponse saleResponse = getSale(id);
+
+//        byte[] pdfBytes = receiptService.generateReceipt(saleResponse);
+        log.trace("Exiting getReceipt method in ReportServiceImpl");
+//        return pdfBytes;
+        return null;
+    }
 }
 

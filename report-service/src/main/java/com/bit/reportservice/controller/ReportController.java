@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -145,6 +147,23 @@ public class ReportController {
         log.info("Returning receipt PDF for id: {}", id);
 
         log.trace("Exiting getReceipt method in ReportController with id: {}", id);
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/chart")
+    public ResponseEntity<byte[]> getChart(@RequestParam(defaultValue = "month") String unit) throws ReceiptGenerationException, HeaderProcessingException {
+        log.trace("Entering getChart method in ReportController");
+
+        byte[] pdfBytes = reportService.getChart(unit);
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("filename", "chart_" + unit + "_" + dateFormat.format(new Date()) + ".pdf");
+        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+        log.info("Returning chart PDF for time unit: {}", unit);
+
+        log.trace("Exiting getChart method in ReportController");
         return new ResponseEntity<>(pdfBytes, headers, HttpStatus.CREATED);
     }
 }
