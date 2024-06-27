@@ -17,9 +17,10 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductResponse {
+public class SaleProductResponse {
 
     private Long id;
+    private Long productId;
     private String name;
     private String barcodeNumber;
     private Integer quantity;

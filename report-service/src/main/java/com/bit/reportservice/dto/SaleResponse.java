@@ -24,7 +24,7 @@ public class SaleResponse {
     private Date date;
     private String paymentMethod;
     private List<String> campaignNames;
-    private List<ProductResponse> products;
+    private List<SaleProductResponse> products;
     private BigDecimal cash;
     private BigDecimal change;
     private BigDecimal total;

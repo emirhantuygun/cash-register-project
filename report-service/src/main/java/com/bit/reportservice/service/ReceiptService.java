@@ -1,6 +1,6 @@
 package com.bit.reportservice.service;
 
-import com.bit.reportservice.dto.ProductResponse;
+import com.bit.reportservice.dto.SaleProductResponse;
 import com.bit.reportservice.dto.SaleResponse;
 import com.bit.reportservice.exception.ReceiptGenerationException;
 import com.itextpdf.text.*;
@@ -217,7 +217,7 @@ public class ReceiptService {
             productTable.setWidthPercentage(100);
             productTable.setWidths(columnWidths);
 
-            for (ProductResponse product : sale.getProducts()) {
+            for (SaleProductResponse product : sale.getProducts()) {
                 PdfPCell cell6 = new PdfPCell(new Phrase(product.getBarcodeNumber(), lightSmall));
                 cell6.setBorderWidth(0);
                 cell6.setVerticalAlignment(Element.ALIGN_MIDDLE);

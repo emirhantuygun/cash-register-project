@@ -55,4 +55,10 @@ public class _GlobalExceptionHandler {
         log.error("Handling ReceiptGenerationException: {}", ex.getMessage(), ex);
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(InvalidTimeUnitException.class)
+    public ResponseEntity<String> handleInvalidTimeUnitException(InvalidTimeUnitException ex) {
+        log.error("Handling InvalidTimeUnitException: {}", ex.getMessage(), ex);
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }

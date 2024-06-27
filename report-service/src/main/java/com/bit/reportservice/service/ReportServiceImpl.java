@@ -1,15 +1,21 @@
 package com.bit.reportservice.service;
 
 import com.bit.reportservice.dto.SaleResponse;
+import com.bit.reportservice.dto.SaleProductResponse;
 import com.bit.reportservice.exception.HeaderProcessingException;
+import com.bit.reportservice.exception.InvalidTimeUnitException;
 import com.bit.reportservice.exception.ReceiptGenerationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-
+import java.util.Calendar;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This class implements the ReportService interface and provides methods for generating sales reports.
@@ -73,13 +79,47 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public byte[] getChart(String unit) throws HeaderProcessingException, ReceiptGenerationException {
-        log.trace("Entering getReceipt method in ReportServiceImpl");
-//        SaleResponse saleResponse = getSale(id);
+        log.trace("Entering getChart method in ReportServiceImpl");
 
-//        byte[] pdfBytes = receiptService.generateReceipt(saleResponse);
-        log.trace("Exiting getReceipt method in ReportServiceImpl");
-//        return pdfBytes;
-        return null;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String startDate;
+        String endDate = dateFormat.format(new Date());
+
+        startDate = switch (unit) {
+            case "day" -> getDateBefore(Calendar.DAY_OF_YEAR, dateFormat);
+            case "week" -> getDateBefore(Calendar.WEEK_OF_YEAR, dateFormat);
+            case "month" -> getDateBefore(Calendar.MONTH, dateFormat);
+            case "year" -> getDateBefore(Calendar.YEAR, dateFormat);
+            default -> throw new InvalidTimeUnitException("Invalid time unit parameter");
+        };
+
+        Page<SaleResponse> saleResponsePage = getAllSalesFilteredAndSorted(0, 10, "id", "ASC",
+                null, null, null, null, startDate, endDate);
+
+        List<SaleResponse> saleResponses = saleResponsePage.getContent();
+
+        Map<String, Integer> productStockMap = saleResponses.stream()
+                .flatMap(saleResponse -> saleResponse.getProducts().stream()) // Flatten the list of products
+                .collect(Collectors.toMap(
+                        SaleProductResponse::getName,
+                        SaleProductResponse::getQuantity,
+                        Integer::sum // Merge function to sum quantities of duplicate product names
+                ));
+
+        // Do something with saleResponses
+        saleResponses.forEach(saleResponse -> {
+            System.out.println(saleResponse);
+        });
+
+        byte[] pdfBytes = chartService.generateReceipt(saleResponse);
+        log.trace("Exiting getChart method in ReportServiceImpl");
+        return pdfBytes;
+    }
+
+    private String getDateBefore(int calendarField, SimpleDateFormat dateFormat) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(calendarField, -1);
+        return dateFormat.format(calendar.getTime());
     }
 }
 
