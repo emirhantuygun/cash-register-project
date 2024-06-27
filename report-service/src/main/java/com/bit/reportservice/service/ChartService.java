@@ -50,7 +50,7 @@ public class ChartService {
 
     private final GeminiService geminiService;
 
-    public byte[] generateChart(Map<String, Integer> productQuantityMap) {
+    protected byte[] generateChart(Map<String, Integer> productQuantityMap) {
 
         try {
             BaseFont baseFontLight = BaseFont.createFont(LIGHT_FONT_PATH, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
@@ -62,11 +62,11 @@ public class ChartService {
             com.itextpdf.text.Font space = new com.itextpdf.text.Font(baseFontLight, 20, com.itextpdf.text.Font.BOLD);
 
             // Create a pie chart with percentages
-            DefaultPieDataset dataset = new DefaultPieDataset();
+            @SuppressWarnings("rawtypes") DefaultPieDataset dataset = new DefaultPieDataset<>();
             productQuantityMap.forEach(dataset::setValue);
 
             JFreeChart chart = ChartFactory.createPieChart("", dataset, true, false, false);
-            PiePlot plot = (PiePlot) chart.getPlot();
+            @SuppressWarnings("rawtypes") PiePlot plot = (PiePlot) chart.getPlot();
             plot.setLabelFont(new Font("Arial", Font.BOLD, 12));  // Using a monospaced font
             plot.setLabelGap(0.02);
             plot.setBackgroundPaint(Color.white);
@@ -157,6 +157,7 @@ public class ChartService {
             document.add(new Paragraph("\n"));
             document.add(new Paragraph("\n"));
 
+
             // GEMINI
 
             try (InputStream inputStream = getClass().getResourceAsStream(GEMINI_IMAGE_PATH)) {
@@ -176,7 +177,7 @@ public class ChartService {
             if (saleAnalysis != null) {
 
                 saleAnalysis = saleAnalysis.replaceAll("\\*\\*", "");
-                saleAnalysis = saleAnalysis.replaceAll("\\#\\#", "");
+                saleAnalysis = saleAnalysis.replaceAll("##", "");
 
                 String[] sentencesArray = saleAnalysis.split("(?<=[.!?])\\s*");
 
@@ -209,7 +210,6 @@ public class ChartService {
 
                     }
 
-
                     PdfPCell rightCell1 = new PdfPCell();
                     Phrase phrase = new Phrase(sentence);
                     rightCell1.addElement(phrase);
@@ -229,7 +229,7 @@ public class ChartService {
         }
     }
 
-    public String convertSalesDataToText(Map<String, Integer> salesData) {
+    private String convertSalesDataToText(Map<String, Integer> salesData) {
         StringBuilder salesDataText = new StringBuilder("Sales Data:\n");
         for (Map.Entry<String, Integer> entry : salesData.entrySet()) {
             salesDataText.append("- ").append(entry.getKey()).append(": ")

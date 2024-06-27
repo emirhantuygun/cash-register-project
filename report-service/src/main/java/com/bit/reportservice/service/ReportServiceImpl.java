@@ -79,7 +79,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public byte[] getChart(String unit) throws HeaderProcessingException, ReceiptGenerationException {
+    public byte[] getChart(String unit) throws HeaderProcessingException {
         log.trace("Entering getChart method in ReportServiceImpl");
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");

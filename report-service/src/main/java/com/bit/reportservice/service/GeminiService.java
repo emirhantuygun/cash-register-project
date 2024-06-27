@@ -21,7 +21,7 @@ public class GeminiService {
     @Value("${gemini.api-key}")
     private String GEMINI_API_KEY;
 
-    public String getInsight(String data) throws IOException {
+    protected String getInsight(String data) throws IOException {
         String ENDPOINT_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=" + GEMINI_API_KEY;
 
         JsonObject requestJson = getJsonObject(data);
