@@ -17,6 +17,7 @@ import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.data.general.DefaultPieDataset;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.awt.Font;
@@ -35,15 +36,25 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ChartService {
 
+    @Value("${chart.font-path.light}")
+    private String LIGHT_FONT_PATH;
+
+    @Value("${chart.font-path.regular}")
+    private String REGULAR_FONT_PATH;
+
+    @Value("${chart.image-path.gemini}")
+    private String GEMINI_IMAGE_PATH;
+
+    @Value("${chart.image-path.symbol}")
+    private String SYMBOL_IMAGE_PATH;
+
     private final GeminiService geminiService;
 
     public byte[] generateChart(Map<String, Integer> productQuantityMap) {
 
-        BaseFont baseFontLight = null;
-        BaseFont baseFontRegular = null;
         try {
-            baseFontLight = BaseFont.createFont("fonts/rubik-light.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-            baseFontRegular = BaseFont.createFont("fonts/rubik-regular.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            BaseFont baseFontLight = BaseFont.createFont(LIGHT_FONT_PATH, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            BaseFont baseFontRegular = BaseFont.createFont(REGULAR_FONT_PATH, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
             com.itextpdf.text.Font bold = new com.itextpdf.text.Font(baseFontRegular, 20, com.itextpdf.text.Font.BOLD);
             com.itextpdf.text.Font boldBig = new com.itextpdf.text.Font(baseFontRegular, 30, com.itextpdf.text.Font.BOLD);
             com.itextpdf.text.Font boldSmall = new com.itextpdf.text.Font(baseFontRegular, 14, com.itextpdf.text.Font.BOLD);
@@ -148,7 +159,7 @@ public class ChartService {
 
             // GEMINI
 
-            try (InputStream inputStream = getClass().getResourceAsStream("/static/images/gemini.png")) {
+            try (InputStream inputStream = getClass().getResourceAsStream(GEMINI_IMAGE_PATH)) {
                 if (inputStream != null) {
                     Image image = Image.getInstance(IOUtils.toByteArray(inputStream));
 
@@ -180,24 +191,24 @@ public class ChartService {
 
                 for (String sentence : sentences) {
                     System.out.println(sentence);
-                    try (InputStream inputStream = getClass().getResourceAsStream("/static/images/symbol.png")) {
-                        if (inputStream != null) {
-                            Image image = Image.getInstance(IOUtils.toByteArray(inputStream));
+                    InputStream inputStream = getClass().getResourceAsStream(SYMBOL_IMAGE_PATH);
+                    if (inputStream != null) {
+                        Image image = Image.getInstance(IOUtils.toByteArray(inputStream));
 
-                            image.scaleToFit(10, 10); // Resize the image if necessary
-                            image.setSpacingBefore(10f);
+                        image.scaleToFit(10, 10); // Resize the image if necessary
+                        image.setSpacingBefore(10f);
 
-                            PdfPCell leftCell1 = new PdfPCell(image);
+                        PdfPCell leftCell1 = new PdfPCell(image);
 
-                            leftCell1.setHorizontalAlignment(Element.ALIGN_LEFT);
-                            leftCell1.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                        leftCell1.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        leftCell1.setVerticalAlignment(Element.ALIGN_MIDDLE);
 
-                            leftCell1.setBorder(Rectangle.NO_BORDER);
+                        leftCell1.setBorder(Rectangle.NO_BORDER);
 
-                            aiTable.addCell(leftCell1);
+                        aiTable.addCell(leftCell1);
 
-                        }
                     }
+
 
                     PdfPCell rightCell1 = new PdfPCell();
                     Phrase phrase = new Phrase(sentence);

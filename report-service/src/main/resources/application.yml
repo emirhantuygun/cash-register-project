@@ -28,5 +28,13 @@ receipt:
   city: "SERDIVAN/SAKARYA"
   phone-number: "0264 295 54 54"
 
+chart:
+  font-path:
+    light: "fonts/rubik-light.ttf"
+    regular: "fonts/rubik-regular.ttf"
+  image-path:
+    gemini: "/static/images/gemini.png"
+    symbol: "/static/images/symbol.png"
+
 gemini:
   api-key: "AIzaSyCxyCa0kCuUKlzCe5DJAhm6NJCvAFZiq0Y"
