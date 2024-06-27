@@ -37,29 +37,6 @@ public class ChartService {
 
     private final GeminiService geminiService;
 
-    // Example method to get sales data
-    public Map<String, Integer> getSalesData() {
-        // Implement this method to fetch and return sales data from your database
-        // For example purposes, using hardcoded values
-        return Map.of("Product A", 5,
-                "Product B", 3,
-                "Product C", 2,
-                "Product D", 5,
-                "Product E", 10,
-                "Product F", 1,
-                "Product G", 8
-        );
-    }
-
-    public String convertSalesDataToText(Map<String, Integer> salesData) {
-        StringBuilder salesDataText = new StringBuilder("Sales Data:\n");
-        for (Map.Entry<String, Integer> entry : salesData.entrySet()) {
-            salesDataText.append("- ").append(entry.getKey()).append(": ")
-                    .append(entry.getValue()).append(" units\n");
-        }
-        return salesDataText.toString();
-    }
-
     public byte[] generateChart(Map<String, Integer> productQuantityMap) {
 
         BaseFont baseFontLight = null;
@@ -183,7 +160,7 @@ public class ChartService {
 
             document.add(new Paragraph("\n"));
             String saleFigures = convertSalesDataToText(productQuantityMap);
-            String saleAnalysis = geminiService.prompt(saleFigures);
+            String saleAnalysis = geminiService.getInsight(saleFigures);
             System.out.println(saleAnalysis);
             if (saleAnalysis != null) {
 
@@ -237,7 +214,16 @@ public class ChartService {
 
             return pdfOut.toByteArray();
         } catch (DocumentException | IOException e) {
-            throw new ChartGenerationException("");
+            throw new ChartGenerationException("An error occurred while generating the chart");
         }
+    }
+
+    public String convertSalesDataToText(Map<String, Integer> salesData) {
+        StringBuilder salesDataText = new StringBuilder("Sales Data:\n");
+        for (Map.Entry<String, Integer> entry : salesData.entrySet()) {
+            salesDataText.append("- ").append(entry.getKey()).append(": ")
+                    .append(entry.getValue()).append(" units\n");
+        }
+        return salesDataText.toString();
     }
 }

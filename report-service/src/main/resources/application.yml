@@ -27,3 +27,6 @@ receipt:
   location: "KEMALPASA, ESENTEPE CAMPUS, 54050"
   city: "SERDIVAN/SAKARYA"
   phone-number: "0264 295 54 54"
+
+gemini:
+  api-key: "AIzaSyCxyCa0kCuUKlzCe5DJAhm6NJCvAFZiq0Y"

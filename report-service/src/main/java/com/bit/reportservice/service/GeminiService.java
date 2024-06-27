@@ -4,8 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import org.springframework.beans.factory.annotation.Value;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -14,12 +15,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 @Service
+@RequiredArgsConstructor
 public class GeminiService {
 
-    private static final String API_KEY = "AIzaSyCxyCa0kCuUKlzCe5DJAhm6NJCvAFZiq0Y";
-    private static final String ENDPOINT_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=" + API_KEY;
+    @Value("${gemini.api-key}")
+    private String GEMINI_API_KEY;
 
-    public String prompt(String data) throws IOException {
+    public String getInsight(String data) throws IOException {
+        String ENDPOINT_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=" + GEMINI_API_KEY;
+
         JsonObject requestJson = getJsonObject(data);
 
         HttpURLConnection con = (HttpURLConnection) new URL(ENDPOINT_URL).openConnection();
