@@ -1,7 +1,9 @@
 package com.bit.reportservice.service;
 
 import com.bit.reportservice.dto.SaleResponse;
+import com.bit.reportservice.dto.SaleProductResponse;
 import com.bit.reportservice.exception.HeaderProcessingException;
+import com.bit.reportservice.exception.InvalidTimeUnitException;
 import com.bit.reportservice.exception.ReceiptGenerationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,6 +32,9 @@ class ReportServiceImplTest {
 
     @Mock
     private ReceiptService receiptService;
+
+    @Mock
+    private ChartService chartService;
 
     @Test
     void testGetSale_ReturnsSaleResponse() throws HeaderProcessingException {
@@ -143,5 +148,121 @@ class ReportServiceImplTest {
 
         // Act & Assert
         assertThrows(ReceiptGenerationException.class, () -> reportService.getReceipt(id));
+    }
+
+    @Test
+    void testGetChart_shouldReturnChartPdf_whenUnitIsDay() throws Exception {
+        // Arrange
+        SaleProductResponse product1 = SaleProductResponse.builder().name("Product1").quantity(10).build();
+        SaleProductResponse product2 = SaleProductResponse.builder().name("Product2").quantity(5).build();
+        SaleResponse saleResponse1 = SaleResponse.builder().products(List.of(product1)).build();
+        SaleResponse saleResponse2 = SaleResponse.builder().products(List.of(product2)).build();
+        List<SaleResponse> saleResponses = List.of(saleResponse1, saleResponse2);
+
+        when(gatewayService.getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString()))
+                .thenReturn(new PageImpl<>(saleResponses));
+        when(chartService.generateChart(anyMap(), anyString())).thenReturn(new byte[]{1, 2, 3, 4, 5});
+
+        // Act
+        byte[] pdfBytes = reportService.getChart("day");
+
+        // Assert
+        assertNotNull(pdfBytes);
+        assertArrayEquals(new byte[]{1, 2, 3, 4, 5}, pdfBytes);
+
+        verify(gatewayService, times(1)).getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString());
+        verify(chartService, times(1)).generateChart(anyMap(), eq("day"));
+    }
+
+    @Test
+    void testGetChart_shouldReturnChartPdf_whenUnitIsWeek() throws Exception {
+        // Arrange
+        SaleProductResponse product1 = SaleProductResponse.builder().name("Product1").quantity(10).build();
+        SaleProductResponse product2 = SaleProductResponse.builder().name("Product2").quantity(5).build();
+        SaleResponse saleResponse1 = SaleResponse.builder().products(List.of(product1)).build();
+        SaleResponse saleResponse2 = SaleResponse.builder().products(List.of(product2)).build();
+        List<SaleResponse> saleResponses = List.of(saleResponse1, saleResponse2);
+
+        when(gatewayService.getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString()))
+                .thenReturn(new PageImpl<>(saleResponses));
+        when(chartService.generateChart(anyMap(), anyString())).thenReturn(new byte[]{1, 2, 3, 4, 5});
+
+        // Act
+        byte[] pdfBytes = reportService.getChart("week");
+
+        // Assert
+        assertNotNull(pdfBytes);
+        assertArrayEquals(new byte[]{1, 2, 3, 4, 5}, pdfBytes);
+
+        verify(gatewayService, times(1)).getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString());
+        verify(chartService, times(1)).generateChart(anyMap(), eq("week"));
+    }
+
+    @Test
+    void testGetChart_shouldReturnChartPdf_whenUnitIsMonth() throws Exception {
+        // Arrange
+        SaleProductResponse product1 = SaleProductResponse.builder().name("Product1").quantity(10).build();
+        SaleProductResponse product2 = SaleProductResponse.builder().name("Product2").quantity(5).build();
+        SaleResponse saleResponse1 = SaleResponse.builder().products(List.of(product1)).build();
+        SaleResponse saleResponse2 = SaleResponse.builder().products(List.of(product2)).build();
+        List<SaleResponse> saleResponses = List.of(saleResponse1, saleResponse2);
+
+        when(gatewayService.getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString()))
+                .thenReturn(new PageImpl<>(saleResponses));
+        when(chartService.generateChart(anyMap(), anyString())).thenReturn(new byte[]{1, 2, 3, 4, 5});
+
+        // Act
+        byte[] pdfBytes = reportService.getChart("month");
+
+        // Assert
+        assertNotNull(pdfBytes);
+        assertArrayEquals(new byte[]{1, 2, 3, 4, 5}, pdfBytes);
+
+        verify(gatewayService, times(1)).getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString());
+        verify(chartService, times(1)).generateChart(anyMap(), eq("month"));
+    }
+
+    @Test
+    void testGetChart_shouldReturnChartPdf_whenUnitIsYear() throws Exception {
+        // Arrange
+        SaleProductResponse product1 = SaleProductResponse.builder().name("Product1").quantity(10).build();
+        SaleProductResponse product2 = SaleProductResponse.builder().name("Product2").quantity(5).build();
+        SaleResponse saleResponse1 = SaleResponse.builder().products(List.of(product1)).build();
+        SaleResponse saleResponse2 = SaleResponse.builder().products(List.of(product2)).build();
+        List<SaleResponse> saleResponses = List.of(saleResponse1, saleResponse2);
+
+        when(gatewayService.getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString()))
+                .thenReturn(new PageImpl<>(saleResponses));
+        when(chartService.generateChart(anyMap(), anyString())).thenReturn(new byte[]{1, 2, 3, 4, 5});
+
+        // Act
+        byte[] pdfBytes = reportService.getChart("year");
+
+        // Assert
+        assertNotNull(pdfBytes);
+        assertArrayEquals(new byte[]{1, 2, 3, 4, 5}, pdfBytes);
+
+        verify(gatewayService, times(1)).getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString());
+        verify(chartService, times(1)).generateChart(anyMap(), eq("year"));
+    }
+
+    @Test
+    void testGetChart_shouldThrowInvalidTimeUnitException_whenUnitIsInvalid() throws HeaderProcessingException {
+        // Act & Assert
+        assertThrows(InvalidTimeUnitException.class, () -> reportService.getChart("invalid"));
+
+        verify(gatewayService, times(0)).getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString());
+        verify(chartService, times(0)).generateChart(anyMap(), anyString());
+    }
+
+    @Test
+    void testGetChart_shouldThrowHeaderProcessingException_whenChartServiceFails() throws Exception {
+        // Arrange
+        when(gatewayService.getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString()))
+                .thenThrow(new HeaderProcessingException("Header processing failed"));
+
+        // Act & Assert
+        assertThrows(HeaderProcessingException.class, () -> reportService.getChart("month"));
+        verify(gatewayService, times(1)).getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString());
     }
 }

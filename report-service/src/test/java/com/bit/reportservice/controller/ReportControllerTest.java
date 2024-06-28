@@ -137,11 +137,14 @@ class ReportControllerTest {
 
     @Test
     void testGetChart_shouldReturnChartPdf_whenUnitIsDefaultMonth() throws Exception {
+        // Arrange
         byte[] pdfBytes = new byte[]{1, 2, 3, 4, 5};
         when(reportService.getChart(anyString())).thenReturn(pdfBytes);
 
+        // Act
         ResponseEntity<byte[]> response = reportController.getChart("month");
 
+        // Assert
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
         assertArrayEquals(pdfBytes, response.getBody());
@@ -156,11 +159,14 @@ class ReportControllerTest {
 
     @Test
     void testGetChart_shouldReturnChartPdf_whenUnitIsDay() throws Exception {
+        // Arrange
         byte[] pdfBytes = new byte[]{1, 2, 3, 4, 5};
         when(reportService.getChart(anyString())).thenReturn(pdfBytes);
 
+        // Act
         ResponseEntity<byte[]> response = reportController.getChart("day");
 
+        // Assert
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
         assertArrayEquals(pdfBytes, response.getBody());
@@ -175,29 +181,34 @@ class ReportControllerTest {
 
     @Test
     void testGetChart_shouldThrowReceiptGenerationException_whenServiceThrowsException() throws Exception {
+        // Arrange
         when(reportService.getChart(anyString())).thenThrow(new ReceiptGenerationException("Receipt generation failed", new RuntimeException()));
 
+        // Act & Assert
         assertThrows(ReceiptGenerationException.class, () -> reportController.getChart("day"));
-
         verify(reportService, times(1)).getChart("day");
     }
 
     @Test
     void testGetChart_shouldThrowHeaderProcessingException_whenServiceThrowsException() throws Exception {
+        // Arrange
         when(reportService.getChart(anyString())).thenThrow(new HeaderProcessingException("Header processing failed"));
 
+        // Act & Assert
         assertThrows(HeaderProcessingException.class, () -> reportController.getChart("day"));
-
         verify(reportService, times(1)).getChart("day");
     }
 
     @Test
     void testGetChart_shouldReturnChartPdfWithCorrectHeaders() throws Exception {
+        // Arrange
         byte[] pdfBytes = new byte[]{1, 2, 3, 4, 5};
         when(reportService.getChart(anyString())).thenReturn(pdfBytes);
 
+        // Act
         ResponseEntity<byte[]> response = reportController.getChart("week");
 
+        // Assert
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertNotNull(response.getBody());
         assertArrayEquals(pdfBytes, response.getBody());
