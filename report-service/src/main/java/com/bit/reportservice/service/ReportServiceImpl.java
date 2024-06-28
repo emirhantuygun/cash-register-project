@@ -1,7 +1,7 @@
 package com.bit.reportservice.service;
 
-import com.bit.reportservice.dto.SaleResponse;
 import com.bit.reportservice.dto.SaleProductResponse;
+import com.bit.reportservice.dto.SaleResponse;
 import com.bit.reportservice.exception.HeaderProcessingException;
 import com.bit.reportservice.exception.InvalidTimeUnitException;
 import com.bit.reportservice.exception.ReceiptGenerationException;
@@ -9,10 +9,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import java.util.Calendar;
+
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -62,6 +62,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public Page<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction, String cashier, String paymentMethod, BigDecimal minTotal, BigDecimal maxTotal, String startDate, String endDate) throws HeaderProcessingException {
         log.trace("Entering getAllSalesFilteredAndSorted method in ReportServiceImpl");
+        log.debug("Query Parameters - page: {}, size: {}, sortBy: {}, direction: {}, cashier: {}, paymentMethod: {}, minTotal: {}, maxTotal: {}, startDate: {}, endDate: {}", page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
         Page<SaleResponse> saleResponses = gatewayService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
 
         log.trace("Exiting getAllSalesFilteredAndSorted method in ReportServiceImpl");
@@ -84,15 +85,17 @@ public class ReportServiceImpl implements ReportService {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String startDate;
-        String endDate = dateFormat.format(new Date());
+        String endDate = getDateAfterOrBefore(Calendar.DAY_OF_YEAR, 1, dateFormat);
 
         startDate = switch (unit) {
-            case "day" -> getDateBefore(Calendar.DAY_OF_YEAR, dateFormat);
-            case "week" -> getDateBefore(Calendar.WEEK_OF_YEAR, dateFormat);
-            case "month" -> getDateBefore(Calendar.MONTH, dateFormat);
-            case "year" -> getDateBefore(Calendar.YEAR, dateFormat);
+            case "day" -> getDateAfterOrBefore(Calendar.DAY_OF_YEAR, -1, dateFormat);
+            case "week" -> getDateAfterOrBefore(Calendar.WEEK_OF_YEAR, -1, dateFormat);
+            case "month" -> getDateAfterOrBefore(Calendar.MONTH, -1, dateFormat);
+            case "year" -> getDateAfterOrBefore(Calendar.YEAR, -1, dateFormat);
             default -> throw new InvalidTimeUnitException("Invalid time unit parameter");
         };
+
+        log.debug("startDate: {}, endDate: {}", startDate, endDate);
 
         Page<SaleResponse> saleResponsePage = getAllSalesFilteredAndSorted(0, 10, "id", "ASC",
                 null, null, null, null, startDate, endDate);
@@ -107,15 +110,16 @@ public class ReportServiceImpl implements ReportService {
                         SaleProductResponse::getQuantity,
                         Integer::sum
                 ));
+        log.debug("Got productQuantityMap: {}", productQuantityMap);
 
         byte[] pdfBytes = chartService.generateChart(productQuantityMap);
         log.trace("Exiting getChart method in ReportServiceImpl");
         return pdfBytes;
     }
 
-    private String getDateBefore(int calendarField, SimpleDateFormat dateFormat) {
+    private String getDateAfterOrBefore(int calendarField, int amount, SimpleDateFormat dateFormat) {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(calendarField, -1);
+        calendar.add(calendarField, amount);
         return dateFormat.format(calendar.getTime());
     }
 }
