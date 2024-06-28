@@ -87,7 +87,7 @@ public class ReportServiceImpl implements ReportService {
         String startDate;
         String endDate = getDateAfterOrBefore(Calendar.DAY_OF_YEAR, 1, dateFormat);
 
-        startDate = switch (unit) {
+        startDate = switch (unit.toLowerCase()) {
             case "day" -> getDateAfterOrBefore(Calendar.DAY_OF_YEAR, -1, dateFormat);
             case "week" -> getDateAfterOrBefore(Calendar.WEEK_OF_YEAR, -1, dateFormat);
             case "month" -> getDateAfterOrBefore(Calendar.MONTH, -1, dateFormat);
@@ -112,7 +112,8 @@ public class ReportServiceImpl implements ReportService {
                 ));
         log.debug("Got productQuantityMap: {}", productQuantityMap);
 
-        byte[] pdfBytes = chartService.generateChart(productQuantityMap);
+        byte[] pdfBytes = chartService.generateChart(productQuantityMap, unit);
+
         log.trace("Exiting getChart method in ReportServiceImpl");
         return pdfBytes;
     }

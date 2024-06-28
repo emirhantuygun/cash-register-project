@@ -1,6 +1,7 @@
 package com.bit.reportservice.service;
 
 import com.bit.reportservice.exception.ChartGenerationException;
+import com.bit.reportservice.exception.InvalidTimeUnitException;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.*;
@@ -27,10 +28,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +49,7 @@ public class ChartService {
 
     private final GeminiService geminiService;
 
-    protected byte[] generateChart(Map<String, Integer> productQuantityMap) {
+    protected byte[] generateChart(Map<String, Integer> productQuantityMap, String unit) {
 
         try {
             BaseFont baseFontLight = BaseFont.createFont(LIGHT_FONT_PATH, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
@@ -87,17 +86,20 @@ public class ChartService {
             PdfWriter.getInstance(document, pdfOut);
             document.open();
 
-            // Add title
+
+            // Add Date
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             Paragraph date = new Paragraph(dateFormat.format(new Date()), lightSmall);
             date.setAlignment(Paragraph.ALIGN_RIGHT);
             document.add(date);
             document.add(new Paragraph("\n"));
-            Paragraph title = new Paragraph("SALES REPORT", boldBig);
-            title.setAlignment(Paragraph.ALIGN_CENTER);
+
+
+            // Add Title
+            Paragraph title = getTitle(unit, boldBig);
             document.add(title);
 
-            // Add chart image to PDF
+            // CHART IMAGE
             Image chartImage = Image.getInstance(chartOut.toByteArray());
             chartImage.setAlignment(Image.ALIGN_CENTER);
             document.add(chartImage);
@@ -107,7 +109,7 @@ public class ChartService {
             document.add(new Paragraph("\n"));
 
 
-            // Statistics table
+            // STATISTICS TABLE
             Paragraph statisticsTitle = new Paragraph("Sales Statistics", bold);
             statisticsTitle.setAlignment(Paragraph.ALIGN_CENTER);
             document.add(statisticsTitle);
@@ -227,6 +229,21 @@ public class ChartService {
         } catch (DocumentException | IOException e) {
             throw new ChartGenerationException("An error occurred while generating the chart");
         }
+    }
+
+    private Paragraph getTitle(String unit, com.itextpdf.text.Font boldBig) {
+        String unitIdentifier;
+        unitIdentifier = switch (unit.toLowerCase()) {
+            case "day" -> "DAILY";
+            case "week" -> "WEEKLY";
+            case "month" -> "MONTHLY";
+            case "year" -> "YEARLY";
+            default -> throw new InvalidTimeUnitException("Invalid time unit parameter");
+        };
+
+        Paragraph title = new Paragraph(unitIdentifier + " SALES REPORT", boldBig);
+        title.setAlignment(Paragraph.ALIGN_CENTER);
+        return title;
     }
 
     private String convertSalesDataToText(Map<String, Integer> salesData) {
