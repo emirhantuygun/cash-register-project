@@ -13,14 +13,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -131,6 +133,81 @@ class ReportControllerTest {
         assertEquals("application/pdf", response.getHeaders().getContentType().toString());
         assertArrayEquals(pdfBytes, response.getBody());
         verify(reportService, times(1)).getReceipt(saleId);
+    }
+
+    @Test
+    void testGetChart_shouldReturnChartPdf_whenUnitIsDefaultMonth() throws Exception {
+        byte[] pdfBytes = new byte[]{1, 2, 3, 4, 5};
+        when(reportService.getChart(anyString())).thenReturn(pdfBytes);
+
+        ResponseEntity<byte[]> response = reportController.getChart("month");
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertArrayEquals(pdfBytes, response.getBody());
+
+        HttpHeaders headers = response.getHeaders();
+        assertEquals(MediaType.APPLICATION_PDF, headers.getContentType());
+        assertTrue(headers.getContentDisposition().getFilename().contains("chart_month_"));
+        assertEquals("must-revalidate, post-check=0, pre-check=0", headers.getCacheControl());
+
+        verify(reportService, times(1)).getChart("month");
+    }
+
+    @Test
+    void testGetChart_shouldReturnChartPdf_whenUnitIsDay() throws Exception {
+        byte[] pdfBytes = new byte[]{1, 2, 3, 4, 5};
+        when(reportService.getChart(anyString())).thenReturn(pdfBytes);
+
+        ResponseEntity<byte[]> response = reportController.getChart("day");
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertArrayEquals(pdfBytes, response.getBody());
+
+        HttpHeaders headers = response.getHeaders();
+        assertEquals(MediaType.APPLICATION_PDF, headers.getContentType());
+        assertTrue(headers.getContentDisposition().getFilename().contains("chart_day_"));
+        assertEquals("must-revalidate, post-check=0, pre-check=0", headers.getCacheControl());
+
+        verify(reportService, times(1)).getChart("day");
+    }
+
+    @Test
+    void testGetChart_shouldThrowReceiptGenerationException_whenServiceThrowsException() throws Exception {
+        when(reportService.getChart(anyString())).thenThrow(new ReceiptGenerationException("Receipt generation failed", new RuntimeException()));
+
+        assertThrows(ReceiptGenerationException.class, () -> reportController.getChart("day"));
+
+        verify(reportService, times(1)).getChart("day");
+    }
+
+    @Test
+    void testGetChart_shouldThrowHeaderProcessingException_whenServiceThrowsException() throws Exception {
+        when(reportService.getChart(anyString())).thenThrow(new HeaderProcessingException("Header processing failed"));
+
+        assertThrows(HeaderProcessingException.class, () -> reportController.getChart("day"));
+
+        verify(reportService, times(1)).getChart("day");
+    }
+
+    @Test
+    void testGetChart_shouldReturnChartPdfWithCorrectHeaders() throws Exception {
+        byte[] pdfBytes = new byte[]{1, 2, 3, 4, 5};
+        when(reportService.getChart(anyString())).thenReturn(pdfBytes);
+
+        ResponseEntity<byte[]> response = reportController.getChart("week");
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertArrayEquals(pdfBytes, response.getBody());
+
+        HttpHeaders headers = response.getHeaders();
+        assertEquals(MediaType.APPLICATION_PDF, headers.getContentType());
+        assertTrue(headers.getContentDisposition().getFilename().contains("chart_week_"));
+        assertEquals("must-revalidate, post-check=0, pre-check=0", headers.getCacheControl());
+
+        verify(reportService, times(1)).getChart("week");
     }
 }
 

@@ -15,6 +15,7 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -339,13 +340,13 @@ public class SaleServiceImpl implements SaleService {
     /**
      * This method generates a list of predicates for filtering sales based on the given parameters.
      *
-     * @param cashier The cashier name to filter sales by.
-     * @param paymentMethod The payment method to filter sales by.
-     * @param minTotal The minimum total amount to filter sales by.
-     * @param maxTotal The maximum total amount to filter sales by.
-     * @param startDate The start date to filter sales by.
-     * @param endDate The end date to filter sales by.
-     * @param root The root of the CriteriaQuery.
+     * @param cashier         The cashier name to filter sales by.
+     * @param paymentMethod   The payment method to filter sales by.
+     * @param minTotal        The minimum total amount to filter sales by.
+     * @param maxTotal        The maximum total amount to filter sales by.
+     * @param startDate       The start date to filter sales by.
+     * @param endDate         The end date to filter sales by.
+     * @param root            The root of the CriteriaQuery.
      * @param criteriaBuilder The CriteriaBuilder for creating predicates.
      * @return A list of predicates for filtering sales.
      */
@@ -415,10 +416,10 @@ public class SaleServiceImpl implements SaleService {
      *
      * @param saleProductRequests The list of product requests for the sale.
      * @return A list of Product objects representing the products for the sale.
-     * @throws HeaderProcessingException If there is an error processing the header.
+     * @throws HeaderProcessingException  If there is an error processing the header.
      * @throws ProductOutOfStockException If there is not enough stock for a product.
-     * @throws ProductNotFoundException If the Product service returns a 404 Not Found status.
-     * @throws ProductServiceException If any other error occurs during the process.
+     * @throws ProductNotFoundException   If the Product service returns a 404 Not Found status.
+     * @throws ProductServiceException    If any other error occurs during the process.
      */
     @ExcludeFromGeneratedCoverage
     private List<Product> getProducts(List<SaleProductRequest> saleProductRequests) throws HeaderProcessingException {
@@ -482,8 +483,8 @@ public class SaleServiceImpl implements SaleService {
      * to the products and calculates the total price after applying the campaigns.
      *
      * @param campaignIds The list of campaign IDs to apply to the products.
-     * @param products The list of products for which the campaigns need to be applied.
-     * @param total The total price of the products before applying the campaigns.
+     * @param products    The list of products for which the campaigns need to be applied.
+     * @param total       The total price of the products before applying the campaigns.
      * @return A CampaignProcessResult object containing the list of applied campaigns, the updated list of products,
      * and the total price after applying the campaigns.
      */
@@ -533,7 +534,7 @@ public class SaleServiceImpl implements SaleService {
      *
      * @param sale The sale object for which the campaign names need to be retrieved.
      * @return A list of strings representing the names of the campaigns applied to the sale.
-     *         If no campaigns are applied, it returns null.
+     * If no campaigns are applied, it returns null.
      */
     private List<String> getCampaignNames(Sale sale) {
         log.trace("Entering getCampaignNames method in SaleServiceImpl class");
@@ -554,10 +555,10 @@ public class SaleServiceImpl implements SaleService {
      * If the cash amount is not enough, it throws an InsufficientCashException.
      * If the cash amount is sufficient, it calculates and returns the change amount.
      *
-     * @param cash The cash amount provided by the customer.
+     * @param cash              The cash amount provided by the customer.
      * @param totalWithCampaign The total amount of the sale after applying the campaigns.
      * @return The change amount after processing the cash payment.
-     * @throws CashNotProvidedException If the cash amount is not provided.
+     * @throws CashNotProvidedException  If the cash amount is not provided.
      * @throws InsufficientCashException If the cash amount is not enough to cover the sale amount.
      */
     protected BigDecimal processCashPayment(BigDecimal cash, BigDecimal totalWithCampaign) {
@@ -585,11 +586,11 @@ public class SaleServiceImpl implements SaleService {
      * If the total amount paid is not enough, it throws an exception.
      * Finally, it calculates and returns the change amount to be given to the customer.
      *
-     * @param mixedPayment The mixed payment object provided by the customer.
+     * @param mixedPayment      The mixed payment object provided by the customer.
      * @param totalWithCampaign The total amount of the sale after applying the campaigns.
      * @return The change amount to be given to the customer after processing the mixed payment.
-     * @throws MixedPaymentNotFoundException If the mixed payment object is not provided.
-     * @throws InvalidMixedPaymentException If the cash or credit card amounts in the mixed payment object are not valid.
+     * @throws MixedPaymentNotFoundException     If the mixed payment object is not provided.
+     * @throws InvalidMixedPaymentException      If the cash or credit card amounts in the mixed payment object are not valid.
      * @throws InsufficientMixedPaymentException If the total amount paid by the customer is not enough to cover the sale amount.
      */
     protected BigDecimal processMixedPayment(MixedPayment mixedPayment, BigDecimal totalWithCampaign) {
@@ -661,7 +662,7 @@ public class SaleServiceImpl implements SaleService {
                 rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY, productStockReduceRequest);
                 log.debug("Stock reduce request sent for product with id: {}", product.getId());
 
-            } catch (Exception e) {
+            } catch (AmqpException e) {
                 log.error("Failed to send reduce message to RabbitMQ", e);
                 throw new RabbitMQException("Failed to send reduce message to RabbitMQ", e);
             }

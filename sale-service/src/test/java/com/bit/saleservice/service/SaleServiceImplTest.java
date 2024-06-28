@@ -13,6 +13,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -559,10 +560,10 @@ class SaleServiceImplTest {
 
         List<Product> products = List.of(product1, product2);
 
-        doThrow(new RuntimeException("RabbitMQ error")).when(rabbitTemplate).convertAndSend(anyString(), anyString(), Optional.ofNullable(any()));
+        doThrow(new AmqpException("RabbitMQ Error")).when(rabbitTemplate).convertAndSend(any(), any(), any(ProductStockReduceRequest.class));
 
         // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> saleService.reduceStocks(products));
+        RabbitMQException exception = assertThrows(RabbitMQException.class, () -> saleService.reduceStocks(products));
         assertEquals("Failed to send reduce message to RabbitMQ", exception.getMessage());
     }
 
