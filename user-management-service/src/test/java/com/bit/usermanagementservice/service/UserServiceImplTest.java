@@ -5,7 +5,9 @@ import com.bit.usermanagementservice.dto.UserRequest;
 import com.bit.usermanagementservice.dto.UserResponse;
 import com.bit.usermanagementservice.entity.AppUser;
 import com.bit.usermanagementservice.entity.Role;
+import com.bit.usermanagementservice.exception.RabbitMQException;
 import com.bit.usermanagementservice.exception.UserNotSoftDeletedException;
+import com.bit.usermanagementservice.exception.UserNotFoundException;
 import com.bit.usermanagementservice.repository.RoleRepository;
 import com.bit.usermanagementservice.repository.UserRepository;
 import com.bit.usermanagementservice.wrapper.UpdateUserMessage;
@@ -260,5 +262,111 @@ class UserServiceImplTest {
         verify(userRepository, times(1)).deleteRolesForUser(userId);
         verify(userRepository, times(1)).deletePermanently(userId);
         verify(rabbitTemplate, times(1)).convertAndSend(any(), any(), eq(userId));
+    }
+
+    //----------------------------
+
+    @Test
+    void testRestoreUser_shouldThrowRabbitMQException_whenRabbitMQFails() {
+        // Arrange
+        Long userId = 1L;
+
+        when(userRepository.existsByIdAndDeletedTrue(userId)).thenReturn(true);
+        doThrow(new RuntimeException("RabbitMQ failure")).when(rabbitTemplate).convertAndSend(any(), any(), eq(userId));
+
+        // Act & Assert
+        RabbitMQException exception = assertThrows(RabbitMQException.class, () -> userService.restoreUser(userId));
+
+        assertEquals("Failed to send restore message to RabbitMQ", exception.getMessage());
+        verify(userRepository, times(1)).existsByIdAndDeletedTrue(userId);
+        verify(rabbitTemplate, times(1)).convertAndSend(any(), any(), eq(userId));
+        verify(userRepository, never()).restoreUser(anyLong());
+    }
+
+    @Test
+    void testRestoreUser_shouldThrowUserNotFoundException_whenUserNotFoundAfterRestoring() {
+        // Arrange
+        Long userId = 1L;
+
+        when(userRepository.existsByIdAndDeletedTrue(userId)).thenReturn(true);
+        doNothing().when(rabbitTemplate).convertAndSend(any(), any(), eq(userId));
+        doNothing().when(userRepository).restoreUser(userId);
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userService.restoreUser(userId));
+
+        assertEquals("Couldn't restore the user with id " + userId, exception.getMessage());
+        verify(userRepository, times(1)).existsByIdAndDeletedTrue(userId);
+        verify(rabbitTemplate, times(1)).convertAndSend(any(), any(), eq(userId));
+        verify(userRepository, times(1)).restoreUser(userId);
+        verify(userRepository, times(1)).findById(userId);
+    }
+
+    @Test
+    void testDeleteUser_shouldThrowUserNotFoundException_whenUserDoesNotExist() {
+        // Arrange
+        Long userId = 1L;
+
+        when(userRepository.existsById(userId)).thenReturn(false);
+
+        // Act & Assert
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userService.deleteUser(userId));
+
+        assertEquals("User not found with id " + userId, exception.getMessage());
+        verify(userRepository, times(1)).existsById(userId);
+        verify(userRepository, never()).deleteById(anyLong());
+        verify(rabbitTemplate, never()).convertAndSend(anyString(), anyString(), anyLong());
+    }
+
+    @Test
+    void testDeleteUser_shouldThrowRabbitMQException_whenRabbitMQFails() {
+        // Arrange
+        Long userId = 1L;
+
+        when(userRepository.existsById(userId)).thenReturn(true);
+        doThrow(new RuntimeException("RabbitMQ failure")).when(rabbitTemplate).convertAndSend(any(), any(), eq(userId));
+
+        // Act & Assert
+        RabbitMQException exception = assertThrows(RabbitMQException.class, () -> userService.deleteUser(userId));
+
+        assertEquals("Failed to send delete message to RabbitMQ", exception.getMessage());
+        verify(userRepository, times(1)).existsById(userId);
+        verify(rabbitTemplate, times(1)).convertAndSend(any(), any(), eq(userId));
+        verify(userRepository, never()).deleteById(anyLong());
+    }
+
+    @Test
+    void testDeleteUserPermanently_shouldThrowUserNotFoundException_whenUserDoesNotExist() {
+        // Arrange
+        Long userId = 1L;
+        when(userRepository.existsById(userId)).thenReturn(false);
+
+        // Act & Assert
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userService.deleteUserPermanently(userId));
+
+        assertEquals("User not found with id " + userId, exception.getMessage());
+        verify(userRepository, times(1)).existsById(userId);
+        verify(userRepository, never()).deleteRolesForUser(anyLong());
+        verify(userRepository, never()).deletePermanently(anyLong());
+        verify(rabbitTemplate, never()).convertAndSend(anyString(), anyString(), anyLong());
+    }
+
+    @Test
+    void testDeleteUserPermanently_shouldThrowRabbitMQException_whenRabbitMQFails() {
+        // Arrange
+        Long userId = 1L;
+
+        when(userRepository.existsById(userId)).thenReturn(true);
+        doThrow(new RuntimeException("RabbitMQ failure")).when(rabbitTemplate).convertAndSend(any(), any(), eq(userId));
+
+        // Act & Assert
+        RabbitMQException exception = assertThrows(RabbitMQException.class, () -> userService.deleteUserPermanently(userId));
+
+        assertEquals("Failed to send delete-permanent message to RabbitMQ", exception.getMessage());
+        verify(userRepository, times(1)).existsById(userId);
+        verify(rabbitTemplate, times(1)).convertAndSend(any(), any(), eq(userId));
+        verify(userRepository, never()).deleteRolesForUser(anyLong());
+        verify(userRepository, never()).deletePermanently(anyLong());
     }
 }
