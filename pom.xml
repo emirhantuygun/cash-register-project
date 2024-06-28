@@ -143,6 +143,8 @@
                                 <exclude>**/Resilience4JConfig.class</exclude>
                                 <exclude>**/GatewayConfig.class</exclude>
                                 <exclude>**/ReceiptService.class</exclude>
+                                <exclude>**/ChartService.class</exclude>
+                                <exclude>**/GeminiService.class</exclude>
                                 <exclude>**/ApiGatewayApplication.class</exclude>
                                 <exclude>**/AuthServiceApplication.class</exclude>
                                 <exclude>**/ProductServiceApplication.class</exclude>

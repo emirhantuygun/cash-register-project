@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 import java.io.BufferedReader;
@@ -14,6 +15,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class GeminiService {
@@ -22,6 +24,7 @@ public class GeminiService {
     private String GEMINI_API_KEY;
 
     protected String getInsight(String data) throws IOException {
+        log.trace("Entering getInsight method in GeminiService");
         String ENDPOINT_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=" + GEMINI_API_KEY;
 
         JsonObject requestJson = getJsonObject(data);
@@ -51,14 +54,20 @@ public class GeminiService {
                 JsonArray newPartsArray = contentObject.getAsJsonArray("parts");
                 for (JsonElement partElement : newPartsArray) {
                     JsonObject partObject = partElement.getAsJsonObject();
+
+                    log.trace("Exiting getInsight method in GeminiService");
                     return partObject.get("text").getAsString();
                 }
             }
         }
+        log.debug("Gemini connection failed, returning null");
+
+        log.trace("Exiting getInsight method in GeminiService");
         return null;
     }
 
     private JsonObject getJsonObject(String data) {
+        log.trace("Entering getJsonObject method in GeminiService");
         JsonObject requestJson = new JsonObject();
         JsonArray contentsArray = getJsonElements(data);
         requestJson.add("contents", contentsArray);
@@ -78,13 +87,17 @@ public class GeminiService {
         safetySettingsArray.add(safetySettings);
 
         requestJson.add("safetySettings", safetySettingsArray);
+
+        log.trace("Exiting getJsonObject method in GeminiService");
         return requestJson;
     }
 
     private JsonArray getJsonElements(String data) {
+        log.trace("Entering getJsonElements method in GeminiService");
+
         JsonObject userPart = new JsonObject();
         userPart.addProperty("text",
-                " Suppose that I own a supermarket. Please analyze the sales figures for my products and categorize them into three parts: Low Performance, Moderate Performance, and Best Performance. Provide suggestions such as products whose stock quantities can be reduced and specify the best sellers. Be creative. Use basic words. Exclude additional considerations or recommendations. Give me a straightforward analysis. All of them will be as paragraphs, not item by item. Make it about 200 words." + data);
+                "Suppose that I own a supermarket. Please analyze the sales figures for my products and categorize them into three parts: Low Performance, Moderate Performance, and Best Performance. Provide suggestions such as products whose stock quantities can be reduced and specify the best sellers. Be creative. Use basic words. Exclude additional considerations or recommendations. Give me a straightforward analysis. All of them will be as paragraphs, not item by item. Make it about 200 words." + data);
 
         JsonObject userContent = new JsonObject();
         userContent.addProperty("role", "user");
@@ -94,6 +107,8 @@ public class GeminiService {
 
         JsonArray contentsArray = new JsonArray();
         contentsArray.add(userContent);
+
+        log.trace("Exiting getJsonElements method in GeminiService");
         return contentsArray;
     }
 }

@@ -75,6 +75,7 @@ public class ReportServiceImpl implements ReportService {
         SaleResponse saleResponse = getSale(id);
 
         byte[] pdfBytes = receiptService.generateReceipt(saleResponse);
+
         log.trace("Exiting getReceipt method in ReportServiceImpl");
         return pdfBytes;
     }
@@ -92,9 +93,11 @@ public class ReportServiceImpl implements ReportService {
             case "week" -> getDateAfterOrBefore(Calendar.WEEK_OF_YEAR, -1, dateFormat);
             case "month" -> getDateAfterOrBefore(Calendar.MONTH, -1, dateFormat);
             case "year" -> getDateAfterOrBefore(Calendar.YEAR, -1, dateFormat);
-            default -> throw new InvalidTimeUnitException("Invalid time unit parameter");
+            default -> {
+                log.error("Invalid time unit parameter: {}", unit);
+                throw new InvalidTimeUnitException("Invalid time unit parameter");
+            }
         };
-
         log.debug("startDate: {}, endDate: {}", startDate, endDate);
 
         Page<SaleResponse> saleResponsePage = getAllSalesFilteredAndSorted(0, 10, "id", "ASC",
@@ -119,8 +122,12 @@ public class ReportServiceImpl implements ReportService {
     }
 
     private String getDateAfterOrBefore(int calendarField, int amount, SimpleDateFormat dateFormat) {
+        log.trace("Entering getDateAfterOrBefore method in ReportServiceImpl");
+
         Calendar calendar = Calendar.getInstance();
         calendar.add(calendarField, amount);
+
+        log.trace("Exiting getDateAfterOrBefore method in ReportServiceImpl");
         return dateFormat.format(calendar.getTime());
     }
 }

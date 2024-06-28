@@ -10,6 +10,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.IOUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
@@ -31,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class ChartService {
@@ -50,6 +52,7 @@ public class ChartService {
     private final GeminiService geminiService;
 
     protected byte[] generateChart(Map<String, Integer> productQuantityMap, String unit) {
+        log.trace("Entering generateChart method in ChartService");
 
         try {
             BaseFont baseFontLight = BaseFont.createFont(LIGHT_FONT_PATH, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
@@ -174,10 +177,11 @@ public class ChartService {
 
             document.add(new Paragraph("\n"));
             String saleFigures = convertSalesDataToText(productQuantityMap);
-            String saleAnalysis = geminiService.getInsight(saleFigures);
-            System.out.println(saleAnalysis);
-            if (saleAnalysis != null) {
 
+            log.info("Calling getInsight method in GeminiService");
+            String saleAnalysis = geminiService.getInsight(saleFigures);
+
+            if (saleAnalysis != null) {
                 saleAnalysis = saleAnalysis.replaceAll("\\*\\*", "");
                 saleAnalysis = saleAnalysis.replaceAll("##", "");
 
@@ -193,7 +197,6 @@ public class ChartService {
                 aiTable.setWidths(new float[]{0.05f, 0.95f});
 
                 for (String sentence : sentences) {
-                    System.out.println(sentence);
                     InputStream inputStream = getClass().getResourceAsStream(SYMBOL_IMAGE_PATH);
                     if (inputStream != null) {
                         Image image = Image.getInstance(IOUtils.toByteArray(inputStream));
@@ -209,7 +212,6 @@ public class ChartService {
                         leftCell1.setBorder(Rectangle.NO_BORDER);
 
                         aiTable.addCell(leftCell1);
-
                     }
 
                     PdfPCell rightCell1 = new PdfPCell();
@@ -222,36 +224,49 @@ public class ChartService {
                 }
                 document.add(aiTable);
             }
-
             document.close();
 
+            log.trace("Exiting generateChart method in ChartService");
             return pdfOut.toByteArray();
+
         } catch (DocumentException | IOException e) {
+            log.error("Error occurred while generating the the chart", e);
             throw new ChartGenerationException("An error occurred while generating the chart");
         }
     }
 
     private Paragraph getTitle(String unit, com.itextpdf.text.Font boldBig) {
+        log.trace("Entering getTitle method in ChartService");
+
         String unitIdentifier;
         unitIdentifier = switch (unit.toLowerCase()) {
             case "day" -> "DAILY";
             case "week" -> "WEEKLY";
             case "month" -> "MONTHLY";
             case "year" -> "YEARLY";
-            default -> throw new InvalidTimeUnitException("Invalid time unit parameter");
+            default -> {
+                log.error("Invalid time unit parameter: {}", unit);
+                throw new InvalidTimeUnitException("Invalid time unit parameter");
+            }
         };
 
         Paragraph title = new Paragraph(unitIdentifier + " SALES REPORT", boldBig);
         title.setAlignment(Paragraph.ALIGN_CENTER);
+
+        log.trace("Exiting getTitle method in ChartService");
         return title;
     }
 
     private String convertSalesDataToText(Map<String, Integer> salesData) {
+        log.trace("Entering convertSalesDataToText method in ChartService");
+
         StringBuilder salesDataText = new StringBuilder("Sales Data:\n");
         for (Map.Entry<String, Integer> entry : salesData.entrySet()) {
             salesDataText.append("- ").append(entry.getKey()).append(": ")
                     .append(entry.getValue()).append(" units\n");
         }
+
+        log.trace("Exiting convertSalesDataToText method in ChartService");
         return salesDataText.toString();
     }
 }
