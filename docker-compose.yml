@@ -68,6 +68,8 @@ services:
       - "${SERVICE_REGISTRY_PORT}"
     ports:
       - "${SERVICE_REGISTRY_PORT}:${SERVICE_REGISTRY_PORT}"
+    volumes:
+      - logs-docker:/logs
     networks:
       - registry
       - zipkin
@@ -84,6 +86,8 @@ services:
       - "${API_GATEWAY_PORT}"
     ports:
       - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
+    volumes:
+      - logs-docker:/logs
     networks:
       - registry
       - redis
@@ -91,61 +95,6 @@ services:
     depends_on:
       - service-registry
       - redis
-      - zipkin
-
-
-  product-service:
-    container_name: product-service
-    image: emirhantuygun/product-service:latest
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-    networks:
-      - registry
-      - postgres
-      - redis
-      - rabbitmq
-      - zipkin
-    depends_on:
-      - service-registry
-      - api-gateway
-      - redis
-      - postgres
-      - rabbitmq
-      - zipkin
-
-
-  sale-service:
-    container_name: sale-service
-    image: emirhantuygun/sale-service:latest
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-    networks:
-      - registry
-      - postgres
-      - rabbitmq
-      - zipkin
-    depends_on:
-      - service-registry
-      - api-gateway
-      - postgres
-      - product-service
-      - rabbitmq
-      - zipkin
-
-
-  report-service:
-    container_name: report-service
-    image: emirhantuygun/report-service:latest
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-    networks:
-      - registry
-      - zipkin
-    depends_on:
-      - service-registry
-      - api-gateway
-      - sale-service
       - zipkin
 
 
@@ -154,6 +103,8 @@ services:
     image: emirhantuygun/auth-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+    volumes:
+      - logs-docker:/logs
     networks:
       - registry
       - postgres
@@ -174,6 +125,8 @@ services:
     image: emirhantuygun/user-management-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+    volumes:
+      - logs-docker:/logs
     networks:
       - registry
       - postgres
@@ -187,6 +140,72 @@ services:
       - rabbitmq
       - zipkin
 
+
+  product-service:
+    container_name: product-service
+    image: emirhantuygun/product-service:latest
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    volumes:
+      - logs-docker:/logs
+    networks:
+      - registry
+      - postgres
+      - redis
+      - rabbitmq
+      - zipkin
+    depends_on:
+      - service-registry
+      - api-gateway
+      - redis
+      - postgres
+      - rabbitmq
+      - zipkin
+
+
+  sale-service:
+    container_name: sale-service
+    image: emirhantuygun/sale-service:latest
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    volumes:
+      - logs-docker:/logs
+    networks:
+      - registry
+      - postgres
+      - rabbitmq
+      - zipkin
+    depends_on:
+      - service-registry
+      - api-gateway
+      - postgres
+      - product-service
+      - rabbitmq
+      - zipkin
+
+
+  report-service:
+    container_name: report-service
+    image: emirhantuygun/report-service:latest
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    volumes:
+      - logs-docker:/logs
+    networks:
+      - registry
+      - zipkin
+    depends_on:
+      - service-registry
+      - api-gateway
+      - sale-service
+      - zipkin
+
+
+volumes:
+  postgres:
+  logs-docker:
+  redis:
 
 networks:
   postgres:
