@@ -15,6 +15,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/**
+ * This class is responsible for interacting with the Gemini API.
+ * It provides methods to generate insights based on user input.
+ *
+ * @author Emirhan Tuygun
+ */
 @Log4j2
 @Service
 @RequiredArgsConstructor
@@ -23,6 +29,13 @@ public class GeminiService {
     @Value("${gemini.api-key}")
     private String GEMINI_API_KEY;
 
+    /**
+     * This method sends a request to the Gemini API to generate an insight based on the provided data.
+     *
+     * @param data The data to be analyzed.
+     * @return The generated insight.
+     * @throws IOException If an error occurs during the API request.
+     */
     protected String getInsight(String data) throws IOException {
         log.trace("Entering getInsight method in GeminiService");
         String ENDPOINT_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=" + GEMINI_API_KEY;
@@ -66,6 +79,13 @@ public class GeminiService {
         return null;
     }
 
+    /**
+     * This method constructs a JSON object that will be sent to the Gemini API.
+     * The JSON object includes the user's data, generation configuration, and safety settings.
+     *
+     * @param data The user's data to be analyzed.
+     * @return A JSON object representing the request to the Gemini API.
+     */
     private JsonObject getJsonObject(String data) {
         log.trace("Entering getJsonObject method in GeminiService");
         JsonObject requestJson = new JsonObject();
@@ -92,6 +112,14 @@ public class GeminiService {
         return requestJson;
     }
 
+    /**
+     * This method constructs a JSON array that will be sent to the Gemini API.
+     * The JSON array includes a single user content object, which in turn includes a single part object.
+     * The part object contains a text field that includes a detailed user request.
+     *
+     * @param data The user's data to be analyzed.
+     * @return A JSON array representing the user's request to the Gemini API.
+     */
     private JsonArray getJsonElements(String data) {
         log.trace("Entering getJsonElements method in GeminiService");
 

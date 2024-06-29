@@ -72,5 +72,12 @@ public interface ReportService {
      */
     byte[] getReceipt(Long id) throws HeaderProcessingException, ReceiptGenerationException;
 
+    /**
+     * This method generates a chart based on the sales data for a given time unit.
+     *
+     * @param unit The time unit for which the chart should be generated. It can be "day", "week", "month", or "year".
+     * @return A byte array representing the generated chart in PDF format.
+     * @throws HeaderProcessingException If there is an error processing the request headers.
+     */
     byte[] getChart(String unit) throws HeaderProcessingException, ReceiptGenerationException;
 }

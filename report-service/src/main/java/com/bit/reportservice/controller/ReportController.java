@@ -150,6 +150,14 @@ public class ReportController {
         return new ResponseEntity<>(pdfBytes, headers, HttpStatus.CREATED);
     }
 
+    /**
+     * Retrieves a chart PDF for sales data based on a specified time unit.
+     *
+     * @param unit The time unit for the chart. It can be "day", "week", "month", or "year". The default is "month".
+     * @return A ResponseEntity containing the byte array of the chart PDF and appropriate headers.
+     * @throws ReceiptGenerationException If there is an error generating the chart PDF.
+     * @throws HeaderProcessingException If there is an error processing the request headers.
+     */
     @GetMapping("/chart")
     public ResponseEntity<byte[]> getChart(@RequestParam(defaultValue = "month") String unit) throws ReceiptGenerationException, HeaderProcessingException {
         log.trace("Entering getChart method in ReportController");

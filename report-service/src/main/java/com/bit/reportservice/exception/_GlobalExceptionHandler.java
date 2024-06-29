@@ -56,12 +56,26 @@ public class _GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    /**
+     * This method handles ChartGenerationException.
+     * It logs the exception message and returns a ResponseEntity with a 500 status code and the exception message as the body.
+     *
+     * @param ex The ChartGenerationException to be handled. This exception is thrown when there is an issue with generating charts.
+     * @return A ResponseEntity with a 500 status code and the exception message as the body. This response is sent back to the client.
+     */
     @ExceptionHandler(ChartGenerationException.class)
     public ResponseEntity<String> handleChartGenerationException(ChartGenerationException ex) {
         log.error("Handling ChartGenerationException: {}", ex.getMessage(), ex);
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    /**
+     * This method handles InvalidTimeUnitException.
+     * It logs the exception message and returns a ResponseEntity with a 400 status code and the exception message as the body.
+     *
+     * @param ex The InvalidTimeUnitException to be handled. This exception is thrown when an invalid time unit is provided.
+     * @return A ResponseEntity with a 400 status code and the exception message as the body. This response is sent back to the client.
+     */
     @ExceptionHandler(InvalidTimeUnitException.class)
     public ResponseEntity<String> handleInvalidTimeUnitException(InvalidTimeUnitException ex) {
         log.error("Handling InvalidTimeUnitException: {}", ex.getMessage(), ex);

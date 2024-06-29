@@ -121,6 +121,14 @@ public class ReportServiceImpl implements ReportService {
         return pdfBytes;
     }
 
+    /**
+     * This method calculates and returns a date string that is either 'amount' days before or after the current date.
+     *
+     * @param calendarField The type of date field to be used, such as Calendar.DAY_OF_YEAR, Calendar.WEEK_OF_YEAR, etc.
+     * @param amount The number of units to add or subtract from the current date. A positive value will result in a date in the future, while a negative value will result in a date in the past.
+     * @param dateFormat The SimpleDateFormat object used to format the date string.
+     * @return A string representation of the calculated date, formatted according to the provided SimpleDateFormat object.
+     */
     private String getDateAfterOrBefore(int calendarField, int amount, SimpleDateFormat dateFormat) {
         log.trace("Entering getDateAfterOrBefore method in ReportServiceImpl");
 

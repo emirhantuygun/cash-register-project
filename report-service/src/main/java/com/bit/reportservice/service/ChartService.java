@@ -32,6 +32,12 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
+/**
+ * This class is responsible for generating a PDF report based on sales data.
+ * It uses iText library for PDF generation and JFreeChart for creating charts.
+ *
+ * @author Emirhan Tuygun
+ */
 @Log4j2
 @Service
 @RequiredArgsConstructor
@@ -51,6 +57,14 @@ public class ChartService {
 
     private final GeminiService geminiService;
 
+    /**
+     * Generates a PDF report based on the given sales data and time unit.
+     *
+     * @param productQuantityMap Map of product names and their respective sales quantities.
+     * @param unit                Time unit for the sales data (e.g., "day", "week", "month", "year").
+     * @return Byte array containing the generated PDF report.
+     * @throws ChartGenerationException If an error occurs while generating the chart.
+     */
     protected byte[] generateChart(Map<String, Integer> productQuantityMap, String unit) {
         log.trace("Entering generateChart method in ChartService");
 
@@ -235,6 +249,14 @@ public class ChartService {
         }
     }
 
+    /**
+     * This method generates a title for the PDF report based on the given time unit.
+     *
+     * @param unit The time unit for the sales data (e.g., "day", "week", "month", "year").
+     * @param boldBig The font style for the title.
+     * @return A Paragraph object containing the generated title.
+     * @throws InvalidTimeUnitException If the given time unit is not valid.
+     */
     private Paragraph getTitle(String unit, com.itextpdf.text.Font boldBig) {
         log.trace("Entering getTitle method in ChartService");
 
@@ -257,6 +279,12 @@ public class ChartService {
         return title;
     }
 
+    /**
+     * This method converts the sales data map into a text format for further processing.
+     *
+     * @param salesData A map containing product names as keys and their respective sales quantities as values.
+     * @return A string representation of the sales data in a formatted text.
+     */
     private String convertSalesDataToText(Map<String, Integer> salesData) {
         log.trace("Entering convertSalesDataToText method in ChartService");
 
