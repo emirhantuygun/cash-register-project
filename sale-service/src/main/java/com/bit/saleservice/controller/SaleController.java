@@ -93,6 +93,7 @@ public class SaleController {
      * @param maxTotal The maximum total amount to filter by. Optional.
      * @param startDate The start date to filter by. Optional.
      * @param endDate The end date to filter by. Optional.
+     * @param isCancelled The boolean on whether it is cancelled to filter by. Optional.
      * @return A ResponseEntity containing a PageWrapper of SaleResponse objects and a status code of OK (200).
      *         The PageWrapper represents the filtered and sorted sales in the system.
      */
@@ -107,12 +108,13 @@ public class SaleController {
             @RequestParam(required = false) BigDecimal minTotal,
             @RequestParam(required = false) BigDecimal maxTotal,
             @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate
+            @RequestParam(required = false) String endDate,
+            @RequestParam(required = false) Boolean isCancelled
     ) {
-        log.trace("Entering getAllSalesFilteredAndSorted method in SaleController with page: {}, size: {}, sortBy: {}, direction: {}, cashier: {}, paymentMethod: {}, minTotal: {}, maxTotal: {}, startDate: {}, endDate: {}",
-                page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
+        log.trace("Entering getAllSalesFilteredAndSorted method in SaleController with page: {}, size: {}, sortBy: {}, direction: {}, cashier: {}, paymentMethod: {}, minTotal: {}, maxTotal: {}, startDate: {}, endDate: {}, isCancelled: {}",
+                page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate, isCancelled);
 
-        PageWrapper<SaleResponse> saleResponsePageWrapper = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
+        PageWrapper<SaleResponse> saleResponsePageWrapper = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate, isCancelled);
         log.info("Successfully retrieved filtered and sorted sales");
 
         log.trace("Exiting getAllSalesFilteredAndSorted method in SaleController");

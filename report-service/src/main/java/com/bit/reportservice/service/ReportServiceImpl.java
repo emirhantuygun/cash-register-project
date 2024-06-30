@@ -60,10 +60,10 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Page<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction, String cashier, String paymentMethod, BigDecimal minTotal, BigDecimal maxTotal, String startDate, String endDate) throws HeaderProcessingException {
+    public Page<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction, String cashier, String paymentMethod, BigDecimal minTotal, BigDecimal maxTotal, String startDate, String endDate, Boolean isCancelled) throws HeaderProcessingException {
         log.trace("Entering getAllSalesFilteredAndSorted method in ReportServiceImpl");
-        log.debug("Query Parameters - page: {}, size: {}, sortBy: {}, direction: {}, cashier: {}, paymentMethod: {}, minTotal: {}, maxTotal: {}, startDate: {}, endDate: {}", page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
-        Page<SaleResponse> saleResponses = gatewayService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
+        log.debug("Query Parameters - page: {}, size: {}, sortBy: {}, direction: {}, cashier: {}, paymentMethod: {}, minTotal: {}, maxTotal: {}, startDate: {}, endDate: {}, isCancelled: {}", page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate, isCancelled);
+        Page<SaleResponse> saleResponses = gatewayService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate, isCancelled);
 
         log.trace("Exiting getAllSalesFilteredAndSorted method in ReportServiceImpl");
         return saleResponses;
@@ -101,7 +101,7 @@ public class ReportServiceImpl implements ReportService {
         log.debug("startDate: {}, endDate: {}", startDate, endDate);
 
         Page<SaleResponse> saleResponsePage = getAllSalesFilteredAndSorted(0, 10, "id", "ASC",
-                null, null, null, null, startDate, endDate);
+                null, null, null, null, startDate, endDate, false);
 
         List<SaleResponse> saleResponses = saleResponsePage.getContent();
         log.info("Got saleResponses: {}", saleResponses);

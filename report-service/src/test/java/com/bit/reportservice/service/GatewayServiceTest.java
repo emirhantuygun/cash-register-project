@@ -117,7 +117,7 @@ class GatewayServiceTest {
         // Act & Assert
         assertThrows(SaleServiceException.class, () ->
                 gatewayService.getAllSalesFilteredAndSorted(0, 10, "id", "ASC", "cashier", "credit",
-                        BigDecimal.TEN, BigDecimal.valueOf(100), "2022-01-01", "2022-12-31"));
+                        BigDecimal.TEN, BigDecimal.valueOf(100), "2022-01-01", "2022-12-31", false));
     }
 
     @Test
@@ -133,7 +133,7 @@ class GatewayServiceTest {
 
         // Act
         Page<SaleResponse> result = gatewayService.getAllSalesFilteredAndSorted(0, 10, "id", "ASC", "cashier", "credit",
-                BigDecimal.TEN, BigDecimal.valueOf(100), "2022-01-01", "2022-12-31");
+                BigDecimal.TEN, BigDecimal.valueOf(100), "2022-01-01", "2022-12-31", false);
 
         // Assert
         assertNotNull(result);

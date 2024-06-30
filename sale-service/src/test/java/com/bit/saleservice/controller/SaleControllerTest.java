@@ -91,21 +91,22 @@ class SaleControllerTest {
         BigDecimal maxPrice = BigDecimal.valueOf(20);
         String startDate = "2022-01-01";
         String endDate = "2022-01-31";
+        Boolean isCancelled = false;
         Page<SaleResponse> saleResponses = new PageImpl<>(List.of(new SaleResponse()), PageRequest.of(0, 10), 1);
         PageWrapper<SaleResponse> response = new PageWrapper<>();
         response.setContent(saleResponses.getContent());
         response.setPageNumber(page);
         response.setPageSize(size);
         response.setTotalElements(saleResponses.getTotalElements());
-        when(saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate)).thenReturn(response);
+        when(saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate, isCancelled)).thenReturn(response);
 
         // Act
-        ResponseEntity<PageWrapper<SaleResponse>> result = saleController.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate);
+        ResponseEntity<PageWrapper<SaleResponse>> result = saleController.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate, isCancelled);
 
         // Assert
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertEquals(response, result.getBody());
-        verify(saleService).getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate);
+        verify(saleService).getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate, isCancelled);
     }
 
     @Test

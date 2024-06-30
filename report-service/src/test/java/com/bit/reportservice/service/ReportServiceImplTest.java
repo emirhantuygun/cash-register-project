@@ -96,16 +96,17 @@ class ReportServiceImplTest {
         BigDecimal maxPrice = BigDecimal.valueOf(100);
         String startDate = "2022-01-01";
         String endDate = "2022-12-31";
+        Boolean isCancelled = false;
 
-        when(gatewayService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate))
+        when(gatewayService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate, isCancelled))
                 .thenReturn(saleResponsePage);
 
         // Act
-        Page<SaleResponse> result = reportService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate);
+        Page<SaleResponse> result = reportService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate, isCancelled);
 
         // Assert
         assertThat(result).isEqualTo(saleResponsePage);
-        verify(gatewayService, times(1)).getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate);
+        verify(gatewayService, times(1)).getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate, isCancelled);
     }
 
     @Test
@@ -159,7 +160,7 @@ class ReportServiceImplTest {
         SaleResponse saleResponse2 = SaleResponse.builder().products(List.of(product2)).build();
         List<SaleResponse> saleResponses = List.of(saleResponse1, saleResponse2);
 
-        when(gatewayService.getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString()))
+        when(gatewayService.getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString(), anyBoolean()))
                 .thenReturn(new PageImpl<>(saleResponses));
         when(chartService.generateChart(anyMap(), anyString())).thenReturn(new byte[]{1, 2, 3, 4, 5});
 
@@ -170,7 +171,7 @@ class ReportServiceImplTest {
         assertNotNull(pdfBytes);
         assertArrayEquals(new byte[]{1, 2, 3, 4, 5}, pdfBytes);
 
-        verify(gatewayService, times(1)).getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString());
+        verify(gatewayService, times(1)).getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString(), anyBoolean());
         verify(chartService, times(1)).generateChart(anyMap(), eq("day"));
     }
 
@@ -183,7 +184,7 @@ class ReportServiceImplTest {
         SaleResponse saleResponse2 = SaleResponse.builder().products(List.of(product2)).build();
         List<SaleResponse> saleResponses = List.of(saleResponse1, saleResponse2);
 
-        when(gatewayService.getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString()))
+        when(gatewayService.getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString(), anyBoolean()))
                 .thenReturn(new PageImpl<>(saleResponses));
         when(chartService.generateChart(anyMap(), anyString())).thenReturn(new byte[]{1, 2, 3, 4, 5});
 
@@ -194,7 +195,7 @@ class ReportServiceImplTest {
         assertNotNull(pdfBytes);
         assertArrayEquals(new byte[]{1, 2, 3, 4, 5}, pdfBytes);
 
-        verify(gatewayService, times(1)).getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString());
+        verify(gatewayService, times(1)).getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString(), anyBoolean());
         verify(chartService, times(1)).generateChart(anyMap(), eq("week"));
     }
 
@@ -207,7 +208,7 @@ class ReportServiceImplTest {
         SaleResponse saleResponse2 = SaleResponse.builder().products(List.of(product2)).build();
         List<SaleResponse> saleResponses = List.of(saleResponse1, saleResponse2);
 
-        when(gatewayService.getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString()))
+        when(gatewayService.getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString(), anyBoolean()))
                 .thenReturn(new PageImpl<>(saleResponses));
         when(chartService.generateChart(anyMap(), anyString())).thenReturn(new byte[]{1, 2, 3, 4, 5});
 
@@ -218,7 +219,7 @@ class ReportServiceImplTest {
         assertNotNull(pdfBytes);
         assertArrayEquals(new byte[]{1, 2, 3, 4, 5}, pdfBytes);
 
-        verify(gatewayService, times(1)).getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString());
+        verify(gatewayService, times(1)).getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString(), anyBoolean());
         verify(chartService, times(1)).generateChart(anyMap(), eq("month"));
     }
 
@@ -231,7 +232,7 @@ class ReportServiceImplTest {
         SaleResponse saleResponse2 = SaleResponse.builder().products(List.of(product2)).build();
         List<SaleResponse> saleResponses = List.of(saleResponse1, saleResponse2);
 
-        when(gatewayService.getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString()))
+        when(gatewayService.getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString(), anyBoolean()))
                 .thenReturn(new PageImpl<>(saleResponses));
         when(chartService.generateChart(anyMap(), anyString())).thenReturn(new byte[]{1, 2, 3, 4, 5});
 
@@ -242,7 +243,7 @@ class ReportServiceImplTest {
         assertNotNull(pdfBytes);
         assertArrayEquals(new byte[]{1, 2, 3, 4, 5}, pdfBytes);
 
-        verify(gatewayService, times(1)).getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString());
+        verify(gatewayService, times(1)).getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString(), anyBoolean());
         verify(chartService, times(1)).generateChart(anyMap(), eq("year"));
     }
 
@@ -251,18 +252,18 @@ class ReportServiceImplTest {
         // Act & Assert
         assertThrows(InvalidTimeUnitException.class, () -> reportService.getChart("invalid"));
 
-        verify(gatewayService, times(0)).getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString());
+        verify(gatewayService, times(0)).getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString(), anyBoolean());
         verify(chartService, times(0)).generateChart(anyMap(), anyString());
     }
 
     @Test
     void testGetChart_shouldThrowHeaderProcessingException_whenChartServiceFails() throws Exception {
         // Arrange
-        when(gatewayService.getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString()))
+        when(gatewayService.getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString(), anyBoolean()))
                 .thenThrow(new HeaderProcessingException("Header processing failed"));
 
         // Act & Assert
         assertThrows(HeaderProcessingException.class, () -> reportService.getChart("month"));
-        verify(gatewayService, times(1)).getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString());
+        verify(gatewayService, times(1)).getAllSalesFilteredAndSorted(anyInt(), anyInt(), anyString(), anyString(), any(), any(), any(), any(), anyString(), anyString(), anyBoolean());
     }
 }

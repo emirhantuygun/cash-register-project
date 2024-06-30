@@ -98,12 +98,12 @@ public class SaleServiceImpl implements SaleService {
     public PageWrapper<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction,
                                                                   String cashier, String paymentMethod,
                                                                   BigDecimal minTotal, BigDecimal maxTotal,
-                                                                  String startDate, String endDate) {
+                                                                  String startDate, String endDate, Boolean isCancelled) {
         log.trace("Entering getAllSalesFilteredAndSorted method in SaleServiceImpl class");
 
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
         Page<Sale> salesPage = saleRepository.findAll((root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = getPredicates(cashier, paymentMethod, minTotal, maxTotal, startDate, endDate, root, criteriaBuilder);
+            List<Predicate> predicates = getPredicates(cashier, paymentMethod, minTotal, maxTotal, startDate, endDate, isCancelled, root, criteriaBuilder);
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         }, pageable);
@@ -346,6 +346,7 @@ public class SaleServiceImpl implements SaleService {
      * @param maxTotal        The maximum total amount to filter sales by.
      * @param startDate       The start date to filter sales by.
      * @param endDate         The end date to filter sales by.
+     * @param isCancelled     The boolean on whether it is cancelled to filter by.
      * @param root            The root of the CriteriaQuery.
      * @param criteriaBuilder The CriteriaBuilder for creating predicates.
      * @return A list of predicates for filtering sales.
@@ -354,9 +355,10 @@ public class SaleServiceImpl implements SaleService {
     private List<Predicate> getPredicates(String cashier, String paymentMethod,
                                           BigDecimal minTotal, BigDecimal maxTotal,
                                           String startDate, String endDate,
+                                          Boolean isCancelled,
                                           Root<Sale> root, CriteriaBuilder criteriaBuilder) {
-        log.trace("Entering getPredicates method with parameters: cashier={}, paymentMethod={}, minTotal={}, maxTotal={}, startDate={}, endDate={}",
-                cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
+        log.trace("Entering getPredicates method with parameters: cashier={}, paymentMethod={}, minTotal={}, maxTotal={}, startDate={}, endDate={}, isCancelled={}",
+                cashier, paymentMethod, minTotal, maxTotal, startDate, endDate, isCancelled);
 
         List<Predicate> predicates = new ArrayList<>();
         if (StringUtils.isNotBlank(cashier)) {
@@ -400,6 +402,11 @@ public class SaleServiceImpl implements SaleService {
                 log.error("Error parsing endDate: {}", endDate, e);
                 throw new ParsingException("Error parsing endDate: ", e);
             }
+        }
+
+        if (isCancelled != null) {
+            predicates.add(criteriaBuilder.equal(root.get("cancelled"), isCancelled));
+            log.debug("Added predicate for isCancelled: {}", isCancelled);
         }
 
         log.trace("Exiting getPredicates method with {} predicates", predicates.size());

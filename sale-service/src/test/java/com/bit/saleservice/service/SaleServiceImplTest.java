@@ -120,6 +120,7 @@ class SaleServiceImplTest {
         BigDecimal maxTotal = BigDecimal.TEN;
         String startDate = "2022-01-01";
         String endDate = "2022-01-31";
+        Boolean isCancelled = false;
 
         Page<Sale> salesPage = Page.empty();
         PageWrapper<SaleResponse> response = new PageWrapper<>();
@@ -127,7 +128,7 @@ class SaleServiceImplTest {
         when(saleRepository.findAll((Specification<Sale>) any(), any())).thenReturn(salesPage);
 
         // Act
-        PageWrapper<SaleResponse> saleResponses = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
+        PageWrapper<SaleResponse> saleResponses = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate, isCancelled);
 
         // Assert
         assertEquals(salesPage.getTotalElements(), saleResponses.getTotalElements());
@@ -411,6 +412,7 @@ class SaleServiceImplTest {
         BigDecimal maxTotal = BigDecimal.valueOf(500);
         String startDate = "2023-01-01";
         String endDate = "2023-12-31";
+        Boolean isCancelled = false;
 
         Sale sale = new Sale();
         sale.setPaymentMethod(Payment.PAYPAL);
@@ -424,7 +426,7 @@ class SaleServiceImplTest {
         when(saleRepository.findAll((Specification<Sale>) any(), any(Pageable.class))).thenReturn(salePage);
 
         // Act
-        PageWrapper<SaleResponse> result = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
+        PageWrapper<SaleResponse> result = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate, isCancelled);
 
         // Assert
         assertNotNull(result);
@@ -445,9 +447,11 @@ class SaleServiceImplTest {
         BigDecimal maxTotal = null;
         String startDate = "";
         String endDate = "";
+        Boolean isCancelled = false;
+
 
         // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate));
+        assertThrows(IllegalArgumentException.class, () -> saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate, isCancelled));
     }
 
     @Test
@@ -463,6 +467,7 @@ class SaleServiceImplTest {
         BigDecimal maxTotal = null;
         String startDate = "invalid-date";
         String endDate = "invalid-date";
+        Boolean isCancelled = false;
 
         Sale sale = new Sale();
         sale.setPaymentMethod(Payment.PAYPAL);
@@ -475,7 +480,7 @@ class SaleServiceImplTest {
         when(saleRepository.findAll((Specification<Sale>) any(), any(Pageable.class))).thenReturn(salePage);
 
         // Act
-        PageWrapper<SaleResponse> result = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
+        PageWrapper<SaleResponse> result = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate, isCancelled);
 
         // Assert
         assertNotNull(result);
@@ -496,6 +501,7 @@ class SaleServiceImplTest {
         BigDecimal maxTotal = null;
         String startDate = "";
         String endDate = "";
+        Boolean isCancelled = false;
 
         Page<Sale> salePage = Page.empty();
         PageWrapper<SaleResponse> response = new PageWrapper<>();
@@ -505,7 +511,7 @@ class SaleServiceImplTest {
         when(saleRepository.findAll((Specification<Sale>) any(), any(Pageable.class))).thenReturn(salePage);
 
         // Act
-        PageWrapper<SaleResponse> result = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
+        PageWrapper<SaleResponse> result = saleService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate, isCancelled);
 
         // Assert
         assertNotNull(result);

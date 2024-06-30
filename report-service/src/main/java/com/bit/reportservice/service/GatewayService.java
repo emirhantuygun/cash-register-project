@@ -218,7 +218,7 @@ public class GatewayService {
      */
     protected Page<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction, String cashier,
                                                               String paymentMethod, BigDecimal minTotal, BigDecimal maxTotal,
-                                                              String startDate, String endDate) throws HeaderProcessingException {
+                                                              String startDate, String endDate, Boolean isCancelled) throws HeaderProcessingException {
         log.trace("Entering getAllSalesFilteredAndSorted method in GatewayService");
 
         try {
@@ -238,7 +238,8 @@ public class GatewayService {
                     .queryParam("minTotal", minTotal)
                     .queryParam("maxTotal", maxTotal)
                     .queryParam("startDate", startDate)
-                    .queryParam("endDate", endDate);
+                    .queryParam("endDate", endDate)
+                    .queryParam("isCancelled", isCancelled);
 
             ResponseEntity<PageWrapper<SaleResponse>> responseEntity = restTemplate.exchange(
                     builder.toUriString(),

@@ -114,12 +114,13 @@ public class ReportController {
             @RequestParam(required = false) BigDecimal minTotal,
             @RequestParam(required = false) BigDecimal maxTotal,
             @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate
+            @RequestParam(required = false) String endDate,
+            @RequestParam(required = false) Boolean isCancelled
     ) throws HeaderProcessingException {
-        log.trace("Entering getAllSalesFilteredAndSorted method in ReportController with parameters: page={}, size={}, sortBy={}, direction={}, cashier={}, paymentMethod={}, minTotal={}, maxTotal={}, startDate={}, endDate={}",
-                page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
+        log.trace("Entering getAllSalesFilteredAndSorted method in ReportController with parameters: page={}, size={}, sortBy={}, direction={}, cashier={}, paymentMethod={}, minTotal={}, maxTotal={}, startDate={}, endDate={}, isCancelled={}",
+                page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate, isCancelled);
 
-        Page<SaleResponse> saleResponses = reportService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate);
+        Page<SaleResponse> saleResponses = reportService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate, isCancelled);
         log.info("Returning filtered and sorted sales response with page size: {}", saleResponses.getSize());
 
         log.trace("Exiting getAllSalesFilteredAndSorted method in ReportController");

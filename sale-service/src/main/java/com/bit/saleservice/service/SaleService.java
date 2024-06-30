@@ -61,12 +61,13 @@ public interface SaleService {
      * @param maxTotal The maximum total amount to filter by.
      * @param startDate The start date to filter by.
      * @param endDate The end date to filter by.
+     * @param isCancelled The boolean on whether it is cancelled to filter by.
      * @return A PageWrapper object containing the filtered and sorted sales.
      */
     PageWrapper<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction,
                                                            String cashier, String paymentMethod,
                                                            BigDecimal minTotal, BigDecimal maxTotal,
-                                                           String startDate, String endDate);
+                                                           String startDate, String endDate, Boolean isCancelled);
 
     /**
      * Updates an existing sale.

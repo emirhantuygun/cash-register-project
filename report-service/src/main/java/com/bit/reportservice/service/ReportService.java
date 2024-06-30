@@ -60,7 +60,7 @@ public interface ReportService {
     Page<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction,
                                                     String cashier, String paymentMethod,
                                                     BigDecimal minTotal, BigDecimal maxTotal,
-                                                    String startDate, String endDate) throws HeaderProcessingException;
+                                                    String startDate, String endDate, Boolean isCancelled) throws HeaderProcessingException;
 
     /**
      * Generates a receipt for a sale based on its unique identifier.

@@ -101,21 +101,22 @@ class ReportControllerTest {
         BigDecimal maxPrice = BigDecimal.valueOf(100);
         String startDate = "2022-01-01";
         String endDate = "2022-12-31";
+        Boolean isCancelled = false;
 
         when(reportService.getAllSalesFilteredAndSorted(
-                eq(page), eq(size), eq(sortBy), eq(direction), eq(cashier), eq(paymentMethod), eq(minPrice), eq(maxPrice), eq(startDate), eq(endDate)))
+                eq(page), eq(size), eq(sortBy), eq(direction), eq(cashier), eq(paymentMethod), eq(minPrice), eq(maxPrice), eq(startDate), eq(endDate), eq(isCancelled)))
                 .thenReturn(saleResponsePage);
 
         // Act
         ResponseEntity<Page<SaleResponse>> response = reportController.getAllSalesFilteredAndSorted(
-                page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate);
+                page, size, sortBy, direction, cashier, paymentMethod, minPrice, maxPrice, startDate, endDate, isCancelled);
 
         // Assert
         assertEquals(200, response.getStatusCode().value());
         assertEquals(1, response.getBody().getContent().size());
         assertEquals(saleResponse, response.getBody().getContent().get(0));
         verify(reportService, times(1)).getAllSalesFilteredAndSorted(
-                eq(page), eq(size), eq(sortBy), eq(direction), eq(cashier), eq(paymentMethod), eq(minPrice), eq(maxPrice), eq(startDate), eq(endDate));
+                eq(page), eq(size), eq(sortBy), eq(direction), eq(cashier), eq(paymentMethod), eq(minPrice), eq(maxPrice), eq(startDate), eq(endDate), eq(isCancelled));
     }
 
     @Test
