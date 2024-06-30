@@ -53,7 +53,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 })
                 .collect(Collectors.toSet());
 
+        User userDetails = new User(user.getUsername(), user.getPassword(), authorities);
+        log.info("Got user: {}", userDetails);
+
         log.trace("Exiting loadUserByUsername method in UserDetailsServiceImpl with username: {}", username);
-        return new User(user.getUsername(), user.getPassword(), authorities);
+        return userDetails;
     }
 }

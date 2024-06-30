@@ -161,6 +161,8 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         userRepository.save(appUser);
+        log.info("User created in Auth Service asynchronously");
+
         log.trace("Exiting createUser method in AuthServiceImpl");
     }
 
@@ -189,6 +191,8 @@ public class AuthServiceImpl implements AuthService {
         existingUser.setRoles(getRolesAsRole(authUserRequest.getRoles()));
 
         userRepository.save(existingUser);
+        log.info("User updated in Auth Service asynchronously");
+
         log.trace("Exiting updateUser method in AuthServiceImpl");
     }
 
@@ -201,7 +205,10 @@ public class AuthServiceImpl implements AuthService {
     @RabbitListener(queues = "${rabbitmq.queue.restore}")
     public void restoreUser(Long id) {
         log.trace("Entering restoreUser method in AuthServiceImpl");
+
         userRepository.restoreUser(id);
+        log.info("User restored in Auth Service asynchronously");
+
         log.trace("Exiting restoreUser method in AuthServiceImpl");
     }
 
@@ -214,7 +221,10 @@ public class AuthServiceImpl implements AuthService {
     @RabbitListener(queues = "${rabbitmq.queue.delete}")
     public void deleteUser(Long id) {
         log.trace("Entering deleteUser method in AuthServiceImpl");
+
         userRepository.deleteById(id);
+        log.info("User soft-deleted in Auth Service asynchronously");
+
         log.trace("Exiting deleteUser method in AuthServiceImpl");
     }
 
@@ -230,6 +240,7 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.deleteRolesForUser(id);
         userRepository.deletePermanently(id);
+        log.info("User permanently deleted in Auth Service asynchronously");
 
         log.trace("Exiting deleteUserPermanently method in AuthServiceImpl");
     }
