@@ -88,6 +88,7 @@ public class Initializer implements CommandLineRunner {
 
             Product product = Product.builder()
                     .name("Product " + i)
+                    .productId((long) i)
                     .barcodeNumber("0123456789" + i)
                     .quantity(i)
                     .price(BigDecimal.valueOf(i * 10))

@@ -83,13 +83,17 @@ public class ChartService {
 
             JFreeChart chart = ChartFactory.createPieChart("", dataset, true, false, false);
             @SuppressWarnings("rawtypes") PiePlot plot = (PiePlot) chart.getPlot();
-            plot.setLabelFont(new Font("Arial", Font.BOLD, 12));  // Using a monospaced font
-            plot.setLabelGap(0.02);
+            plot.setMaximumLabelWidth(0.20);  // Limit the maximum label width (20% of the plot area)
+            plot.setLabelGap(0.05);
+            plot.setSimpleLabels(true);
+            plot.setLabelBackgroundPaint(new Color(255, 255, 255));
+            plot.setLabelOutlinePaint(Color.black);
+            plot.setLabelOutlineStroke(new BasicStroke(1.0f));
+
             plot.setBackgroundPaint(Color.white);
             plot.setOutlineVisible(false);
             plot.setShadowPaint(null);
             plot.setLabelGenerator(new StandardPieSectionLabelGenerator(" {0}:  {2} ", new DecimalFormat("#"), new DecimalFormat("0.00%")));
-            plot.setSimpleLabels(true);
             plot.setInsets(new RectangleInsets(10, 10, 10, 10));
             chart.getLegend().setItemFont(new Font("Arial", Font.BOLD, 12));
             chart.setBackgroundPaint(Color.white);

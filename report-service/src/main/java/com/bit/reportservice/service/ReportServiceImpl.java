@@ -100,7 +100,7 @@ public class ReportServiceImpl implements ReportService {
         };
         log.debug("startDate: {}, endDate: {}", startDate, endDate);
 
-        Page<SaleResponse> saleResponsePage = getAllSalesFilteredAndSorted(0, 10, "id", "ASC",
+        Page<SaleResponse> saleResponsePage = getAllSalesFilteredAndSorted(0, Integer.MAX_VALUE, "id", "ASC",
                 null, null, null, null, startDate, endDate, false);
 
         List<SaleResponse> saleResponses = saleResponsePage.getContent();
