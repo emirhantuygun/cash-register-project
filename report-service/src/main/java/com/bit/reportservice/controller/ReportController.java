@@ -168,7 +168,7 @@ public class ReportController {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("filename", "chart_" + unit + "_" + dateFormat.format(new Date()) + ".pdf");
+        headers.setContentDispositionFormData("filename", unit + "-chart_" + dateFormat.format(new Date()) + ".pdf");
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
         log.info("Returning chart PDF for time unit: {}", unit);
 

@@ -95,7 +95,7 @@ public class ChartService {
             chart.setBackgroundPaint(Color.white);
 
             ByteArrayOutputStream chartOut = new ByteArrayOutputStream();
-            ChartUtils.writeChartAsPNG(chartOut, chart, 600, 600);
+            ChartUtils.writeChartAsPNG(chartOut, chart, 550, 550);
 
             // Create PDF document
             ByteArrayOutputStream pdfOut = new ByteArrayOutputStream();
@@ -121,6 +121,8 @@ public class ChartService {
             chartImage.setAlignment(Image.ALIGN_CENTER);
             document.add(chartImage);
 
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
             document.add(new Paragraph("\n"));
             document.add(new Paragraph("\n"));
             document.add(new Paragraph("\n"));

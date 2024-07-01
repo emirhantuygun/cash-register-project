@@ -248,7 +248,7 @@ public class AuthServiceImpl implements AuthService {
     /**
      * Saves the user's JWT token in the database and Redis.
      *
-     * @param user The user associated with the token.
+     * @param user     The user associated with the token.
      * @param jwtToken The JWT token to be saved.
      * @throws RedisOperationException If there is an error while saving the token status in Redis.
      */
