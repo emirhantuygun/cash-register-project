@@ -90,6 +90,7 @@ public class ChartService {
             plot.setLabelOutlinePaint(Color.black);
             plot.setLabelOutlineStroke(new BasicStroke(1.0f));
 
+            plot.setLabelFont(new Font("Arial", Font.BOLD, 10));  // Using a monospaced font
             plot.setBackgroundPaint(Color.white);
             plot.setOutlineVisible(false);
             plot.setShadowPaint(null);
