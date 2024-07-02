@@ -3,10 +3,10 @@
 ## Project Description
 <div>
   <div>
-    <img src="~images/32bit.png" alt="Project Logo" style="height:20%;width:20%;" align="right">
+    <img src="~images/32bit.png" alt="32bit" style="height:20%;width:20%;" align="right">
   </div>
   <div>
-    This project is made for 32bit's Backend Competition. The cash register project is designed to facilitate the process of a cashier handling sales transactions.
+    This project is made for 32bit's Backend Competition 2024. The cash register project is designed to facilitate the process of a cashier handling sales transactions.
   </div>
 </div>
 
@@ -21,10 +21,14 @@
 - [Technologies Used](#technologies-used)
 - [Features](#features)
 - [Getting Started](#getting-started)
+- [Services](#services)
 - [Default Ports](#default-ports)
-- [Endpoints](#endpoints)
 - [Roles & Users](#roles--users)
+- [Authentication & Authorization](#authentication--authorization)
 - [Endpoints](#endpoints)
+- [Request Body Examples](#request-body-examples)
+- [Receipt Example](#receipt-example)
+- [AI Insight Example](#ai-insight-example)
 
 
 
@@ -64,9 +68,10 @@
 - Load Balancing
 - Token Storing
 - Caching
-- Circuit Breaking
 - Message Queueing
 - Asynchronous Messaging
+- Circuit Breaking
+- Distributed Tracing System
 - Soft Deletion
 - Pagination, Filtering & Sorting
 - Logging
@@ -84,7 +89,7 @@
 
 Ensure you have the following installed:
 - Java 17
-- Maven or Gradle
+- Maven
 - Docker 
 
 ### Usage
@@ -183,7 +188,7 @@ To make requests to the relevant service, you need to have the following role.
 | ADMIN User   | admin    | admin    | ADMIN                   |
 
 
-## Authentication and Authorization
+## Authentication & Authorization
 
 > **⚠️Important:** All endpoints require a **JSON Web Token (JWT)** for authentication except auth/login, so **you need to log in first**.
 To access the endpoints, include the JWT in the Authorization header of your HTTP requests as a **Bearer token**.
@@ -360,7 +365,12 @@ POST /auth/login
 
 
 ## Receipt Example
-![Project Logo](~images/receipt.png)
+![Receipt](~images/receipt.png)
+
+
+
+## AI Insight Example
+![AI Insight](~images/ai_insight.png)
 
 
 
