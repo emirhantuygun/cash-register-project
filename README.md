@@ -1,7 +1,6 @@
 # Cash Register Project
 
 ## Project Description
-
 <div>
   <div>
     <img src="~images/32bit.png" alt="Project Logo" style="height:20%;width:20%;" align="right">
@@ -11,21 +10,24 @@
   </div>
 </div>
 
-## Project Architecture
 
+
+## Project Architecture
 ![Project Logo](~images/architecture.png)
 
-## Table of Contents
 
+
+## Table of Contents
 - [Technologies Used](#technologies-used)
 - [Features](#features)
 - [Getting Started](#getting-started)
-    - [Prerequisites](#prerequisites)
-    - [Usage](#usage)
-- [Ports](#ports)
+- [Default Ports](#default-ports)
 - [Endpoints](#endpoints)
-- [Required Roles](#required-roles)
+- [Roles & Users](#roles--users)
 - [Endpoints](#endpoints)
+
+
+
 
 ## Technologies Used
 - Java 17
@@ -39,30 +41,41 @@
 - Netflix Eureka
 - Mockito
 - JUnit 5
+- JUnit Suite Engine
 - JaCoCo
+- Micrometer
 - Zipkin
 - Resilience4J
 - Redis
 - RabbitMQ
 - Google Jib
 - Log4j2
+- iTextPDF
+- JFreeChart
+- Google Gemini
+
 
 
 ## Features
-- Soft Deletion
-- Pagination, Filtering & Sorting
 - Role Based Authentication & Authorization
 - Token Based Authentication & Authorization
 - Microservices
-- Unit Testing
-- Caching
+- API Gateway
+- Load Balancing
 - Token Storing
+- Caching
 - Circuit Breaking
 - Message Queueing
+- Asynchronous Messaging
+- Soft Deletion
+- Pagination, Filtering & Sorting
 - Logging
+- Unit Testing
 - JavaDoc
-- Load Balancing
-- Gateway
+- Receipt Generation
+- Chart Generation
+- AI Insight
+
 
 
 ## Getting Started
@@ -70,12 +83,26 @@
 ### Prerequisites
 
 Ensure you have the following installed:
-
 - Java 17
 - Maven or Gradle
 - Docker 
 
 ### Usage
+Create a `.env` file in the root directory of the project and add the following configuration:
+
+```env
+# PORTS
+API_GATEWAY_PORT=8080
+SERVICE_REGISTRY_PORT=8761
+REDIS_PORT=6380
+RABBITMQ_PORT=5672
+ZIPKIN_PORT=9411
+POSTGRES_PORT=5433
+
+# API KEY
+GEMINI_API_KEY=<YOUR_GEMINI_API_KEY>
+```
+
 To start all services defined in docker-compose.yml, use the following command:
 
 ```bash
@@ -112,7 +139,8 @@ Sale Service is responsible for handling **sales transactions** and **managing c
 Report Service is responsible for **generating receipts** related to sales and transactions. It allows users to **view detailed sales information** and generate receipts for completed transactions. This service provides insights into sales performance, helping businesses make informed decisions based on sales data.
 
 
-## Ports
+## Default Ports
+Any changes to these ports require changes to the configuration files.
 
 | Container        | Port |
 |------------------|------|
@@ -121,10 +149,8 @@ Report Service is responsible for **generating receipts** related to sales and t
 | Redis            | 6380 | 
 | RabbitMQ         | 5672 | 
 | Zipkin           | 9411 | 
-| Product DB       | 5433 |
-| Sale DB          | 5434 |
-| User DB          | 5435 |
-| Auth DB          | 5436 |
+| Postgres         | 5433 |
+
 
 
 ## Roles & Users
@@ -171,8 +197,8 @@ An example of login request:
 }
 ```
 
-## Endpoints
 
+## Endpoints
 All requests should be made to the **API Gateway's url** which is **http://localhost:8080**.
 
 ### Auth Service
@@ -234,6 +260,7 @@ All requests should be made to the **API Gateway's url** which is **http://local
 | GET         | /reports/deleted           | Get all deleted sales                  |
 | GET         | /reports/filteredAndSorted | Get all sales with filters and sorting |
 | GET         | /reports/receipt/{id}      | Get receipt by sale ID                 |
+
 
 
 ## Request Body Examples
@@ -332,6 +359,8 @@ POST /auth/login
 ```
 
 
+## Receipt Example
+![Project Logo](~images/receipt.png)
 
 
 
