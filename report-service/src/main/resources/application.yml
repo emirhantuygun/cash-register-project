@@ -37,4 +37,5 @@ chart:
     symbol: "/static/images/symbol.png"
 
 gemini:
+  active: ${GEMINI_ACTIVE}
   api-key: ${GEMINI_API_KEY}

@@ -146,6 +146,7 @@ services:
     image: emirhantuygun/product-service:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - SEND_EMAIL=${SEND_EMAIL}
     volumes:
       - logs-docker:/logs
     networks:
@@ -190,6 +191,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_ACTIVE=${GEMINI_ACTIVE}
     volumes:
       - logs-docker:/logs
     networks:

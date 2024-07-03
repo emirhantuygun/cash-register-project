@@ -55,6 +55,9 @@ public class ChartService {
     @Value("${chart.image-path.symbol}")
     private String SYMBOL_IMAGE_PATH;
 
+    @Value("${gemini.active}")
+    private String USE_GEMINI;
+
     private final GeminiService geminiService;
 
     /**
@@ -186,64 +189,66 @@ public class ChartService {
 
             // GEMINI
 
-            try (InputStream inputStream = getClass().getResourceAsStream(GEMINI_IMAGE_PATH)) {
-                if (inputStream != null) {
-                    Image image = Image.getInstance(IOUtils.toByteArray(inputStream));
-
-                    image.scaleToFit(75, 75); // Resize the image if necessary
-                    image.setAlignment(Image.ALIGN_CENTER);
-                    document.add(image);
-                }
-            }
-
-            document.add(new Paragraph("\n"));
-            String saleFigures = convertSalesDataToText(productQuantityMap);
-
-            log.info("Calling getInsight method in GeminiService");
-            String saleAnalysis = geminiService.getInsight(saleFigures);
-
-            if (saleAnalysis != null) {
-                saleAnalysis = saleAnalysis.replaceAll("\\*\\*", "");
-                saleAnalysis = saleAnalysis.replaceAll("##", "");
-
-                String[] sentencesArray = saleAnalysis.split("(?<=[.!?])\\s*");
-
-                // Convert the array to a list for easier processing
-                List<String> sentences = new ArrayList<>();
-                for (String sentence : sentencesArray) {
-                    sentences.add(sentence.trim());
-                }
-                PdfPTable aiTable = new PdfPTable(2);
-                aiTable.setWidthPercentage(90);
-                aiTable.setWidths(new float[]{0.05f, 0.95f});
-
-                for (String sentence : sentences) {
-                    InputStream inputStream = getClass().getResourceAsStream(SYMBOL_IMAGE_PATH);
+            if (Boolean.parseBoolean(USE_GEMINI)) {
+                try (InputStream inputStream = getClass().getResourceAsStream(GEMINI_IMAGE_PATH)) {
                     if (inputStream != null) {
                         Image image = Image.getInstance(IOUtils.toByteArray(inputStream));
 
-                        image.scaleToFit(10, 10); // Resize the image if necessary
-                        image.setSpacingBefore(10f);
-
-                        PdfPCell leftCell1 = new PdfPCell(image);
-
-                        leftCell1.setHorizontalAlignment(Element.ALIGN_LEFT);
-                        leftCell1.setVerticalAlignment(Element.ALIGN_MIDDLE);
-
-                        leftCell1.setBorder(Rectangle.NO_BORDER);
-
-                        aiTable.addCell(leftCell1);
+                        image.scaleToFit(75, 75); // Resize the image if necessary
+                        image.setAlignment(Image.ALIGN_CENTER);
+                        document.add(image);
                     }
-
-                    PdfPCell rightCell1 = new PdfPCell();
-                    Phrase phrase = new Phrase(sentence);
-                    rightCell1.addElement(phrase);
-                    rightCell1.setHorizontalAlignment(Element.ALIGN_LEFT);
-                    rightCell1.setVerticalAlignment(Element.ALIGN_MIDDLE);
-                    rightCell1.setBorder(Rectangle.NO_BORDER);
-                    aiTable.addCell(rightCell1);
                 }
-                document.add(aiTable);
+
+                document.add(new Paragraph("\n"));
+                String saleFigures = convertSalesDataToText(productQuantityMap);
+
+                log.info("Calling getInsight method in GeminiService");
+                String saleAnalysis = geminiService.getInsight(saleFigures);
+
+                if (saleAnalysis != null) {
+                    saleAnalysis = saleAnalysis.replaceAll("\\*\\*", "");
+                    saleAnalysis = saleAnalysis.replaceAll("##", "");
+
+                    String[] sentencesArray = saleAnalysis.split("(?<=[.!?])\\s*");
+
+                    // Convert the array to a list for easier processing
+                    List<String> sentences = new ArrayList<>();
+                    for (String sentence : sentencesArray) {
+                        sentences.add(sentence.trim());
+                    }
+                    PdfPTable aiTable = new PdfPTable(2);
+                    aiTable.setWidthPercentage(90);
+                    aiTable.setWidths(new float[]{0.05f, 0.95f});
+
+                    for (String sentence : sentences) {
+                        InputStream inputStream = getClass().getResourceAsStream(SYMBOL_IMAGE_PATH);
+                        if (inputStream != null) {
+                            Image image = Image.getInstance(IOUtils.toByteArray(inputStream));
+
+                            image.scaleToFit(10, 10); // Resize the image if necessary
+                            image.setSpacingBefore(10f);
+
+                            PdfPCell leftCell1 = new PdfPCell(image);
+
+                            leftCell1.setHorizontalAlignment(Element.ALIGN_LEFT);
+                            leftCell1.setVerticalAlignment(Element.ALIGN_MIDDLE);
+
+                            leftCell1.setBorder(Rectangle.NO_BORDER);
+
+                            aiTable.addCell(leftCell1);
+                        }
+
+                        PdfPCell rightCell1 = new PdfPCell();
+                        Phrase phrase = new Phrase(sentence);
+                        rightCell1.addElement(phrase);
+                        rightCell1.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        rightCell1.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                        rightCell1.setBorder(Rectangle.NO_BORDER);
+                        aiTable.addCell(rightCell1);
+                    }
+                    document.add(aiTable);
+                }
             }
             document.close();
 
