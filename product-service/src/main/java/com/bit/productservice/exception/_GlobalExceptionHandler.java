@@ -107,4 +107,24 @@ public class _GlobalExceptionHandler {
         log.error("ProductNotSoftDeletedException occurred: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+
+    @ExceptionHandler(InvalidEmailFormatException.class)
+    public ResponseEntity<String> handleInvalidEmailFormatException(InvalidEmailFormatException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(EmailSendingFailedException.class)
+    public ResponseEntity<String> handleEmailSendingFailedException(EmailSendingFailedException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(MissingEmailConfigurationException.class)
+    public ResponseEntity<String> handleMissingEmailConfigurationException(MissingEmailConfigurationException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(EmailException.class)
+    public ResponseEntity<String> handleEmailException(EmailException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

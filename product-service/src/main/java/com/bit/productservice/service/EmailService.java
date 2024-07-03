@@ -1,5 +1,8 @@
 package com.bit.productservice.service;
 
+import com.bit.productservice.exception.EmailSendingFailedException;
+import com.bit.productservice.exception.InvalidEmailFormatException;
+import com.bit.productservice.exception.MissingEmailConfigurationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
@@ -19,9 +22,8 @@ public class EmailService {
     @Value("${email-recipient}")
     private String recipient;
 
-    private final JavaMailSender javaMailSender;
-
     private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@(.+)$";
+    private final JavaMailSender javaMailSender;
 
     @PostConstruct
     public void validateEmailConfiguration() {
@@ -29,11 +31,11 @@ public class EmailService {
             throw new MissingEmailConfigurationException("Email configuration is missing or incomplete.");
         }
 
-        if (!isValidEmail(fromEmailId)) {
+        if (isNotValidEmail(fromEmailId)) {
             throw new InvalidEmailFormatException("From email address format is invalid: " + fromEmailId);
         }
 
-        if (!isValidEmail(recipient)) {
+        if (isNotValidEmail(recipient)) {
             throw new InvalidEmailFormatException("Recipient email address format is invalid: " + recipient);
         }
     }
@@ -52,9 +54,9 @@ public class EmailService {
         }
     }
 
-    private boolean isValidEmail(String email) {
+    private boolean isNotValidEmail(String email) {
         Pattern pattern = Pattern.compile(EMAIL_REGEX);
-        return pattern.matcher(email).matches();
+        return !(pattern.matcher(email).matches());
     }
 }
 
