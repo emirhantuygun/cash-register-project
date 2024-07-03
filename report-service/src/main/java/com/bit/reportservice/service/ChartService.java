@@ -190,6 +190,7 @@ public class ChartService {
             // GEMINI
 
             if (Boolean.parseBoolean(USE_GEMINI)) {
+                log.info("Gemini is active");
                 try (InputStream inputStream = getClass().getResourceAsStream(GEMINI_IMAGE_PATH)) {
                     if (inputStream != null) {
                         Image image = Image.getInstance(IOUtils.toByteArray(inputStream));
@@ -305,6 +306,7 @@ public class ChartService {
             salesDataText.append("- ").append(entry.getKey()).append(": ")
                     .append(entry.getValue()).append(" units\n");
         }
+        log.debug("Sales Data String: {}", salesDataText.toString());
 
         log.trace("Exiting convertSalesDataToText method in ChartService");
         return salesDataText.toString();

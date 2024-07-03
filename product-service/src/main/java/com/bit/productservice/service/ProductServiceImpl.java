@@ -232,6 +232,7 @@ public class ProductServiceImpl implements ProductService {
         log.info("Reduced stock for product with ID: {}", request.getId());
 
         if (Boolean.parseBoolean(SEND_EMAIL) && product.getStockQuantity() == 0) {
+            log.info("Email sending is active");
             emailService.sendEmail("Product Out of Stock", product.getName() + " is out of stock!");
             log.info("Sent out of stock email for product with ID: {}", request.getId());
         }

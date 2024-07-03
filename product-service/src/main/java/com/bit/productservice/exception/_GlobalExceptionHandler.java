@@ -110,21 +110,25 @@ public class _GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidEmailFormatException.class)
     public ResponseEntity<String> handleInvalidEmailFormatException(InvalidEmailFormatException ex) {
+        log.error("InvalidEmailFormatException occurred: {}", ex.getMessage(), ex);
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(EmailSendingFailedException.class)
     public ResponseEntity<String> handleEmailSendingFailedException(EmailSendingFailedException ex) {
+        log.error("EmailSendingFailedException occurred: {}", ex.getMessage(), ex);
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(MissingEmailConfigurationException.class)
     public ResponseEntity<String> handleMissingEmailConfigurationException(MissingEmailConfigurationException ex) {
+        log.error("MissingEmailConfigurationException occurred: {}", ex.getMessage(), ex);
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(EmailException.class)
     public ResponseEntity<String> handleEmailException(EmailException ex) {
+        log.error("EmailException occurred: {}", ex.getMessage(), ex);
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
