@@ -152,7 +152,7 @@ class ReportControllerTest {
 
         HttpHeaders headers = response.getHeaders();
         assertEquals(MediaType.APPLICATION_PDF, headers.getContentType());
-        assertTrue(headers.getContentDisposition().getFilename().contains("chart_month_"));
+        assertTrue(headers.getContentDisposition().getFilename().contains("month-chart_"));
         assertEquals("must-revalidate, post-check=0, pre-check=0", headers.getCacheControl());
 
         verify(reportService, times(1)).getChart("month");
@@ -174,7 +174,7 @@ class ReportControllerTest {
 
         HttpHeaders headers = response.getHeaders();
         assertEquals(MediaType.APPLICATION_PDF, headers.getContentType());
-        assertTrue(headers.getContentDisposition().getFilename().contains("chart_day_"));
+        assertTrue(headers.getContentDisposition().getFilename().contains("day-chart_"));
         assertEquals("must-revalidate, post-check=0, pre-check=0", headers.getCacheControl());
 
         verify(reportService, times(1)).getChart("day");
@@ -216,7 +216,7 @@ class ReportControllerTest {
 
         HttpHeaders headers = response.getHeaders();
         assertEquals(MediaType.APPLICATION_PDF, headers.getContentType());
-        assertTrue(headers.getContentDisposition().getFilename().contains("chart_week_"));
+        assertTrue(headers.getContentDisposition().getFilename().contains("week-chart"));
         assertEquals("must-revalidate, post-check=0, pre-check=0", headers.getCacheControl());
 
         verify(reportService, times(1)).getChart("week");
