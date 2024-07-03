@@ -17,6 +17,7 @@ import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -39,9 +40,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
+    @Value("${send-email}")
+    private String SEND_EMAIL;
+
     private final ProductRepository productRepository;
     private final BarcodeService barcodeService;
     private final CacheService cacheService;
+    private final EmailService emailService;
 
     @Override
     @Cacheable(cacheNames = "product_id", key = "#id", unless = "#result == null")
@@ -222,8 +227,14 @@ public class ProductServiceImpl implements ProductService {
 
         product.setStockQuantity(product.getStockQuantity() - request.getRequestedQuantity());
         productRepository.save(product);
+
         cacheService.updateProductCache(mapToProductResponse(product));
         log.info("Reduced stock for product with ID: {}", request.getId());
+
+        if (Boolean.parseBoolean(SEND_EMAIL) && product.getStockQuantity() == 0) {
+            emailService.sendEmail("Product Out of Stock", product.getName() + " is out of stock!");
+            log.info("Sent out of stock email for product with ID: {}", request.getId());
+        }
 
         log.trace("Exiting reduceProductStock method in ProductServiceImpl class");
     }

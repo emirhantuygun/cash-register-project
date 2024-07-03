@@ -147,6 +147,9 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SEND_EMAIL=${SEND_EMAIL}
+      - EMAIL_USERNAME=${EMAIL_USERNAME}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - EMAIL_RECIPIENT=${EMAIL_RECIPIENT}
     volumes:
       - logs-docker:/logs
     networks:
