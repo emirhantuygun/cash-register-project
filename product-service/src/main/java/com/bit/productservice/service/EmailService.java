@@ -26,7 +26,7 @@ public class EmailService {
     private final JavaMailSender javaMailSender;
 
     @PostConstruct
-    public void validateEmailConfiguration() {
+    protected void validateEmailConfiguration() {
         if (fromEmailId == null || fromEmailId.isEmpty() || recipient == null || recipient.isEmpty()) {
             throw new MissingEmailConfigurationException("Email configuration is missing or incomplete.");
         }
@@ -40,7 +40,7 @@ public class EmailService {
         }
     }
 
-    public void sendEmail(String subject, String body) {
+    protected void sendEmail(String subject, String body) {
         try {
             SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
             simpleMailMessage.setFrom(fromEmailId);
