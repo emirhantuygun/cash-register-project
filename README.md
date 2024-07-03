@@ -54,6 +54,7 @@
 - RabbitMQ
 - Google Jib
 - Log4j2
+- JavaMailSender
 - iTextPDF
 - JFreeChart
 - Google Gemini
@@ -77,6 +78,7 @@
 - Logging
 - Unit Testing
 - JavaDoc
+- Email Sending (when a product is out of stock)
 - Receipt Generation
 - Chart Generation
 - AI Insight
@@ -105,7 +107,14 @@ ZIPKIN_PORT=9411
 POSTGRES_PORT=5433
 
 # API KEY
+GEMINI_ACTIVE=true           # Make it "false" if you don't want application to use Gemini and provide AI insights
 GEMINI_API_KEY=<YOUR_GEMINI_API_KEY>
+
+# EMAIL
+SEND_EMAIL=true              # Make it "false" if you don't want application to send Out of Stock Emails
+EMAIL_USERNAME=<YOUR_SENDER_EMAIL_ID>
+EMAIL_PASSWORD=<YOUR_SENDER_EMAIL_APP_PASSWORD>
+EMAIL_RECIPIENT=<YOUR_RECIPIENT_EMAIL_ADDRESS>
 ```
 
 To start all services defined in docker-compose.yml, use the following command:
