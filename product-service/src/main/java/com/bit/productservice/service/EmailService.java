@@ -13,6 +13,12 @@ import org.springframework.stereotype.Service;
 import jakarta.annotation.PostConstruct;
 import java.util.regex.Pattern;
 
+/**
+ * This class is responsible for sending emails using the configured email service.
+ * It validates the email configuration and sends emails with the provided subject and body.
+ *
+ * @author Emirhan Tuygun
+ */
 @Log4j2
 @Service
 @RequiredArgsConstructor
@@ -27,6 +33,10 @@ public class EmailService {
     private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@(.+)$";
     private final JavaMailSender javaMailSender;
 
+    /**
+     * Validates the email configuration by checking if the 'fromEmailId' and 'recipient' properties are not empty and valid email addresses.
+     * Throws MissingEmailConfigurationException or InvalidEmailFormatException if the configuration is missing or invalid.
+     */
     @PostConstruct
     protected void validateEmailConfiguration() {
         log.trace("Entering validateEmailConfiguration method in EmailService");
@@ -50,6 +60,13 @@ public class EmailService {
         log.trace("Exiting validateEmailConfiguration method in EmailService");
     }
 
+    /**
+     * Sends an email with the provided subject and body.
+     * Logs the email details and throws EmailSendingFailedException if the email sending fails.
+     *
+     * @param subject The subject of the email.
+     * @param body The body of the email.
+     */
     protected void sendEmail(String subject, String body) {
         log.trace("Entering sendEmail method in EmailService");
 
@@ -72,6 +89,12 @@ public class EmailService {
         log.trace("Exiting sendEmail method in EmailService");
     }
 
+    /**
+     * Checks if the provided email address is valid.
+     *
+     * @param email The email address to validate.
+     * @return True if the email address is valid, false otherwise.
+     */
     private boolean isNotValidEmail(String email) {
         log.trace("Entering isNotValidEmail method in EmailService");
         Pattern pattern = Pattern.compile(EMAIL_REGEX);

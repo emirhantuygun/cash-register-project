@@ -108,24 +108,60 @@ public class _GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
+    /**
+     * Handles InvalidEmailFormatException.
+     * This method catches and handles the custom exception InvalidEmailFormatException.
+     * When this exception is thrown, it logs the error message and returns a ResponseEntity with a status of 500 (Internal Server Error)
+     * and the exception message as the response body.
+     *
+     * @param ex The InvalidEmailFormatException that occurred.
+     * @return A ResponseEntity with a status of 500 (Internal Server Error) and the exception message as the response body.
+     */
     @ExceptionHandler(InvalidEmailFormatException.class)
     public ResponseEntity<String> handleInvalidEmailFormatException(InvalidEmailFormatException ex) {
         log.error("InvalidEmailFormatException occurred: {}", ex.getMessage(), ex);
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    /**
+     * Handles EmailSendingFailedException.
+     * This method catches and handles the custom exception EmailSendingFailedException.
+     * When this exception is thrown, it logs the error message and returns a ResponseEntity with a status of 500 (Internal Server Error)
+     * and the exception message as the response body.
+     *
+     * @param ex The EmailSendingFailedException that occurred.
+     * @return A ResponseEntity with a status of 500 (Internal Server Error) and the exception message as the response body.
+     */
     @ExceptionHandler(EmailSendingFailedException.class)
     public ResponseEntity<String> handleEmailSendingFailedException(EmailSendingFailedException ex) {
         log.error("EmailSendingFailedException occurred: {}", ex.getMessage(), ex);
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    /**
+     * Handles MissingEmailConfigurationException.
+     * This method catches and handles the custom exception MissingEmailConfigurationException.
+     * When this exception is thrown, it logs the error message and returns a ResponseEntity with a status of 500 (Internal Server Error)
+     * and the exception message as the response body.
+     *
+     * @param ex The MissingEmailConfigurationException that occurred.
+     * @return A ResponseEntity with a status of 500 (Internal Server Error) and the exception message as the response body.
+     */
     @ExceptionHandler(MissingEmailConfigurationException.class)
     public ResponseEntity<String> handleMissingEmailConfigurationException(MissingEmailConfigurationException ex) {
         log.error("MissingEmailConfigurationException occurred: {}", ex.getMessage(), ex);
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    /**
+     * Handles EmailException.
+     * This method catches and handles the custom exception EmailException.
+     * When this exception is thrown, it logs the error message and returns a ResponseEntity with a status of 500 (Internal Server Error)
+     * and the exception message as the response body.
+     *
+     * @param ex The EmailException that occurred.
+     * @return A ResponseEntity with a status of 500 (Internal Server Error) and the exception message as the response body.
+     */
     @ExceptionHandler(EmailException.class)
     public ResponseEntity<String> handleEmailException(EmailException ex) {
         log.error("EmailException occurred: {}", ex.getMessage(), ex);
