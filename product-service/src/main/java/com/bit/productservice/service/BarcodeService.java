@@ -41,6 +41,7 @@ public class BarcodeService {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             log.debug("SHA-256 MessageDigest instance created");
 
+            // Hashing the combined name
             byte[] hashBytes = digest.digest(combinedName.getBytes());
             log.debug("Hashed bytes: {}", hashBytes);
 

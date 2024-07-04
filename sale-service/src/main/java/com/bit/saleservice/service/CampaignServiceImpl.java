@@ -65,7 +65,10 @@ public class CampaignServiceImpl implements CampaignService{
         log.trace("Entering getAllCampaignsFilteredAndSorted method in CampaignServiceImpl with page: {}, size: {}, sortBy: {}, direction: {}, name: {}, details: {}, isExpired: {}",
                 page, size, sortBy, direction, name, details, isExpired);
 
+        // Creating the pageable object
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
+
+        // Getting the campaign page
         Page<Campaign> campaignsPage = campaignRepository.findAll((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = getPredicates(name, details, isExpired, root, criteriaBuilder);
 

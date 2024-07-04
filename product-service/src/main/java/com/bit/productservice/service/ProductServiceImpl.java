@@ -53,8 +53,12 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse getProduct(Long id) {
         log.trace("Entering getProduct method in ProductServiceImpl class with id: {}", id);
 
+        // Finding the product
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException("Product not found with id " + id));
+                .orElseThrow(() -> {
+                    log.error("Product not found with id: {}", id);
+                    return new ProductNotFoundException("Product not found with id " + id);
+                });
         ProductResponse response = mapToProductResponse(product);
         log.debug("Product found: {}", response);
 
@@ -66,6 +70,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductResponse> getAllProducts() {
         log.trace("Entering getAllProducts method in ProductServiceImpl class");
 
+        // Getting all products
         List<Product> products = productRepository.findAll();
         List<ProductResponse> responses = products.stream().map(this::mapToProductResponse).toList();
         log.debug("Found {} products", responses.size());
@@ -78,6 +83,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductResponse> getDeletedProducts() {
         log.trace("Entering getDeletedProducts method in ProductServiceImpl class");
 
+        // Getting all soft deleted products
         List<Product> products = productRepository.findSoftDeletedProducts();
         List<ProductResponse> responses = products.stream().map(this::mapToProductResponse).toList();
         log.debug("Found {} deleted products", responses.size());
@@ -94,11 +100,16 @@ public class ProductServiceImpl implements ProductService {
 
         log.debug("Filter and sort parameters - page: {}, size: {}, sortBy: {}, direction: {}, name: {}, description: {}, minPrice: {}, maxPrice: {}, minStock: {}, maxStock: {}",
                 page, size, sortBy, direction, name, description, minPrice, maxPrice, minStock, maxStock);
+
+        // Creating the pageable object
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
+
+        // Creating the predicates and getting the results
         Page<Product> productsPage = productRepository.findAll((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = getPredicates(name, description, minPrice, maxPrice, minStock, maxStock, criteriaBuilder, root);
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         }, pageable);
+
         Page<ProductResponse> responsePage = productsPage.map(this::mapToProductResponse);
         log.info("Found {} products on the filtered and sorted page", responsePage.getTotalElements());
 
@@ -110,6 +121,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse createProduct(ProductRequest productRequest) throws AlgorithmNotFoundException {
         log.trace("Entering createProduct method in ProductServiceImpl class");
 
+        // Creating a new product object
         log.debug("Creating product with request: {}", productRequest);
         Product product = Product.builder()
                 .name(productRequest.getName())
@@ -120,6 +132,8 @@ public class ProductServiceImpl implements ProductService {
                 .build();
         productRepository.save(product);
         ProductResponse productResponse = mapToProductResponse(product);
+
+        // Caching the product
         cacheService.createProductCache(productResponse);
         log.info("Product created with ID: {}", product.getId());
 
@@ -131,6 +145,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse updateProduct(Long id, ProductRequest productRequest) throws AlgorithmNotFoundException {
         log.trace("Entering updateProduct method in ProductServiceImpl class");
 
+        // Finding the existing product and updating it
         log.debug("Updating product with ID {} and request: {}", id, productRequest);
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> {
@@ -145,6 +160,8 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(existingProduct);
 
         ProductResponse productResponse = mapToProductResponse(existingProduct);
+
+        // Caching the updated product
         cacheService.updateProductCache(productResponse);
         log.info("Product updated with ID: {}", existingProduct.getId());
 
@@ -156,10 +173,13 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse restoreProduct(Long id) {
         log.trace("Entering restoreProduct method in ProductServiceImpl class with id: {}", id);
 
+        // Checking whether the product is soft-deleted
         if (!productRepository.existsByIdAndDeletedTrue(id)) {
             log.warn("Product with id {} is not soft-deleted and cannot be restored", id);
             throw new ProductNotSoftDeletedException("Product with id " + id + " is not soft-deleted and cannot be restored.");
         }
+
+        // Restoring the soft-deleted product
         productRepository.restoreProduct(id);
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> {
@@ -168,6 +188,8 @@ public class ProductServiceImpl implements ProductService {
                 });
 
         ProductResponse productResponse = mapToProductResponse(product);
+
+        // Caching the restored product
         cacheService.createProductCache(productResponse);
         log.info("Product restored with ID: {}", id);
 
@@ -219,6 +241,7 @@ public class ProductServiceImpl implements ProductService {
     public void reduceProductStock(ProductStockReduceRequest request) {
         log.trace("Entering reduceProductStock method in ProductServiceImpl class with request: {}", request);
 
+        // Finding and updating the product
         Product product = productRepository.findById(request.getId())
                 .orElseThrow(() -> {
                     log.error("Product not found with id: {}", request.getId());
@@ -228,9 +251,11 @@ public class ProductServiceImpl implements ProductService {
         product.setStockQuantity(product.getStockQuantity() - request.getRequestedQuantity());
         productRepository.save(product);
 
+        // Caching the updated product
         cacheService.updateProductCache(mapToProductResponse(product));
         log.info("Reduced stock for product with ID: {}", request.getId());
 
+        // Sending an email if the stock quantity is zero and email sending is enabled
         if (Boolean.parseBoolean(SEND_EMAIL) && product.getStockQuantity() == 0) {
             log.info("Email sending is active");
             emailService.sendEmail("Product Out of Stock", product.getName() + " is out of stock!");
@@ -244,6 +269,7 @@ public class ProductServiceImpl implements ProductService {
     public void returnProducts(ProductStockReturnRequest request) {
         log.trace("Entering returnProducts method in ProductServiceImpl class with request: {}", request);
 
+        // Finding and updating the product
         Product product = productRepository.findById(request.getId())
                 .orElseThrow(() -> {
                     log.error("Product not found with id: {}", request.getId());
@@ -252,6 +278,8 @@ public class ProductServiceImpl implements ProductService {
 
         product.setStockQuantity(product.getStockQuantity() + request.getReturnedQuantity());
         productRepository.save(product);
+
+        // Caching the updated product
         cacheService.updateProductCache(mapToProductResponse(product));
         log.info("Returned products for product with ID: {}", request.getId());
 

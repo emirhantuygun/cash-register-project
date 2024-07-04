@@ -41,16 +41,19 @@ public class EmailService {
     protected void validateEmailConfiguration() {
         log.trace("Entering validateEmailConfiguration method in EmailService");
 
+        // Checking nullness of email adresses
         if (fromEmailId == null || fromEmailId.isEmpty() || recipient == null || recipient.isEmpty()) {
             log.error("Email configuration is missing or incomplete. fromEmailId: {}, recipient: {}", fromEmailId, recipient);
             throw new MissingEmailConfigurationException("Email configuration is missing or incomplete.");
         }
 
+        // Validating fromEmailId
         if (isNotValidEmail(fromEmailId)) {
             log.error("From email address format is invalid: {}", fromEmailId);
             throw new InvalidEmailFormatException("From email address format is invalid: " + fromEmailId);
         }
 
+        // Validating recipient
         if (isNotValidEmail(recipient)) {
             log.error("Recipient email address format is invalid: {}", recipient);
             throw new InvalidEmailFormatException("Recipient email address format is invalid: " + recipient);

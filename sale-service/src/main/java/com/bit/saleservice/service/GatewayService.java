@@ -79,9 +79,11 @@ public class GatewayService {
             String getUrl = GATEWAY_URL + GET_PRODUCT_ENDPOINT;
             log.debug("Constructed getUrl: {}", getUrl);
 
+            // Getting HTTP headers
             HttpHeaders headers = getHttpHeaders();
             HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
+            // Making the request
             ResponseEntity<ProductResponse> responseEntity = restTemplate.exchange(
                     getUrl,
                     HttpMethod.GET,
@@ -90,6 +92,7 @@ public class GatewayService {
                     id
             );
 
+            // Checking the status code
             if (!(responseEntity.getStatusCode().is2xxSuccessful())) {
                 log.warn("Product fetch failed with status code: {}", responseEntity.getStatusCode());
                 throw new ProductServiceException("Product fetch failed in product-service!");
@@ -132,9 +135,11 @@ public class GatewayService {
             String returnUrl = GATEWAY_URL + RETURN_PRODUCTS_ENDPOINT;
             log.debug("Constructed returnUrl: {}", returnUrl);
 
+            // Getting HTTP headers
             HttpHeaders headers = getHttpHeaders();
             HttpEntity<ProductStockReturnRequest> requestEntity = new HttpEntity<>(request, headers);
 
+            // Making the request
             ResponseEntity<String> responseEntity = restTemplate.exchange(
                     returnUrl,
                     HttpMethod.POST,
@@ -142,6 +147,7 @@ public class GatewayService {
                     String.class
             );
 
+            // Checking the status code
             if (!(responseEntity.getStatusCode().is2xxSuccessful())) {
                 log.warn("Product return failed with status code: {}", responseEntity.getStatusCode());
                 throw new ProductServiceException("Product return failed in product-service!");
@@ -177,9 +183,11 @@ public class GatewayService {
     protected HttpHeaders getHttpHeaders() throws HeaderProcessingException {
         log.trace("Entering getHttpHeaders method in GatewayService");
 
+        // Creating new headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
+        // Retrieving authorization token from request attributes and set it in the headers
         try {
             ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (attributes != null) {

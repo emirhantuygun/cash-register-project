@@ -42,6 +42,7 @@ public class GeminiService {
 
         JsonObject requestJson = getJsonObject(data);
 
+        // Creating a connection
         HttpURLConnection con = (HttpURLConnection) new URL(ENDPOINT_URL).openConnection();
         con.setRequestMethod("POST");
         con.setRequestProperty("Content-Type", "application/json");
@@ -92,6 +93,7 @@ public class GeminiService {
         JsonArray contentsArray = getJsonElements(data);
         requestJson.add("contents", contentsArray);
 
+        // Setting the generation configuration
         JsonObject generationConfig = new JsonObject();
         generationConfig.addProperty("temperature", 1);
         generationConfig.addProperty("topK", 0);
@@ -100,6 +102,7 @@ public class GeminiService {
 
         requestJson.add("generationConfig", generationConfig);
 
+        // Setting the safety settings
         JsonObject safetySettings = new JsonObject();
         safetySettings.addProperty("category", "HARM_CATEGORY_HARASSMENT");
         safetySettings.addProperty("threshold", "BLOCK_MEDIUM_AND_ABOVE");
@@ -123,6 +126,7 @@ public class GeminiService {
     private JsonArray getJsonElements(String data) {
         log.trace("Entering getJsonElements method in GeminiService");
 
+        // Setting the prompt string
         JsonObject userPart = new JsonObject();
         userPart.addProperty("text",
                 "Suppose that I own a supermarket. Please analyze the sales figures for my products and categorize them into three parts: Low Performance, Moderate Performance, and Best Performance. Provide suggestions such as products whose stock quantities can be reduced and specify the best sellers. Be creative. Use basic words. Exclude additional considerations or recommendations. Give me a straightforward analysis. All of them will be as paragraphs, not item by item. Make it about 200 words." + data);

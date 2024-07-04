@@ -53,12 +53,14 @@ public class ReceiptService {
         log.trace("Entering generateReceipt method in ReceiptService");
 
         try {
+            // Creating a document
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             Document document = new Document();
             PdfWriter.getInstance(document, baos);
 
             document.open();
 
+            // Arranging the fonts
             BaseFont baseFont = BaseFont.createFont(FONT_PATH, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
             Font bold = new Font(baseFont, 20, Font.BOLD);
             Font boldBig = new Font(baseFont, 30, Font.BOLD);

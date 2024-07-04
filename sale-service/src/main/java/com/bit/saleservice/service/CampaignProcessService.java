@@ -68,21 +68,25 @@ public class CampaignProcessService {
         log.trace("Entering processCampaigns method in CampaignProcessService with campaignProcessRequest: {}", campaignProcessRequest);
 
         List<Long> ids = campaignProcessRequest.getCampaignIds();
-        boolean hasDuplicates = ids.stream().distinct().count() < ids.size();
 
+        // Checking whether there are duplicates
+        boolean hasDuplicates = ids.stream().distinct().count() < ids.size();
         if (hasDuplicates) {
             log.warn("Duplicate campaign ids found in campaignProcessRequest: {}", campaignProcessRequest);
             throw new DuplicateCampaignException("Same campaign cannot be used more than once!");
         }
 
+        // Creating CampaignProcessResponse object
         CampaignProcessResponse campaignProcessResponse = CampaignProcessResponse.builder()
                 .products(campaignProcessRequest.getProducts())
                 .total(campaignProcessRequest.getTotal())
                 .build();
 
         for (long id : ids) {
+            // Validating the campaign
             isCampaignValidAndNotExpired(id);
 
+            // Processing the campaign based on its ID
             switch ((int) id) {
                 case 1:
                     log.debug("Processing campaign 1 for campaignProcessResponse: {}", campaignProcessResponse);
@@ -119,6 +123,7 @@ public class CampaignProcessService {
         BigDecimal limitTotal = BigDecimal.valueOf(200);
         BigDecimal total = campaignProcessResponse.getTotal();
 
+        // Check whether the campaign is applicable
         if (total.compareTo(limitTotal) < 0) {
             log.warn("Campaign 1 not applicable. Total: {} is less than limit: {}", total, limitTotal);
             throw new CampaignNotApplicableException("Campaign cannot be applied. Total must be equal to or over 200.");
@@ -158,6 +163,8 @@ public class CampaignProcessService {
                 log.info("Successfully applied campaign 2 to the product with id: {}", product.getProductId());
             }
         }
+
+        // Check whether the campaign is applicable
         if (!isApplicable) {
             log.warn("Campaign 2 not applicable. No product with quantity greater than or equal to 3 found in campaignProcessResponse: {}", campaignProcessResponse);
             throw new CampaignNotApplicableException("Campaign cannot be applied. Requires a minimum purchase of the same 3 products to be applied.");
@@ -192,12 +199,14 @@ public class CampaignProcessService {
     protected void isCampaignValidAndNotExpired(Long id) {
         log.trace("Entering isCampaignValidAndNotExpired method in CampaignProcessService with id: {}", id);
 
+        // Finding the campaign
         Campaign campaign = campaignRepository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Campaign not found with id: {}", id);
                     return new CampaignNotFoundException("Campaign not found with id: " + id);
                 });
 
+        // Checking if the campaign is expired
         boolean isExpired = campaign.getExpiration().before(new Date());
         if (isExpired) {
             log.warn("Campaign expired with id: {} and name: {}", id, campaign.getName());

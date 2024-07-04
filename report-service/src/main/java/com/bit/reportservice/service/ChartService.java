@@ -72,6 +72,7 @@ public class ChartService {
         log.trace("Entering generateChart method in ChartService");
 
         try {
+            // Creating the fonts
             BaseFont baseFontLight = BaseFont.createFont(LIGHT_FONT_PATH, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
             BaseFont baseFontRegular = BaseFont.createFont(REGULAR_FONT_PATH, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
             com.itextpdf.text.Font bold = new com.itextpdf.text.Font(baseFontRegular, 20, com.itextpdf.text.Font.BOLD);
@@ -85,6 +86,8 @@ public class ChartService {
             productQuantityMap.forEach(dataset::setValue);
 
             JFreeChart chart = ChartFactory.createPieChart("", dataset, true, false, false);
+
+            // Arranging the plot values
             @SuppressWarnings("rawtypes") PiePlot plot = (PiePlot) chart.getPlot();
             plot.setMaximumLabelWidth(0.20);  // Limit the maximum label width (20% of the plot area)
             plot.setLabelGap(0.05);
@@ -92,7 +95,6 @@ public class ChartService {
             plot.setLabelBackgroundPaint(new Color(255, 255, 255));
             plot.setLabelOutlinePaint(Color.black);
             plot.setLabelOutlineStroke(new BasicStroke(1.0f));
-
             plot.setLabelFont(new Font("Arial", Font.BOLD, 10));  // Using a monospaced font
             plot.setBackgroundPaint(Color.white);
             plot.setOutlineVisible(false);
@@ -102,6 +104,7 @@ public class ChartService {
             chart.getLegend().setItemFont(new Font("Arial", Font.BOLD, 12));
             chart.setBackgroundPaint(Color.white);
 
+            // Writing the chart as a PNG
             ByteArrayOutputStream chartOut = new ByteArrayOutputStream();
             ChartUtils.writeChartAsPNG(chartOut, chart, 550, 550);
 
@@ -112,7 +115,7 @@ public class ChartService {
             document.open();
 
 
-            // Add Date
+            // Adding Date
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             Paragraph date = new Paragraph(dateFormat.format(new Date()), lightSmall);
             date.setAlignment(Paragraph.ALIGN_RIGHT);
@@ -120,11 +123,11 @@ public class ChartService {
             document.add(new Paragraph("\n"));
 
 
-            // Add Title
+            // Adding Title
             Paragraph title = getTitle(unit, boldBig);
             document.add(title);
 
-            // CHART IMAGE
+            // Creating Chart Image
             Image chartImage = Image.getInstance(chartOut.toByteArray());
             chartImage.setAlignment(Image.ALIGN_CENTER);
             document.add(chartImage);
@@ -136,7 +139,7 @@ public class ChartService {
             document.add(new Paragraph("\n"));
 
 
-            // STATISTICS TABLE
+            // Generating STATISTICS TABLE
             Paragraph statisticsTitle = new Paragraph("Sales Statistics", bold);
             statisticsTitle.setAlignment(Paragraph.ALIGN_CENTER);
             document.add(statisticsTitle);
@@ -187,9 +190,11 @@ public class ChartService {
             document.add(new Paragraph("\n"));
 
 
-            // GEMINI
+            // Generating GEMINI INSIGHTS
 
             if (Boolean.parseBoolean(USE_GEMINI)) {
+
+                // Adding Gemini Image
                 log.info("Gemini is active");
                 try (InputStream inputStream = getClass().getResourceAsStream(GEMINI_IMAGE_PATH)) {
                     if (inputStream != null) {
@@ -207,13 +212,14 @@ public class ChartService {
                 log.info("Calling getInsight method in GeminiService");
                 String saleAnalysis = geminiService.getInsight(saleFigures);
 
+                // Formatting the sale analysis
                 if (saleAnalysis != null) {
                     saleAnalysis = saleAnalysis.replaceAll("\\*\\*", "");
                     saleAnalysis = saleAnalysis.replaceAll("##", "");
 
                     String[] sentencesArray = saleAnalysis.split("(?<=[.!?])\\s*");
 
-                    // Convert the array to a list for easier processing
+                    // Converting the array to a list for easier processing
                     List<String> sentences = new ArrayList<>();
                     for (String sentence : sentencesArray) {
                         sentences.add(sentence.trim());
@@ -222,6 +228,7 @@ public class ChartService {
                     aiTable.setWidthPercentage(90);
                     aiTable.setWidths(new float[]{0.05f, 0.95f});
 
+                    // Formatting each sentence
                     for (String sentence : sentences) {
                         InputStream inputStream = getClass().getResourceAsStream(SYMBOL_IMAGE_PATH);
                         if (inputStream != null) {
@@ -302,6 +309,8 @@ public class ChartService {
         log.trace("Entering convertSalesDataToText method in ChartService");
 
         StringBuilder salesDataText = new StringBuilder("Sales Data:\n");
+
+        // Formatting the sales data
         for (Map.Entry<String, Integer> entry : salesData.entrySet()) {
             salesDataText.append("- ").append(entry.getKey()).append(": ")
                     .append(entry.getValue()).append(" units\n");

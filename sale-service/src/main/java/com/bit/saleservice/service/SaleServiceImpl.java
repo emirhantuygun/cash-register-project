@@ -101,7 +101,10 @@ public class SaleServiceImpl implements SaleService {
                                                                   String startDate, String endDate, Boolean isCancelled) {
         log.trace("Entering getAllSalesFilteredAndSorted method in SaleServiceImpl class");
 
+        // Creating the pageable object
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
+
+        // Getting the sale page object
         Page<Sale> salesPage = saleRepository.findAll((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = getPredicates(cashier, paymentMethod, minTotal, maxTotal, startDate, endDate, isCancelled, root, criteriaBuilder);
 
@@ -111,6 +114,7 @@ public class SaleServiceImpl implements SaleService {
         Page<SaleResponse> saleResponsePage = salesPage.map(this::mapToSaleResponse);
         log.info("Retrieved filtered and sorted sales successfully, total elements: {}", saleResponsePage.getTotalElements());
 
+        // Creating a PageWrapper object
         PageWrapper<SaleResponse> saleResponsePageWrapper = new PageWrapper<>();
         saleResponsePageWrapper.setContent(saleResponsePage.getContent());
         saleResponsePageWrapper.setPageNumber(page);
@@ -127,6 +131,7 @@ public class SaleServiceImpl implements SaleService {
     public SaleResponse createSale(SaleRequest saleRequest) throws HeaderProcessingException {
         log.trace("Entering createSale method in SaleServiceImpl class");
 
+        // Defining the variables
         log.debug("SaleRequest: {}", saleRequest);
         List<Product> products = getProducts(saleRequest.getProducts());
         Payment paymentMethod = getPaymentMethod(saleRequest.getPaymentMethod());
@@ -138,6 +143,7 @@ public class SaleServiceImpl implements SaleService {
         BigDecimal change;
         MixedPayment mixedPayment = null;
 
+        // Checking the campaign ids
         if (campaignIds != null && !campaignIds.isEmpty()) {
             CampaignProcessResult campaignProcessResult = processCampaigns(campaignIds, products, total);
             products = campaignProcessResult.getProducts();
@@ -145,6 +151,7 @@ public class SaleServiceImpl implements SaleService {
             campaigns = campaignProcessResult.getCampaigns();
         }
 
+        // Processing the payment
         change = switch (paymentMethod) {
             case CASH -> {
                 cash = saleRequest.getCash();
@@ -157,6 +164,7 @@ public class SaleServiceImpl implements SaleService {
             default -> null;
         };
 
+        // Creating the sale
         Sale sale = Sale.builder()
                 .cashier(saleRequest.getCashier())
                 .date(new Date())
@@ -173,6 +181,7 @@ public class SaleServiceImpl implements SaleService {
         products.forEach(product -> product.setSale(sale));
         productRepository.saveAll(products);
 
+        // Sending a reduce message to the RabbitMQ
         reduceStocks(products);
 
         sale.setProducts(products);
@@ -188,12 +197,15 @@ public class SaleServiceImpl implements SaleService {
         log.trace("Entering updateSale method in SaleServiceImpl class with id: {}", id);
 
         log.debug("SaleRequest: {}", saleRequest);
+
+        // Finding the existing sale
         Sale existingSale = saleRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Sale doesn't exist with id: {}", id);
                     return new SaleNotFoundException("Sale doesn't exist with id " + id);
                 });
 
+        // Checking whether the payment method is the same as the existing sale's payment method
         Payment paymentMethod = getPaymentMethod(saleRequest.getPaymentMethod());
         if (paymentMethod != existingSale.getPaymentMethod()) {
             log.warn("Payment method update not allowed for sale id: {}", id);
@@ -204,6 +216,7 @@ public class SaleServiceImpl implements SaleService {
         returnProducts(oldProducts);
 
         try {
+            // Defining the variables
             List<Product> products = getProducts(saleRequest.getProducts());
             BigDecimal total = getTotal(products);
             BigDecimal totalWithCampaign = null;
@@ -213,6 +226,7 @@ public class SaleServiceImpl implements SaleService {
             BigDecimal change;
             MixedPayment mixedPayment = null;
 
+            // Checking the campaign ids
             if (campaignIds != null && !campaignIds.isEmpty()) {
                 CampaignProcessResult campaignProcessResult = processCampaigns(campaignIds, products, total);
                 products = campaignProcessResult.getProducts();
@@ -220,6 +234,7 @@ public class SaleServiceImpl implements SaleService {
                 campaigns = campaignProcessResult.getCampaigns();
             }
 
+            // Processing the payment
             change = switch (paymentMethod) {
                 case CASH -> {
                     cash = saleRequest.getCash();
@@ -232,6 +247,7 @@ public class SaleServiceImpl implements SaleService {
                 default -> null;
             };
 
+            // Setting the new values
             existingSale.setCashier(saleRequest.getCashier());
             existingSale.setDate(new Date());
             existingSale.setCampaigns(campaigns);
@@ -245,6 +261,7 @@ public class SaleServiceImpl implements SaleService {
             products.forEach(product -> product.setSale(existingSale));
             productRepository.saveAll(products);
 
+            // Sending a reduce message to the RabbitMQ
             reduceStocks(products);
 
             existingSale.setProducts(products);
@@ -264,12 +281,14 @@ public class SaleServiceImpl implements SaleService {
     public void cancelSale(Long id) {
         log.trace("Entering cancelSale method in SaleServiceImpl class with id: {}", id);
 
+        // Finding the existing sale
         Sale existingSale = saleRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Sale doesn't exist with id: {}", id);
                     return new SaleNotFoundException("Sale doesn't exist with id " + id);
                 });
 
+        // Returning the products
         List<Product> oldProducts = existingSale.getProducts();
         returnProducts(oldProducts);
 
@@ -285,6 +304,7 @@ public class SaleServiceImpl implements SaleService {
     public SaleResponse restoreSale(Long id) {
         log.trace("Entering restoreSale method in SaleServiceImpl class with id: {}", id);
 
+        // Checking whether the sale is soft-deleted
         if (!saleRepository.existsByIdAndDeletedTrue(id)) {
             log.error("Sale with id {} is not soft-deleted and cannot be restored", id);
             throw new SaleNotSoftDeletedException("Sale with id " + id + " is not soft-deleted and cannot be restored.");
@@ -293,6 +313,7 @@ public class SaleServiceImpl implements SaleService {
         productRepository.restoreProductsBySaleId(id);
         saleRepository.restoreSale(id);
 
+        // Finding the sale
         Sale sale = saleRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Sale not found after attempting to restore with id: {}", id);
@@ -308,6 +329,7 @@ public class SaleServiceImpl implements SaleService {
     public void deleteSale(Long id) {
         log.trace("Entering deleteSale method in SaleServiceImpl class with id: {}", id);
 
+        // Checking whether the sale exists
         if (!saleRepository.existsById(id)) {
             log.error("Sale doesn't exist with id: {}", id);
             throw new SaleNotFoundException("Sale doesn't exist with id " + id);
@@ -324,6 +346,7 @@ public class SaleServiceImpl implements SaleService {
     public void deleteSalePermanently(Long id) {
         log.trace("Entering deleteSalePermanently method in SaleServiceImpl class with id: {}", id);
 
+        // Checking whether the sale exists
         if (!saleRepository.existsById(id)) {
             log.error("Sale doesn't exist with id: {}", id);
             throw new SaleNotFoundException("Sale doesn't exist with id " + id);
@@ -374,6 +397,8 @@ public class SaleServiceImpl implements SaleService {
                 throw new InvalidPaymentMethodException("Invalid payment method value: " + paymentMethod, e);
             }
         }
+
+        // Adding total query parameters
         if (minTotal != null) {
             predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("totalWithCampaign"), minTotal));
             log.debug("Added predicate for minTotal: {}", minTotal);
@@ -382,6 +407,8 @@ public class SaleServiceImpl implements SaleService {
             predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("totalWithCampaign"), maxTotal));
             log.debug("Added predicate for maxTotal: {}", maxTotal);
         }
+
+        // Adding date query paramters
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         if (StringUtils.isNotBlank(startDate)) {
             try {
@@ -404,6 +431,7 @@ public class SaleServiceImpl implements SaleService {
             }
         }
 
+        // Adding cancelled query parameter
         if (isCancelled != null) {
             predicates.add(criteriaBuilder.equal(root.get("cancelled"), isCancelled));
             log.debug("Added predicate for isCancelled: {}", isCancelled);
@@ -436,9 +464,12 @@ public class SaleServiceImpl implements SaleService {
 
         for (var productRequest : saleProductRequests) {
             try {
+                // Calling the getProduct method in Gateway Service
                 ProductResponse productResponse = gatewayService.getProduct(productRequest.getId());
 
                 if (productResponse != null) {
+
+                    // Checking whether there are enough stock for the product
                     boolean areEnoughProductsInStock = Boolean.TRUE.equals(productResponse.getStockQuantity() >= productRequest.getQuantity());
 
                     if (areEnoughProductsInStock) {
@@ -498,12 +529,14 @@ public class SaleServiceImpl implements SaleService {
     protected CampaignProcessResult processCampaigns(List<Long> campaignIds, List<Product> products, BigDecimal total) {
         log.trace("Entering processCampaigns method in SaleServiceImpl class");
 
+        // Creating a CampaignProcessRequest object
         CampaignProcessRequest campaignProcessRequest = CampaignProcessRequest.builder()
                 .campaignIds(campaignIds)
                 .products(products)
                 .total(total).build();
         CampaignProcessResponse campaignProcessResponse = campaignProcessService.processCampaigns(campaignProcessRequest);
 
+        // Setting results from the campaignProcessResponse object
         List<Campaign> campaigns = campaignProcessService.getCampaigns(campaignIds);
         products = campaignProcessResponse.getProducts();
         BigDecimal totalWithCampaign = campaignProcessResponse.getTotal();
@@ -571,11 +604,13 @@ public class SaleServiceImpl implements SaleService {
     protected BigDecimal processCashPayment(BigDecimal cash, BigDecimal totalWithCampaign) {
         log.trace("Entering processCashPayment method in SaleServiceImpl class");
 
+        // Check whether cash is provided
         if (cash == null) {
             log.error("Cash not provided");
             throw new CashNotProvidedException("Cash not provided");
         }
 
+        // Check whether cash is enough to cover the sale amount
         if (cash.compareTo(totalWithCampaign) < 0) {
             log.error("Cash is not enough to cover the sale amount.");
             throw new InsufficientCashException("Insufficient cash for payment");
@@ -603,6 +638,7 @@ public class SaleServiceImpl implements SaleService {
     protected BigDecimal processMixedPayment(MixedPayment mixedPayment, BigDecimal totalWithCampaign) {
         log.trace("Entering processMixedPayment method in SaleServiceImpl class");
 
+        // Check whether mixed payment is provided
         if (mixedPayment == null) {
             log.error("Mixed payment not found");
             throw new MixedPaymentNotFoundException("Mixed payment not found");
@@ -610,6 +646,7 @@ public class SaleServiceImpl implements SaleService {
         BigDecimal cashAmount = mixedPayment.getCashAmount();
         BigDecimal creditCardAmount = mixedPayment.getCreditCardAmount();
 
+        // Check whether cash and credit card amounts are provided
         if (cashAmount == null || creditCardAmount == null) {
             log.error("Invalid mixed payment");
             throw new InvalidMixedPaymentException("Invalid mixed payment");
@@ -617,6 +654,7 @@ public class SaleServiceImpl implements SaleService {
 
         BigDecimal amountPaid = cashAmount.add(creditCardAmount);
 
+        // Check whether the total amount paid is enough to cover the sale amount
         if (amountPaid.compareTo(totalWithCampaign) < 0) {
             log.error("The total payment is not enough to cover the sale amount.");
             throw new InsufficientMixedPaymentException("The total payment is not enough to cover the sale amount.");

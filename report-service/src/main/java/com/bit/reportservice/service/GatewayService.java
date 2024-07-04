@@ -83,9 +83,11 @@ public class GatewayService {
             String getUrl = GATEWAY_URL + GET_SALE_ENDPOINT;
             log.debug("Sending GET request to: {}", getUrl);
 
+            // Getting Http headers
             HttpHeaders headers = getHttpHeaders();
             HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
+            // Making the request
             ResponseEntity<SaleResponse> responseEntity = restTemplate.exchange(
                     getUrl,
                     HttpMethod.GET,
@@ -94,6 +96,7 @@ public class GatewayService {
                     id
             );
 
+            // Checking the status code
             if (!(responseEntity.getStatusCode().is2xxSuccessful())) {
                 log.error("Sale fetch failed in sale-service!");
                 throw new SaleServiceException("Sale fetch failed in sale-service!");
@@ -127,9 +130,11 @@ public class GatewayService {
             String getUrl = GATEWAY_URL + GET_ALL_SALES_ENDPOINT;
             log.debug("Sending GET request to: {}", getUrl);
 
+            // Getting Http headers
             HttpHeaders headers = getHttpHeaders();
             HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
+            // Making the request
             ResponseEntity<List<SaleResponse>> responseEntity = restTemplate.exchange(
                     getUrl,
                     HttpMethod.GET,
@@ -137,6 +142,7 @@ public class GatewayService {
                     new ParameterizedTypeReference<>() {}
             );
 
+            // Checking the status code
             if (!(responseEntity.getStatusCode().is2xxSuccessful())) {
                 log.error("Sales fetch failed in sale-service!");
                 throw new SaleServiceException("Sale fetch failed in sale-service!");
@@ -169,9 +175,11 @@ public class GatewayService {
             String getUrl = GATEWAY_URL + GET_DELETED_SALES_ENDPOINT;
             log.debug("Sending GET request to: {}", getUrl);
 
+            // Getting Http headers
             HttpHeaders headers = getHttpHeaders();
             HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
+            // Making the request
             ResponseEntity<List<SaleResponse>> responseEntity = restTemplate.exchange(
                     getUrl,
                     HttpMethod.GET,
@@ -179,6 +187,7 @@ public class GatewayService {
                     new ParameterizedTypeReference<>() {}
             );
 
+            // Checking the status code
             if (!(responseEntity.getStatusCode().is2xxSuccessful())) {
                 log.error("Deleted sales fetch failed in sale-service!");
                 throw new SaleServiceException("Deleted sale fetch failed in sale-service!");
@@ -225,9 +234,11 @@ public class GatewayService {
             String getUrl = GATEWAY_URL + GET_ALL_SALES_FILTERED_AND_SORTED_ENDPOINT;
             log.debug("Sending GET request to: {}", getUrl);
 
+            // Getting Http headers
             HttpHeaders headers = getHttpHeaders();
             HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
+            // Building the query parameters using UriComponentsBuilder
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(getUrl)
                     .queryParam("page", page)
                     .queryParam("size", size)
@@ -241,6 +252,7 @@ public class GatewayService {
                     .queryParam("endDate", endDate)
                     .queryParam("isCancelled", isCancelled);
 
+            // Making the request
             ResponseEntity<PageWrapper<SaleResponse>> responseEntity = restTemplate.exchange(
                     builder.toUriString(),
                     HttpMethod.GET,
@@ -248,6 +260,7 @@ public class GatewayService {
                     new ParameterizedTypeReference<>() {}
             );
 
+            // Checking the status code
             if (!(responseEntity.getStatusCode().is2xxSuccessful())) {
                 log.error("Sales fetch failed in sale-service!");
                 throw new SaleServiceException("Sales fetch failed in sale-service!");
@@ -285,9 +298,11 @@ public class GatewayService {
     protected HttpHeaders getHttpHeaders() throws HeaderProcessingException {
         log.trace("Entering getAllSalesFilteredAndSorted method in GatewayService");
 
+        // Creating an empty HttpHeaders object to store the headers.
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
+        // Extracting the authorization token from the current HTTP request and setting it in the headers.
         try {
             ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (attributes != null) {

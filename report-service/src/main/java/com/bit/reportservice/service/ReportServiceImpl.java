@@ -62,6 +62,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public Page<SaleResponse> getAllSalesFilteredAndSorted(int page, int size, String sortBy, String direction, String cashier, String paymentMethod, BigDecimal minTotal, BigDecimal maxTotal, String startDate, String endDate, Boolean isCancelled) throws HeaderProcessingException {
         log.trace("Entering getAllSalesFilteredAndSorted method in ReportServiceImpl");
+
         log.debug("Query Parameters - page: {}, size: {}, sortBy: {}, direction: {}, cashier: {}, paymentMethod: {}, minTotal: {}, maxTotal: {}, startDate: {}, endDate: {}, isCancelled: {}", page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate, isCancelled);
         Page<SaleResponse> saleResponses = gatewayService.getAllSalesFilteredAndSorted(page, size, sortBy, direction, cashier, paymentMethod, minTotal, maxTotal, startDate, endDate, isCancelled);
 
@@ -84,6 +85,7 @@ public class ReportServiceImpl implements ReportService {
     public byte[] getChart(String unit) throws HeaderProcessingException {
         log.trace("Entering getChart method in ReportServiceImpl");
 
+        // Arranging start and end dates
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String startDate;
         String endDate = getDateAfterOrBefore(Calendar.DAY_OF_YEAR, 1, dateFormat);
@@ -100,12 +102,14 @@ public class ReportServiceImpl implements ReportService {
         };
         log.debug("startDate: {}, endDate: {}", startDate, endDate);
 
+        // Calling getAllSalesFilteredAndSorted method
         Page<SaleResponse> saleResponsePage = getAllSalesFilteredAndSorted(0, Integer.MAX_VALUE, "id", "ASC",
                 null, null, null, null, startDate, endDate, false);
 
         List<SaleResponse> saleResponses = saleResponsePage.getContent();
         log.info("Got saleResponses: {}", saleResponses);
 
+        // Creating a Map<String, Integer> for the chart data
         Map<String, Integer> productQuantityMap = saleResponses.stream()
                 .flatMap(saleResponse -> saleResponse.getProducts().stream())
                 .collect(Collectors.toMap(
@@ -115,6 +119,7 @@ public class ReportServiceImpl implements ReportService {
                 ));
         log.debug("Got productQuantityMap: {}", productQuantityMap);
 
+        // Calling generateChart method in Chart Service
         byte[] pdfBytes = chartService.generateChart(productQuantityMap, unit);
 
         log.trace("Exiting getChart method in ReportServiceImpl");

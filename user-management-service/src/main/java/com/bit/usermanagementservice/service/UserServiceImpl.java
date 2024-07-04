@@ -38,8 +38,8 @@ import java.util.stream.Collectors;
  */
 @Log4j2
 @Service
-@RequiredArgsConstructor
 @Transactional
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     @Value("#{'${default-roles}'.split(', ')}")
@@ -109,8 +109,10 @@ public class UserServiceImpl implements UserService {
         log.trace("Entering getAllUsersFilteredAndSorted method in UserServiceImpl with parameters: page={}, size={}, sortBy={}, direction={}, name={}, username={}, email={}, roleName={}",
                 page, size, sortBy, direction, name, username, email, roleName);
 
+        // Creating the pageable object
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
 
+        // Getting the AppUser page
         Page<AppUser> usersPage = userRepository.findAll((root, query, criteriaBuilder) -> {
 
             List<Predicate> predicates = getPredicates(name, username, email, roleName, root, criteriaBuilder);
@@ -127,9 +129,11 @@ public class UserServiceImpl implements UserService {
     public UserResponse createUser(UserRequest userRequest) {
         log.trace("Entering createUser method in UserServiceImpl with userRequest: {}", userRequest);
 
+        // Validating the request
         validateRoles(userRequest.getRoles());
         checkUniqueness(userRequest);
 
+        // Creating the user object
         AppUser user = AppUser.builder()
                 .name(userRequest.getName())
                 .username(userRequest.getUsername())
@@ -138,7 +142,7 @@ public class UserServiceImpl implements UserService {
                 .roles(getRolesAsRole(userRequest.getRoles()))
                 .build();
 
-
+        // Sending create message to RabbitMQ
         try {
             AuthUserRequest authUserRequest = mapToAuthUserRequest(userRequest);
             rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_CREATE, authUserRequest);
@@ -162,22 +166,27 @@ public class UserServiceImpl implements UserService {
     public UserResponse updateUser(Long id, UserRequest userRequest) {
         log.trace("Entering updateUser method in UserServiceImpl with id: {} and userRequest: {}", id, userRequest);
 
+        // Validating the roles
         validateRoles(userRequest.getRoles());
 
+        // Creating the user object
         AppUser existingUser = userRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("User does not exist with id " + id);
                     return new UserNotFoundException("User doesn't exist with id " + id);
                 });
 
+        // Checking uniqueness for update
         checkUniquenessForUpdate(existingUser, userRequest);
 
+        // Setting the values
         existingUser.setName(userRequest.getName());
         existingUser.setUsername(userRequest.getUsername());
         existingUser.setEmail(userRequest.getEmail());
         existingUser.setPassword(userRequest.getPassword());
         existingUser.setRoles(getRolesAsRole(userRequest.getRoles()));
 
+        // Sending update message to RabbitMQ
         try {
             AuthUserRequest authUserRequest = mapToAuthUserRequest(userRequest);
             UpdateUserMessage updateUserMessage = new UpdateUserMessage(id, authUserRequest);
@@ -201,11 +210,15 @@ public class UserServiceImpl implements UserService {
     public UserResponse restoreUser(Long id) {
         log.trace("Entering restoreUser method in UserServiceImpl with id: {}", id);
 
+        // Checking whether the user is soft-deleted
         if (!userRepository.existsByIdAndDeletedTrue(id)) {
             log.warn("User with id {} is not soft-deleted and cannot be restored.", id);
             throw new UserNotSoftDeletedException("User with id " + id + " is not soft-deleted and cannot be restored.");
         }
 
+        userRepository.restoreUser(id);
+
+        // Sending a restore message to RabbitMQ
         try {
             rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_RESTORE, id);
             log.info("Sent restore message to RabbitMQ for user with id: {}", id);
@@ -215,7 +228,7 @@ public class UserServiceImpl implements UserService {
             throw new RabbitMQException("Failed to send restore message to RabbitMQ", e);
         }
 
-        userRepository.restoreUser(id);
+        // Finding and returning the restored user
         AppUser user = userRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Couldn't restore the user with id " + id);
@@ -232,11 +245,14 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long id) {
         log.trace("Entering deleteUser method in UserServiceImpl with id: {}", id);
 
+        // Checking whether the user exists
         if (!userRepository.existsById(id)) {
             log.warn("User not found with id: {}", id);
             throw new UserNotFoundException("User not found with id " + id);
         }
+        userRepository.deleteById(id);
 
+        // Sending a soft-delete message to RabbitMQ
         try {
             rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_DELETE, id);
             log.info("Sent delete message to RabbitMQ for user with id: {}", id);
@@ -245,8 +261,6 @@ public class UserServiceImpl implements UserService {
             log.error("Failed to send delete message to RabbitMQ for user with id: {}", id, e);
             throw new RabbitMQException("Failed to send delete message to RabbitMQ", e);
         }
-
-        userRepository.deleteById(id);
         log.info("User soft deleted with id: {}", id);
 
         log.trace("Exiting deleteUser method in UserServiceImpl");
@@ -257,11 +271,13 @@ public class UserServiceImpl implements UserService {
     public void deleteUserPermanently(Long id) {
         log.trace("Entering deleteUserPermanently method in UserServiceImpl with id: {}", id);
 
+        // Checking whether the user exists
         if (!userRepository.existsById(id)) {
             log.warn("User not found with id: {}", id);
             throw new UserNotFoundException("User not found with id " + id);
         }
 
+        // Sending a permanent-delete message to RabbitMQ
         try {
             rabbitTemplate.convertAndSend(EXCHANGE, ROUTING_KEY_DELETE_PERMANENT, id);
             log.info("Sent delete-permanent message to RabbitMQ for user with id: {}", id);
@@ -324,10 +340,13 @@ public class UserServiceImpl implements UserService {
     private void checkUniqueness(UserRequest userRequest) {
         log.trace("Entering checkUniqueness method in UserServiceImpl with userRequest: {}", userRequest);
 
+        // Checking whether the username already exists in the database
         if (userRepository.existsByUsername(userRequest.getUsername())) {
             log.warn("Username {} is already taken", userRequest.getUsername());
             throw new IllegalArgumentException("Username is already taken: " + userRequest.getUsername());
         }
+
+        // Checking whether the email already exists in the database
         if (userRepository.existsByEmail(userRequest.getEmail())) {
             log.warn("Email {} is already taken", userRequest.getEmail());
             throw new IllegalArgumentException("Email is already taken: " + userRequest.getEmail());
@@ -348,11 +367,13 @@ public class UserServiceImpl implements UserService {
     private void checkUniquenessForUpdate(AppUser appUser, UserRequest userRequest) {
         log.trace("Entering checkUniquenessForUpdate method in UserServiceImpl with existingUser: {} and userRequest: {}", appUser, userRequest);
 
+        // Checking whether the username already exists in the database for another user, excluding the current user
         if (!userRequest.getUsername().equals(appUser.getUsername()) && userRepository.existsByUsername(userRequest.getUsername())) {
             log.warn("Username {} is already taken by another user", userRequest.getUsername());
             throw new DataIntegrityViolationException("Username already exists: " + userRequest.getUsername());
         }
 
+        // Checking whether the email already exists in the database for another user, excluding the current user
         if (!userRequest.getEmail().equals(appUser.getEmail()) && userRepository.existsByEmail(userRequest.getEmail())) {
             log.warn("Email {} is already taken by another user", userRequest.getEmail());
             throw new DataIntegrityViolationException("Email already exists: " + userRequest.getEmail());
@@ -463,6 +484,8 @@ public class UserServiceImpl implements UserService {
         log.trace("Entering getRolesAsRole method in UserServiceImpl with roleNames");
 
         List<Role> rolesList = new ArrayList<>();
+
+        // Retrieving each Role object from the database based on the role name
         roles.forEach(roleName -> {
             Role role = roleRepository.findByRoleName(roleName)
                     .orElseThrow(() -> {
