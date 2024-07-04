@@ -1,6 +1,7 @@
 package com.bit.productservice.entity;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.*;
 import org.hibernate.annotations.*;
@@ -12,7 +13,9 @@ import java.math.BigDecimal;
  * @author Emirhan Tuygun
  */
 @Entity
-@Table(name = "products")
+@Table(name = "products",
+        indexes = {@Index(name = "idx_name_stockQuantity_price", columnList="name, stock_quantity, price")}
+)
 @SoftDelete
 @AllArgsConstructor
 @NoArgsConstructor

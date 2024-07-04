@@ -19,7 +19,9 @@ import java.util.List;
  * @author Emirhan Tuygun
  */
 @Entity
-@Table(name = "sales")
+@Table(name = "sales",
+        indexes = {@Index(name = "idx_cashier_date_paymentMethod_totalWithCampaign_cancelled", columnList="cashier, date, payment_method, totalWithCampaign, cancelled")}
+)
 @SoftDelete
 @Data
 @Builder

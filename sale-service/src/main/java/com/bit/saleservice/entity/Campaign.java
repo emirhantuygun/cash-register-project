@@ -16,7 +16,9 @@ import java.util.List;
  *
  * @author Emirhan Tuygun
  */
-@Table(name = "campaigns")
+@Table(name = "campaigns",
+        indexes = {@Index(name = "idx_name_stockQuantity_price", columnList="name, isExpired")}
+)
 @Entity
 @SoftDelete
 @Data

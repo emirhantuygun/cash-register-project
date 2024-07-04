@@ -33,5 +33,4 @@ public class Token {
     @Column(name = "is_logged_out")
     private boolean loggedOut;
 
-
 }

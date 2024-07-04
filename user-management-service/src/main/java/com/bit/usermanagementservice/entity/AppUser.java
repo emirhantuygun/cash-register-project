@@ -16,7 +16,9 @@ import java.util.List;
  * @author Emirhan Tuygun
  */
 @Entity
-@Table(name = "users")
+@Table(name = "users",
+        indexes = {@Index(name = "idx_name_username_email_roles", columnList="name, username, email, roles")}
+)
 @SoftDelete
 @AllArgsConstructor
 @NoArgsConstructor
