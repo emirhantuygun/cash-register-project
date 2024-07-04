@@ -83,20 +83,24 @@ public class JwtUtils {
     public boolean isLoggedOut(String token) {
         log.trace("Entering isLoggedOut method in JwtUtils");
         try {
+            // Getting token ID
             String tokenIdStr = jedis.get(token);
             if (tokenIdStr == null) {
                 log.error("Token not found in Redis");
                 throw new TokenNotFoundException("Token not found in Redis");
             }
+            log.debug("Token ID: " + tokenIdStr);
 
             long tokenId = Long.parseLong(tokenIdStr);
             String key = "token:" + tokenId + ":is_logged_out";
 
+            // Getting logout status
             String value = jedis.get(key);
             if (value == null) {
                 log.error("Token does not have logged out information record in Redis");
                 throw new TokenNotFoundException("Token's logout status information not found in Redis");
             }
+            log.debug("Token's logout status information: " + value);
 
             return Boolean.parseBoolean(value);
         } finally {

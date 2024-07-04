@@ -78,6 +78,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public List<String> login(AuthRequest authRequest) throws RedisOperationException {
         log.trace("Entering login method in AuthServiceImpl");
+
+        // Authenticating the credentials
         try {
             var authToken = new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword());
             authenticationManager.authenticate(authToken);
@@ -85,16 +87,20 @@ public class AuthServiceImpl implements AuthService {
             log.error("Authentication failed: Wrong username or password");
             throw new AuthenticationFailedException("Authentication failed: Wrong username or password");
         }
+        log.info("Authentication successful");
 
+        // Finding the user from database
         AppUser appUser = userRepository.findByUsername(authRequest.getUsername())
                 .orElseThrow(() -> {
                     log.error("User not found");
                     return new UserNotFoundException("User not found");
                 });
 
+        // Generating access and refresh tokens
         String accessToken = jwtUtils.generateAccessToken(authRequest.getUsername(), getRolesAsString(appUser.getRoles()));
         String refreshToken = jwtUtils.generateRefreshToken(authRequest.getUsername());
 
+        // Revoking other tokens of the same user
         revokeAllTokensByUser(appUser.getId());
         saveUserToken(appUser, accessToken);
 
@@ -107,6 +113,7 @@ public class AuthServiceImpl implements AuthService {
         log.trace("Entering refreshToken method in AuthServiceImpl");
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
+        // Getting token from the authentication header
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String refreshToken = authHeader.substring(7);
             String username = jwtUtils.extractUsername(refreshToken);
@@ -114,13 +121,17 @@ public class AuthServiceImpl implements AuthService {
             if (username != null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
+                // Validating the refresh token
                 if (userDetails != null && jwtUtils.isValid(refreshToken, userDetails)) {
+
+                    log.info("Refresh token is valid");
                     AppUser appUser = userRepository.findByUsername(username)
                             .orElseThrow(() -> {
                                 log.error("User not found");
                                 return new UserNotFoundException("User not found");
                             });
 
+                    // Generating the access token
                     String accessToken = jwtUtils.generateAccessToken(username, getRolesAsString(appUser.getRoles()));
 
                     revokeAllTokensByUser(appUser.getId());
@@ -152,8 +163,11 @@ public class AuthServiceImpl implements AuthService {
     @RabbitListener(queues = "${rabbitmq.queue.create}")
     public void createUser(AuthUserRequest authUserRequest) throws RoleNotFoundException {
         log.trace("Entering createUser method in AuthServiceImpl");
+
+        // Password encryption
         var encodedPassword = passwordEncoder.encode(authUserRequest.getPassword());
 
+        // Creating the user object
         var appUser = AppUser.builder()
                 .username(authUserRequest.getUsername())
                 .password(encodedPassword)
@@ -176,9 +190,13 @@ public class AuthServiceImpl implements AuthService {
     @RabbitListener(queues = "${rabbitmq.queue.update}")
     public void updateUser(UpdateUserMessage updateUserMessage) throws RoleNotFoundException {
         log.trace("Entering updateUser method in AuthServiceImpl");
+
+        // Getting id and AuthUserRequest from updateUserMessage
         Long id = updateUserMessage.getId();
         AuthUserRequest authUserRequest = updateUserMessage.getAuthUserRequest();
+        log.debug("User is updating with id: {}", id);
 
+        // Getting the existing user object
         AppUser existingUser = userRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("User not found with id " + id);
@@ -254,6 +272,8 @@ public class AuthServiceImpl implements AuthService {
      */
     protected void saveUserToken(AppUser user, String jwtToken) throws RedisOperationException {
         log.trace("Entering saveUserToken method in AuthServiceImpl");
+
+        // Creating a token object
         var token = Token.builder()
                 .token(jwtToken)
                 .user(user)
@@ -261,6 +281,7 @@ public class AuthServiceImpl implements AuthService {
                 .build();
         tokenRepository.save(token);
 
+        // Storing logout status of the token
         try {
             jedis.set("token:" + token.getId() + ":is_logged_out", "false");
             jedis.set(jwtToken, String.valueOf(token.getId()));
@@ -268,6 +289,8 @@ public class AuthServiceImpl implements AuthService {
             log.error("Failed to set token status in Redis: {}", e.getMessage());
             throw new RedisOperationException("Failed to set token status in Redis", e);
         }
+        log.info("Token is saved");
+
         log.trace("Exiting saveUserToken method in AuthServiceImpl");
     }
 
@@ -281,12 +304,15 @@ public class AuthServiceImpl implements AuthService {
      */
     private void revokeAllTokensByUser(long id) throws RedisOperationException {
         log.trace("Entering revokeAllTokensByUser method in AuthServiceImpl");
+
+        // Getting valid tokens of the user
         List<Token> validTokens = tokenRepository.findAllTokensByUser(id);
         if (validTokens.isEmpty()) {
             log.debug("No valid token found");
             return;
         }
 
+        // Setting logout status as true for all the valid tokens
         for (Token token : validTokens) {
             token.setLoggedOut(true);
             try {
@@ -296,6 +322,7 @@ public class AuthServiceImpl implements AuthService {
                 throw new RedisOperationException("Failed to set token status in Redis", e);
             }
         }
+        log.info("Revoked other tokens of the user with id {}", id);
 
         tokenRepository.saveAll(validTokens);
         log.trace("Exiting revokeAllTokensByUser method in AuthServiceImpl");

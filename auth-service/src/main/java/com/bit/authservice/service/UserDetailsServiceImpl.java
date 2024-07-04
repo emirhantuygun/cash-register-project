@@ -39,12 +39,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.trace("Entering loadUserByUsername method in UserDetailsServiceImpl with username: {}", username);
 
+        // Finding the user with the given username
         AppUser user = userRepository.findByUsername(username)
                 .orElseThrow(() -> {
                     log.error("User not found with username: {}", username);
                     return new UsernameNotFoundException("User not found with username: " + username);
                 });
 
+        // Mapping user roles to GrantedAuthority objects
         Set<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> {
                     String roleName = "ROLE_" + role.getRoleName();
@@ -53,6 +55,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 })
                 .collect(Collectors.toSet());
 
+        // Creating a UserDetails object
         User userDetails = new User(user.getUsername(), user.getPassword(), authorities);
         log.info("Got user: {}", userDetails);
 

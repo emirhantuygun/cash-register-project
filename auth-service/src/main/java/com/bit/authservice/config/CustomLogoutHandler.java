@@ -67,6 +67,7 @@ public class CustomLogoutHandler implements LogoutHandler {
                        Authentication authentication) {
         log.trace("Entering logout method in CustomLogoutHandler");
         try {
+            // Getting authorization header
             String authHeader = request.getHeader("Authorization");
 
             if (authHeader == null) {
@@ -79,7 +80,10 @@ public class CustomLogoutHandler implements LogoutHandler {
                 throw new InvalidAuthorizationHeaderException("Invalid Authorization header format");
             }
 
+            // Getting token
             String token = authHeader.substring(7);
+
+            // Getting token entity from database
             Token storedToken = tokenRepository.findByToken(token).orElse(null);
 
             if (storedToken == null) {
@@ -89,6 +93,7 @@ public class CustomLogoutHandler implements LogoutHandler {
 
             storedToken.setLoggedOut(true);
             tokenRepository.save(storedToken);
+
             jedis.set("token:" + storedToken.getId() + ":is_logged_out", "true");
             log.info("Token successfully logged out");
 

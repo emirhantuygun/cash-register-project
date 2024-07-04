@@ -67,6 +67,7 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
                     token = token.substring(7);
                     log.debug("Token after removing Bearer prefix: {}", token);
 
+                    // Token Validation
                     Claims claims = jwtUtils.getClaimsAndValidate(token);
                     log.debug("Claims extracted: {}", claims);
 
@@ -75,6 +76,7 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
                         throw new InvalidTokenException("Invalid token");
                     }
 
+                    // Checking Logout Status
                     if (jwtUtils.isLoggedOut(token)) {
                         log.error("Token is logged out");
                         throw new LoggedOutTokenException("Token is logged out");
@@ -94,6 +96,7 @@ public class AuthGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthG
                         List<String> requiredRoles = config.getRoleMapping().get("/" + basePath);
                         log.debug("Required roles for basePath {}: {}", basePath, requiredRoles);
 
+                        // Role Based Authentication
                         if (roles.stream().noneMatch(requiredRoles::contains)) {
                             log.error("Insufficient roles");
                             throw new InsufficientRolesException("Insufficient roles");
