@@ -24,6 +24,11 @@
                 <SizeBasedTriggeringPolicy size="10MB" />
             </Policies>
         </RollingFile>
+
+        <!-- Logstash Appender -->
+        <Socket name="Logstash" host="logstash" port="5000">
+            <JsonLayout compact="true" eventEol="true" properties="true" objectMessageAsJsonObject="true"/>
+        </Socket>
     </Appenders>
 
     <Loggers>
