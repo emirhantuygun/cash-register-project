@@ -42,6 +42,7 @@
         <Logger name="com.bit" level="TRACE" additivity="false">
             <AppenderRef ref="Console" />
             <AppenderRef ref="RollingFile" />
+            <AppenderRef ref="Logstash"/>
         </Logger>
     </Loggers>
 </Configuration>
