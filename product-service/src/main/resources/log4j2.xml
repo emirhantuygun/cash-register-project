@@ -39,7 +39,7 @@
         </Root>
 
         <!-- Application Loggers -->
-        <Logger name="com.bit" level="TRACE" additivity="false">
+        <Logger name="com.bit" level="trace" additivity="false">
             <AppenderRef ref="Console" />
             <AppenderRef ref="RollingFile" />
             <AppenderRef ref="Logstash"/>

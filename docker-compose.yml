@@ -9,6 +9,12 @@ services:
       - xpack.security.enabled=false
     ports:
       - "${ELASTICSEARCH_PORT}:${ELASTICSEARCH_PORT}"
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:${ELASTICSEARCH_PORT}/_cluster/health || exit 1" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
     networks:
       - elk-stack
 
@@ -31,7 +37,8 @@ services:
     networks:
       - elk-stack
     depends_on:
-      - elasticsearch
+      elasticsearch:
+        condition: service_healthy
 
   kibana:
     image: kibana:7.17.22
@@ -43,7 +50,8 @@ services:
     networks:
       - elk-stack
     depends_on:
-      - elasticsearch
+      elasticsearch:
+        condition: service_healthy
 
 
   redis:
@@ -107,6 +115,7 @@ services:
       - "${SERVICE_REGISTRY_PORT}:${SERVICE_REGISTRY_PORT}"
     volumes:
       - ./logs-docker:/logs
+      - ./service-registry-healthcheck.sh:/service-registry-healthcheck.sh
     networks:
       - elk-stack
       - registry
@@ -133,9 +142,10 @@ services:
       - redis
       - zipkin
     depends_on:
-      - service-registry
-      - redis
-      - zipkin
+      service-registry:
+        condition: service_started
+      redis:
+        condition: service_started
 
 
   auth-service:
@@ -153,12 +163,9 @@ services:
       - rabbitmq
       - zipkin
     depends_on:
-      - service-registry
       - api-gateway
       - postgres
-      - redis
       - rabbitmq
-      - zipkin
 
 
   user-service:
@@ -175,12 +182,8 @@ services:
       - rabbitmq
       - zipkin
     depends_on:
-      - service-registry
       - api-gateway
-      - postgres
       - auth-service
-      - rabbitmq
-      - zipkin
 
 
   product-service:
@@ -202,12 +205,9 @@ services:
       - rabbitmq
       - zipkin
     depends_on:
-      - service-registry
       - api-gateway
-      - redis
       - postgres
       - rabbitmq
-      - zipkin
 
 
   sale-service:
@@ -224,12 +224,8 @@ services:
       - rabbitmq
       - zipkin
     depends_on:
-      - service-registry
       - api-gateway
-      - postgres
       - product-service
-      - rabbitmq
-      - zipkin
 
 
   report-service:
@@ -246,10 +242,8 @@ services:
       - registry
       - zipkin
     depends_on:
-      - service-registry
       - api-gateway
       - sale-service
-      - zipkin
 
 
 volumes:

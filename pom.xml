@@ -179,7 +179,9 @@
                 <version>3.4.3</version>
                 <configuration>
                     <from>
-                        <image>eclipse-temurin:17-jre-alpine@sha256:ad9223070abcf5716e98296a98c371368810deb36197b75f3a7b74815185c5e3</image>
+                        <image>
+                            eclipse-temurin:17-jre-alpine@sha256:ad9223070abcf5716e98296a98c371368810deb36197b75f3a7b74815185c5e3
+                        </image>
                     </from>
                     <to>
                         <image>emirhantuygun/${project.artifactId}</image>
