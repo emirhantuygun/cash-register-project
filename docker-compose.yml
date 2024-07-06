@@ -118,10 +118,14 @@ services:
     volumes:
       - ./logs-docker:/logs
     networks:
+      - elk-stack
       - registry
       - zipkin
     depends_on:
-      - zipkin
+      logstash:
+        condition: service_healthy
+      zipkin:
+        condition: service_started
 
 
   api-gateway:
@@ -136,6 +140,7 @@ services:
     volumes:
       - ./logs-docker:/logs
     networks:
+      - elk-stack
       - registry
       - redis
       - zipkin
@@ -153,6 +158,7 @@ services:
     volumes:
       - ./logs-docker:/logs
     networks:
+      - elk-stack
       - registry
       - postgres
       - redis
@@ -175,6 +181,7 @@ services:
     volumes:
       - ./logs-docker:/logs
     networks:
+      - elk-stack
       - registry
       - postgres
       - rabbitmq
@@ -200,6 +207,7 @@ services:
     volumes:
       - ./logs-docker:/logs
     networks:
+      - elk-stack
       - registry
       - postgres
       - redis
@@ -222,6 +230,7 @@ services:
     volumes:
       - ./logs-docker:/logs
     networks:
+      - elk-stack
       - registry
       - postgres
       - rabbitmq
@@ -245,6 +254,7 @@ services:
     volumes:
       - ./logs-docker:/logs
     networks:
+      - elk-stack
       - registry
       - zipkin
     depends_on:
