@@ -51,8 +51,6 @@ services:
     image: redis:alpine
     volumes:
       - ./redis:/data
-    expose:
-      - "${REDIS_PORT}"
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
     command: --port ${REDIS_PORT}
@@ -64,8 +62,6 @@ services:
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:alpine
-    expose:
-      - "${RABBITMQ_PORT}"
     ports:
       - "${RABBITMQ_PORT}:${RABBITMQ_PORT}"
     networks:
@@ -76,8 +72,6 @@ services:
   zipkin:
     container_name: zipkin
     image: openzipkin/zipkin:latest
-    expose:
-      - "${ZIPKIN_PORT}"
     ports:
       - "${ZIPKIN_PORT}:${ZIPKIN_PORT}"
     networks:
@@ -93,13 +87,11 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: emirhan
       PGDATA: /data/postgres
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     volumes:
       - ./postgres:/data/postgres
       - ./init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
-    expose:
-      - "${POSTGRES_PORT}"
-    ports:
-      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     command: -p ${POSTGRES_PORT}
     networks:
       - postgres
@@ -111,8 +103,6 @@ services:
     image: emirhantuygun/service-registry:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-    expose:
-      - "${SERVICE_REGISTRY_PORT}"
     ports:
       - "${SERVICE_REGISTRY_PORT}:${SERVICE_REGISTRY_PORT}"
     volumes:
@@ -133,8 +123,6 @@ services:
     image: emirhantuygun/api-gateway:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-    expose:
-      - "${API_GATEWAY_PORT}"
     ports:
       - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
     volumes:
