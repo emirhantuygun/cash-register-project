@@ -7,12 +7,31 @@ services:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - "discovery.type=single-node"
       - xpack.security.enabled=false
-    expose:
-      - "${ELASTICSEARCH_PORT}"
     ports:
       - "${ELASTICSEARCH_PORT}:${ELASTICSEARCH_PORT}"
     networks:
       - elk-stack
+
+  logstash:
+    image: logstash:7.17.22
+    container_name: logstash
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    ports:
+      - "${LOGSTASH_PORT}:${LOGSTASH_PORT}/tcp"
+      - "${LOGSTASH_HEALTH_CHECK_PORT}:${LOGSTASH_HEALTH_CHECK_PORT}"
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:${LOGSTASH_HEALTH_CHECK_PORT}/_node/pipelines || exit 1" ]
+      interval: 10s
+      retries: 15
+      start_period: 30s
+      timeout: 10s
+    networks:
+      - elk-stack
+    depends_on:
+      - elasticsearch
 
   redis:
     container_name: redis
