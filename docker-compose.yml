@@ -1,4 +1,19 @@
 services:
+  elasticsearch:
+    image: elasticsearch:7.17.22
+    container_name: elasticsearch
+    environment:
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.type=single-node"
+      - xpack.security.enabled=false
+    expose:
+      - "${ELASTICSEARCH_PORT}"
+    ports:
+      - "${ELASTICSEARCH_PORT}:${ELASTICSEARCH_PORT}"
+    networks:
+      - elk-stack
+
   redis:
     container_name: redis
     image: redis:alpine
@@ -213,6 +228,7 @@ volumes:
   redis:
 
 networks:
+  elk-stack:
   postgres:
   registry:
   redis:
