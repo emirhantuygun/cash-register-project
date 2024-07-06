@@ -115,7 +115,6 @@ services:
       - "${SERVICE_REGISTRY_PORT}:${SERVICE_REGISTRY_PORT}"
     volumes:
       - ./logs-docker:/logs
-      - ./service-registry-healthcheck.sh:/service-registry-healthcheck.sh
     networks:
       - elk-stack
       - registry
