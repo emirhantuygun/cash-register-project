@@ -33,6 +33,19 @@ services:
     depends_on:
       - elasticsearch
 
+  kibana:
+    image: kibana:7.17.22
+    container_name: kibana
+    environment:
+      ELASTICSEARCH_HOSTS: '["http://elasticsearch:${ELASTICSEARCH_PORT}"]'
+    ports:
+      - "${KIBANA_PORT}:${KIBANA_PORT}"
+    networks:
+      - elk-stack
+    depends_on:
+      - elasticsearch
+
+
   redis:
     container_name: redis
     image: redis:alpine
