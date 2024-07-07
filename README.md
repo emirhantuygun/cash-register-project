@@ -28,6 +28,8 @@
 - [Request Body Examples](#request-body-examples)
 - [Receipt Example](#receipt-example)
 - [AI Insight Example](#ai-insight-example)
+- [ELK-Stack Example](#elk-stack-example)
+- [Enabling ELK-Stack](#enabling-elk-stack)
 
 ## Technologies Used
 
@@ -44,6 +46,9 @@
 - JUnit 5
 - JUnit Suite Engine
 - JaCoCo
+- Elasticsearch
+- Logstash
+- Kibana
 - Micrometer
 - Zipkin
 - Resilience4J
@@ -68,6 +73,8 @@
 - Message Queueing
 - Asynchronous Messaging
 - Circuit Breaking
+- Centralized Logging
+- Data Visualization
 - Distributed Tracing System
 - Soft Deletion
 - Pagination, Filtering & Sorting
@@ -95,12 +102,16 @@ Create a `.env` file in the root directory of the project and add the following 
 
 ```env
 # PORTS
-API_GATEWAY_PORT=8080
-SERVICE_REGISTRY_PORT=8761
+ELASTICSEARCH_PORT=9200
+LOGSTASH_PORT=5000
+LOGSTASH_HEALTH_CHECK_PORT=9600
+KIBANA_PORT=5601
 REDIS_PORT=6380
 RABBITMQ_PORT=5672
 ZIPKIN_PORT=9411
 POSTGRES_PORT=5433
+SERVICE_REGISTRY_PORT=8761
+API_GATEWAY_PORT=8080
 
 # API KEY
 GEMINI_ACTIVE=true           # Make it "false" if you don't want application to use Gemini and provide AI insights
@@ -108,7 +119,7 @@ GEMINI_API_KEY=<YOUR_GEMINI_API_KEY>
 
 # EMAIL
 SEND_EMAIL=true              # Make it "false" if you don't want application to send Out of Stock Emails
-EMAIL_USERNAME=<YOUR_SENDER_EMAIL_ID>
+EMAIL_USERNAME=<YOUR_SENDER_EMAIL_ADDRESS>
 EMAIL_PASSWORD=<YOUR_SENDER_EMAIL_APP_PASSWORD>
 EMAIL_RECIPIENT=<YOUR_RECIPIENT_EMAIL_ADDRESS>
 ```
@@ -175,14 +186,17 @@ performance, helping businesses make informed decisions based on sales data.
 
 Any changes to these ports require changes to the configuration files.
 
-| Container        | Port |
-|------------------|------|
-| API Gateway      | 8080 | 
-| Service Registry | 8761 | 
-| Redis            | 6380 | 
-| RabbitMQ         | 5672 | 
-| Zipkin           | 9411 | 
-| Postgres         | 5433 |
+| Container        | Port       |
+|------------------|------------|
+| API Gateway      | 8080       | 
+| Service Registry | 8761       | 
+| Redis            | 6380       | 
+| RabbitMQ         | 5672       | 
+| Zipkin           | 9411       | 
+| Postgres         | 5433       |
+| Elasticsearch    | 9200       |
+| Logstash         | 5000, 9600 |
+| Kibana           | 5601       |
 
 ## Roles & Users
 
@@ -405,15 +419,13 @@ POST /auth/login
 
 ![Receipt](~images/receipt.png)
 
-
 ## AI Insight Example
 
 ![AI Insight](~images/ai_insight.png)
 
-
 ## ELK-Stack Example
 
-
+![ELK](~images/elk.png)
 
 ## Enabling ELK-Stack
 
@@ -425,6 +437,7 @@ Navigate to `log4j2.xml` file in the `src/main/resources` directory of each serv
 Uncomment the AppenderRef for Logstash by removing the `<!--` and `-->` comment tags:
 
 ```xml
+
 <Logger name="com.bit" level="trace" additivity="false">
     <AppenderRef ref="Console"/>
     <AppenderRef ref="RollingFile"/>
@@ -432,11 +445,10 @@ Uncomment the AppenderRef for Logstash by removing the `<!--` and `-->` comment 
 </Logger>
 ```
 
-
 ### 2. Uncomment the Services in docker-compose.yml
 
 Navigate to `docker-compose.yml` file and uncomment the **elasticsearch**, **logstash** and **kibana** services.
-Also uncomment the service_healty condition of service-registry service.
+Also uncomment the **service_healty condition** of service-registry service.
 
 ```yml
 service-registry:
