@@ -1,6 +1,7 @@
 # Cash Register Project
 
 ## Project Description
+
 <div>
   <div>
     <img src="~images/32bit.png" alt="32bit" style="height:20%;width:20%;" align="right">
@@ -10,14 +11,12 @@
   </div>
 </div>
 
-
-
 ## Project Architecture
+
 ![Project Logo](~images/architecture.png)
 
-
-
 ## Table of Contents
+
 - [Technologies Used](#technologies-used)
 - [Features](#features)
 - [Getting Started](#getting-started)
@@ -30,10 +29,8 @@
 - [Receipt Example](#receipt-example)
 - [AI Insight Example](#ai-insight-example)
 
-
-
-
 ## Technologies Used
+
 - Java 17
 - Spring Boot
 - Spring Framework
@@ -59,9 +56,8 @@
 - JFreeChart
 - Google Gemini
 
-
-
 ## Features
+
 - Role Based Authentication & Authorization
 - Token Based Authentication & Authorization
 - Microservices
@@ -83,18 +79,18 @@
 - Chart Generation
 - AI Insight
 
-
-
 ## Getting Started
 
 ### Prerequisites
 
 Ensure you have the following installed:
+
 - Java 17
 - Maven
-- Docker 
+- Docker
 
 ### Usage
+
 Create a `.env` file in the root directory of the project and add the following configuration:
 
 ```env
@@ -122,6 +118,7 @@ To start all services defined in docker-compose.yml, use the following command:
 ```bash
 docker-compose up -d
 ```
+
 To stop all running services, use:
 
 ```bash
@@ -131,29 +128,51 @@ docker-compose down
 ## Services
 
 ### Service Registry
-Service Registry acts as a **central directory** for all the microservices in the application. It maintains a list of available services and their instances, allowing for service discovery. When a service starts, it **registers** itself with the Service Registry, and other services can query the registry to find the network location of service instances.
+
+Service Registry acts as a **central directory** for all the microservices in the application. It maintains a list of
+available services and their instances, allowing for service discovery. When a service starts, it **registers** itself
+with the Service Registry, and other services can query the registry to find the network location of service instances.
 
 ### API Gateway
-The API Gateway is the entry point for all client requests. It **routes** requests to the appropriate backend services and performs functions such as **load balancing** and rate limiting. Crucially, the API Gateway also handles **authorization** by verifying the JWT in the Authorization header of incoming requests to ensure they are **valid** and that the user has the **necessary roles**.
+
+The API Gateway is the entry point for all client requests. It **routes** requests to the appropriate backend services
+and performs functions such as **load balancing** and rate limiting. Crucially, the API Gateway also handles *
+*authorization** by verifying the JWT in the Authorization header of incoming requests to ensure they are **valid** and
+that the user has the **necessary roles**.
 
 ### Auth Service
-Auth Service is responsible for managing **authentication**. It handles user **login, logout, registration**, and **token & refresh-token generation**. When users log in, the service verifies their credentials and issues a JWT for authenticated users, which is then used to access protected endpoints through the API Gateway.
+
+Auth Service is responsible for managing **authentication**. It handles user **login, logout, registration**, and *
+*token & refresh-token generation**. When users log in, the service verifies their credentials and issues a JWT for
+authenticated users, which is then used to access protected endpoints through the API Gateway.
 
 ### User Service
-User Service manages **user-related** operations, including creating, updating, retrieving, and deleting user accounts. It handles user data and ensures that user information is securely stored and accessible to other services that require user details.
+
+User Service manages **user-related** operations, including creating, updating, retrieving, and deleting user accounts.
+It handles user data and ensures that user information is securely stored and accessible to other services that require
+user details.
 
 ### Product Service
-Product Service manages **product-related** operations. It handles the creation, update, retrieval, and deletion of products. This service is responsible for maintaining product information, such as product names, descriptions, prices, and stock levels.
+
+Product Service manages **product-related** operations. It handles the creation, update, retrieval, and deletion of
+products. This service is responsible for maintaining product information, such as product names, descriptions, prices,
+and stock levels.
 
 ### Sale Service
-Sale Service is responsible for handling **sales transactions** and **managing campaigns**. It allows for the creation, retrieval, and management of sales records. The service supports five types of payment methods: cash, credit card, mixed, debit card, and PayPal.
+
+Sale Service is responsible for handling **sales transactions** and **managing campaigns**. It allows for the creation,
+retrieval, and management of sales records. The service supports five types of payment methods: cash, credit card,
+mixed, debit card, and PayPal.
 > **⚠️ Note:** The **MIXED** payment method consists of a **combination** of **cash** and **credit card** payments.
 
 ### Report Service
-Report Service is responsible for **generating receipts** related to sales and transactions. It allows users to **view detailed sales information** and generate receipts for completed transactions. This service provides insights into sales performance, helping businesses make informed decisions based on sales data.
 
+Report Service is responsible for **generating receipts** related to sales and transactions. It allows users to **view
+detailed sales information** and generate receipts for completed transactions. This service provides insights into sales
+performance, helping businesses make informed decisions based on sales data.
 
 ## Default Ports
+
 Any changes to these ports require changes to the configuration files.
 
 | Container        | Port |
@@ -165,11 +184,10 @@ Any changes to these ports require changes to the configuration files.
 | Zipkin           | 9411 | 
 | Postgres         | 5433 |
 
-
-
 ## Roles & Users
 
 ### Default Roles
+
 > There are three default roles in the system:
 > - CASHIER
 > - MANAGER
@@ -196,11 +214,11 @@ To make requests to the relevant service, you need to have the following role.
 | MANAGER User | manager  | manager  | MANAGER                 |
 | ADMIN User   | admin    | admin    | ADMIN                   |
 
-
 ## Authentication & Authorization
 
-> **⚠️Important:** All endpoints require a **JSON Web Token (JWT)** for authentication except auth/login, so **you need to log in first**.
-To access the endpoints, include the JWT in the Authorization header of your HTTP requests as a **Bearer token**.
+> **⚠️Important:** All endpoints require a **JSON Web Token (JWT)** for authentication except auth/login, so **you need
+to log in first**.
+> To access the endpoints, include the JWT in the Authorization header of your HTTP requests as a **Bearer token**.
 
 An example of login request:
 
@@ -211,8 +229,8 @@ An example of login request:
 }
 ```
 
-
 ## Endpoints
+
 All requests should be made to the **API Gateway's url** which is **http://localhost:8080**.
 
 ### Auth Service
@@ -275,14 +293,13 @@ All requests should be made to the **API Gateway's url** which is **http://local
 | GET         | /reports/filteredAndSorted | Get all sales with filters and sorting |
 | GET         | /reports/receipt/{id}      | Get receipt by sale ID                 |
 
-
-
 ## Request Body Examples
 
 ### Auth Service
 
 **Endpoint:**
 POST /auth/login
+
 ```json
 {
   "username": "super",
@@ -293,6 +310,7 @@ POST /auth/login
 ### User Service
 
 **Endpoints:**
+
 - POST /users
 - PUT /users/{id}
 
@@ -302,14 +320,17 @@ POST /auth/login
   "username": "johndoe",
   "email": "johndoe@gmail.com",
   "password": "johndoe54",
-  "roles": ["ADMIN", "CASHIER"]
+  "roles": [
+    "ADMIN",
+    "CASHIER"
+  ]
 }
 ```
-
 
 ### Product Service
 
 **Endpoints:**
+
 - POST /products
 - PUT /products/{id}
 
@@ -322,17 +343,21 @@ POST /auth/login
 }
 ```
 
-
 ### Sale Service
 
 **Endpoints:**
-- POST /sales 
+
+- POST /sales
 - PUT /sales/{id}
+
 ```json
 {
   "cashier": "Jack",
   "paymentMethod": "mixed",
-  "campaignIds": [2,3],
+  "campaignIds": [
+    2,
+    3
+  ],
   "products": [
     {
       "id": 12,
@@ -352,11 +377,15 @@ POST /auth/login
 ```
 
 > **⚠️ Note:** Since there are **4 types of payment methods**, this JSON object can vary. Below is also valid.
+
 ```json
 {
   "cashier": "Jack",
   "paymentMethod": "cash",
-  "campaignIds": [2,3],
+  "campaignIds": [
+    2,
+    3
+  ],
   "products": [
     {
       "id": 12,
@@ -372,17 +401,56 @@ POST /auth/login
 }
 ```
 
-
 ## Receipt Example
+
 ![Receipt](~images/receipt.png)
 
 
-
 ## AI Insight Example
+
 ![AI Insight](~images/ai_insight.png)
 
 
+## ELK-Stack Example
 
+
+
+## Enabling ELK-Stack
+
+Locate the `log4j2.xml` or equivalent logging configuration file in the `src/main/resources` directory of each service.
+
+### 1. Uncomment the Logstash Appender Reference
+
+Navigate to `log4j2.xml` file in the `src/main/resources` directory of each service.
+Uncomment the AppenderRef for Logstash by removing the `<!--` and `-->` comment tags:
+
+```xml
+<Logger name="com.bit" level="trace" additivity="false">
+    <AppenderRef ref="Console"/>
+    <AppenderRef ref="RollingFile"/>
+    <!-- <AppenderRef ref="Logstash"/> -->      Uncomment this line
+</Logger>
+```
+
+
+### 2. Uncomment the Services in docker-compose.yml
+
+Navigate to `docker-compose.yml` file and uncomment the **elasticsearch**, **logstash** and **kibana** services.
+Also uncomment the service_healty condition of service-registry service.
+
+```yml
+service-registry:
+  ...:
+  depends_on:
+    #      logstash:                           Uncomment these two lines
+    #        condition: service_healthy
+    zipkin:
+      condition: service_started
+```
+
+### 3. Build the Images
+
+Build the images using **Google Jib** or **Dockerfile**.
 
 
 
