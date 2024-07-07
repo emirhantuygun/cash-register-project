@@ -28,8 +28,8 @@
 - [Request Body Examples](#request-body-examples)
 - [Receipt Example](#receipt-example)
 - [AI Insight Example](#ai-insight-example)
-- [ELK-Stack Example](#elk-stack-example)
-- [Enabling ELK-Stack](#enabling-elk-stack)
+- [ELK Stack Example](#elk-stack-example)
+- [Enabling ELK Stack](#enabling-elk-stack)
 
 ## Technologies Used
 
@@ -423,11 +423,11 @@ POST /auth/login
 
 ![AI Insight](~images/ai_insight.png)
 
-## ELK-Stack Example
+## ELK Stack Example
 
 ![ELK](~images/elk.png)
 
-## Enabling ELK-Stack
+## Enabling ELK Stack
 
 Locate the `log4j2.xml` or equivalent logging configuration file in the `src/main/resources` directory of each service.
 
