@@ -31,60 +31,82 @@
 - [ELK Stack Example](#elk-stack-example)
 - [Enabling ELK Stack](#enabling-elk-stack)
 
+
+
+
 ## Technologies Used
 
-- Java 17
-- Spring Boot
-- Spring Framework
-- Spring Security
-- JWT Based Authentication & Authorization
-- Docker
-- PostgreSQL
-- Spring Cloud
-- Netflix Eureka
-- Mockito
-- JUnit 5
-- JUnit Suite Engine
-- JaCoCo
-- Elasticsearch
-- Logstash
-- Kibana
-- Micrometer
-- Zipkin
-- Resilience4J
-- Redis
-- RabbitMQ
-- Google Jib
-- Log4j2
-- JavaMailSender
-- iTextPDF
-- JFreeChart
-- Google Gemini
+<div style="display: flex;">
+  <div style="flex: 1; padding: 10px 10px 10px 0;">
+    <ul>
+      <li>Java 17</li>
+      <li>Spring Boot</li>
+      <li>Spring Security</li>
+      <li>PostgreSQL</li>
+      <li>Java JWT</li>
+      <li>Docker</li>
+      <li>Google Jib</li>
+      <li>Spring Cloud</li>
+      <li>Netflix Eureka</li>
+      <li>Mockito</li>
+      <li>JUnit 5</li>
+      <li>JUnit Suite Engine</li>
+      <li>JaCoCo</li>
+    </ul>
+  </div>
+  <div style="flex: 1;padding: 10px 10px 10px 0;">
+    <ul>
+      <li>Log4j2</li>
+      <li>Elasticsearch</li>
+      <li>Logstash</li>
+      <li>Kibana</li>
+      <li>Micrometer</li>
+      <li>Zipkin</li>
+      <li>Resilience4J</li>
+      <li>Redis</li>
+      <li>RabbitMQ</li>
+      <li>JavaMailSender</li>
+      <li>iTextPDF</li>
+      <li>JFreeChart</li>
+      <li>Google Gemini</li>
+    </ul>
+  </div>
+</div>
+
 
 ## Features
 
-- Role Based Authentication & Authorization
-- Token Based Authentication & Authorization
-- Microservices
-- API Gateway
-- Load Balancing
-- Token Storing
-- Caching
-- Message Queueing
-- Asynchronous Messaging
-- Circuit Breaking
-- Centralized Logging
-- Data Visualization
-- Distributed Tracing System
-- Soft Deletion
-- Pagination, Filtering & Sorting
-- Logging
-- Unit Testing
-- JavaDoc
-- Email Sending (when a product is out of stock)
-- Receipt Generation
-- Chart Generation
-- AI Insight
+<div style="display: flex;">
+  <div style="flex: 1; padding: 10px 10px 10px 0;">
+    <ul>
+      <li>Token & Role Based Authentication & Authorization</li>
+      <li>Microservices</li>
+      <li>API Gateway</li>
+      <li>Load Balancing</li>
+      <li>Token Storing</li>
+      <li>Caching</li>
+      <li>Message Queueing</li>
+      <li>Asynchronous Messaging</li>
+      <li>Circuit Breaking</li>
+      <li>Centralized Logging</li>
+    </ul>
+  </div>
+  <div style="flex: 1;padding: 10px 10px 10px 0;">
+    <ul>
+      <li>Data Visualization</li>
+      <li>Distributed Tracing System</li>
+      <li>Soft Deletion</li>
+      <li>Pagination, Filtering & Sorting</li>
+      <li>Unit Testing</li>
+      <li>JavaDoc</li>
+      <li>Email Sending (when a product is out of stock)</li>
+      <li>Receipt Generation</li>
+      <li>Chart Generation</li>
+      <li>AI Insight</li>
+    </ul>
+  </div>
+</div>
+
 
 ## Getting Started
 
@@ -429,15 +451,24 @@ POST /auth/login
 
 ## Enabling ELK Stack
 
-Locate the `log4j2.xml` or equivalent logging configuration file in the `src/main/resources` directory of each service.
+As the owner of the project, I preferred to disable the ELK stack for some presentation purposes.
+You can enable it by following the steps below.
 
 ### 1. Uncomment the Logstash Appender Reference
 
 Navigate to `log4j2.xml` file in the `src/main/resources` directory of each service.
-Uncomment the AppenderRef for Logstash by removing the `<!--` and `-->` comment tags:
+Uncomment the Appender and AppenderRef for Logstash by removing the `<!--` and `-->` comment tags:
 
 ```xml
+<Appenders>
+    <!-- Logstash Appender -->
+    <!--        <Socket name="Logstash" host="logstash" port="5000">-->          Uncomment these three lines
+    <!--            <JsonLayout compact="true" eventEol="true" properties="true" objectMessageAsJsonObject="true"/>-->
+    <!--        </Socket>-->
+</Appenders>
+```
 
+```xml
 <Logger name="com.bit" level="trace" additivity="false">
     <AppenderRef ref="Console"/>
     <AppenderRef ref="RollingFile"/>
