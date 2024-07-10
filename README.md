@@ -31,82 +31,81 @@
 - [ELK Stack Example](#elk-stack-example)
 - [Enabling ELK Stack](#enabling-elk-stack)
 
-
-
-
 ## Technologies Used
 
-<div style="display: flex;">
-  <div style="flex: 1; padding: 10px 10px 10px 0;">
-    <ul>
-      <li>Java 17</li>
-      <li>Spring Boot</li>
-      <li>Spring Security</li>
-      <li>PostgreSQL</li>
-      <li>Java JWT</li>
-      <li>Docker</li>
-      <li>Google Jib</li>
-      <li>Spring Cloud</li>
-      <li>Netflix Eureka</li>
-      <li>Mockito</li>
-      <li>JUnit 5</li>
-      <li>JUnit Suite Engine</li>
-      <li>JaCoCo</li>
-    </ul>
-  </div>
-  <div style="flex: 1;padding: 10px 10px 10px 0;">
-    <ul>
-      <li>Log4j2</li>
-      <li>Elasticsearch</li>
-      <li>Logstash</li>
-      <li>Kibana</li>
-      <li>Micrometer</li>
-      <li>Zipkin</li>
-      <li>Resilience4J</li>
-      <li>Redis</li>
-      <li>RabbitMQ</li>
-      <li>JavaMailSender</li>
-      <li>iTextPDF</li>
-      <li>JFreeChart</li>
-      <li>Google Gemini</li>
-    </ul>
-  </div>
-</div>
-
+<table>
+  <tr>
+    <td>
+        <ul>
+          <li>Java 17</li>
+          <li>Spring Boot</li>
+          <li>Spring Security</li>
+          <li>PostgreSQL</li>
+          <li>Java JWT</li>
+          <li>Docker</li>
+          <li>Google Jib</li>
+          <li>Spring Cloud</li>
+          <li>Netflix Eureka</li>
+          <li>Mockito</li>
+          <li>JUnit 5</li>
+          <li>JUnit Suite Engine</li>
+          <li>JaCoCo</li>
+        </ul>
+    </td>
+    <td>
+        <ul>
+          <li>Log4j2</li>
+          <li>Elasticsearch</li>
+          <li>Logstash</li>
+          <li>Kibana</li>
+          <li>Micrometer</li>
+          <li>Zipkin</li>
+          <li>Resilience4J</li>
+          <li>Redis</li>
+          <li>RabbitMQ</li>
+          <li>JavaMailSender</li>
+          <li>iTextPDF</li>
+          <li>JFreeChart</li>
+          <li>Google Gemini</li>
+        </ul>
+    </td>
+  </tr>
+</table>
 
 ## Features
 
-<div style="display: flex;">
-  <div style="flex: 1; padding: 10px 10px 10px 0;">
-    <ul>
-      <li>Token & Role Based Authentication & Authorization</li>
-      <li>Microservices</li>
-      <li>API Gateway</li>
-      <li>Load Balancing</li>
-      <li>Token Storing</li>
-      <li>Caching</li>
-      <li>Message Queueing</li>
-      <li>Asynchronous Messaging</li>
-      <li>Circuit Breaking</li>
-      <li>Centralized Logging</li>
-    </ul>
-  </div>
-  <div style="flex: 1;padding: 10px 10px 10px 0;">
-    <ul>
-      <li>Data Visualization</li>
-      <li>Distributed Tracing System</li>
-      <li>Soft Deletion</li>
-      <li>Pagination, Filtering & Sorting</li>
-      <li>Unit Testing</li>
-      <li>JavaDoc</li>
-      <li>Email Sending (when a product is out of stock)</li>
-      <li>Receipt Generation</li>
-      <li>Chart Generation</li>
-      <li>AI Insight</li>
-    </ul>
-  </div>
-</div>
-
+<table>
+  <tr>
+    <td>
+        <ul>
+          <li>Token & Role Based Authentication & Authorization</li>
+          <li>Microservices</li>
+          <li>API Gateway</li>
+          <li>Load Balancing</li>
+          <li>Token Storing</li>
+          <li>Caching</li>
+          <li>Message Queueing</li>
+          <li>Asynchronous Messaging</li>
+          <li>Circuit Breaking</li>
+          <li>Centralized Logging</li>
+        </ul>
+    </td>
+    <td>
+        <ul>
+          <li>Data Visualization</li>
+          <li>Distributed Tracing System</li>
+          <li>Soft Deletion</li>
+          <li>Pagination, Filtering & Sorting</li>
+          <li>Unit Testing</li>
+          <li>JavaDoc</li>
+          <li>Email Sending (when a product is out of stock)</li>
+          <li>Receipt Generation</li>
+          <li>Chart Generation</li>
+          <li>AI Insight</li>
+        </ul>
+    </td>
+  </tr>
+</table>
 
 ## Getting Started
 
@@ -460,6 +459,7 @@ Navigate to `log4j2.xml` file in the `src/main/resources` directory of each serv
 Uncomment the Appender and AppenderRef for Logstash by removing the `<!--` and `-->` comment tags:
 
 ```xml
+
 <Appenders>
     <!-- Logstash Appender -->
     <!--        <Socket name="Logstash" host="logstash" port="5000">-->          Uncomment these three lines
@@ -469,6 +469,7 @@ Uncomment the Appender and AppenderRef for Logstash by removing the `<!--` and `
 ```
 
 ```xml
+
 <Logger name="com.bit" level="trace" additivity="false">
     <AppenderRef ref="Console"/>
     <AppenderRef ref="RollingFile"/>
