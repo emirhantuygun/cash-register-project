@@ -131,6 +131,8 @@ public class ProductServiceImpl implements ProductService {
                 .price(productRequest.getPrice())
                 .build();
         productRepository.save(product);
+        log.debug("Product saved: {}", product);
+
         ProductResponse productResponse = mapToProductResponse(product);
 
         // Caching the product
@@ -158,6 +160,7 @@ public class ProductServiceImpl implements ProductService {
         existingProduct.setStockQuantity(productRequest.getStockQuantity());
         existingProduct.setPrice(productRequest.getPrice());
         productRepository.save(existingProduct);
+        log.debug("Product saved: {}", existingProduct);
 
         ProductResponse productResponse = mapToProductResponse(existingProduct);
 
@@ -188,6 +191,7 @@ public class ProductServiceImpl implements ProductService {
                 });
 
         ProductResponse productResponse = mapToProductResponse(product);
+        log.debug("Product restored: {}", productResponse);
 
         // Caching the restored product
         cacheService.createProductCache(productResponse);
@@ -206,6 +210,7 @@ public class ProductServiceImpl implements ProductService {
             log.warn("Product not found with id {}", id);
             throw new ProductNotFoundException("Product not found with id " + id);
         }
+        log.debug("Product exists with id: {}", id);
 
         productRepository.deleteById(id);
         log.info("Product soft deleted with ID: {}", id);
@@ -222,6 +227,7 @@ public class ProductServiceImpl implements ProductService {
             log.warn("Product not found with id {}", id);
             throw new ProductNotFoundException("Product not found with id " + id);
         }
+        log.debug("Product exists with id: {}", id);
 
         productRepository.deletePermanently(id);
         log.info("Product permanently deleted with ID: {}", id);
@@ -250,6 +256,7 @@ public class ProductServiceImpl implements ProductService {
 
         product.setStockQuantity(product.getStockQuantity() - request.getRequestedQuantity());
         productRepository.save(product);
+        log.debug("Product saved: {}", product);
 
         // Caching the updated product
         cacheService.updateProductCache(mapToProductResponse(product));
@@ -278,6 +285,7 @@ public class ProductServiceImpl implements ProductService {
 
         product.setStockQuantity(product.getStockQuantity() + request.getReturnedQuantity());
         productRepository.save(product);
+        log.debug("Product saved: {}", product);
 
         // Caching the updated product
         cacheService.updateProductCache(mapToProductResponse(product));

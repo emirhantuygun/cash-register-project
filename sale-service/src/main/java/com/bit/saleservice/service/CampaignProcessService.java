@@ -128,6 +128,7 @@ public class CampaignProcessService {
             log.warn("Campaign 1 not applicable. Total: {} is less than limit: {}", total, limitTotal);
             throw new CampaignNotApplicableException("Campaign cannot be applied. Total must be equal to or over 200.");
         }
+        log.debug("Campaign 1 is applicable");
 
         BigDecimal newTotal = total.subtract(BigDecimal.valueOf(50));
         campaignProcessResponse.setTotal(newTotal);
@@ -169,6 +170,8 @@ public class CampaignProcessService {
             log.warn("Campaign 2 not applicable. No product with quantity greater than or equal to 3 found in campaignProcessResponse: {}", campaignProcessResponse);
             throw new CampaignNotApplicableException("Campaign cannot be applied. Requires a minimum purchase of the same 3 products to be applied.");
         }
+        log.debug("Campaign 2 is applicable");
+
         log.trace("Exiting campaign_2 method in CampaignProcessService with campaignProcessResponse: {}", campaignProcessResponse);
     }
 
@@ -205,6 +208,7 @@ public class CampaignProcessService {
                     log.warn("Campaign not found with id: {}", id);
                     return new CampaignNotFoundException("Campaign not found with id: " + id);
                 });
+        log.debug("Campaign found with id: {}", id);
 
         // Checking if the campaign is expired
         boolean isExpired = campaign.getExpiration().before(new Date());

@@ -120,6 +120,7 @@ public class SaleServiceImpl implements SaleService {
         saleResponsePageWrapper.setPageNumber(page);
         saleResponsePageWrapper.setPageSize(size);
         saleResponsePageWrapper.setTotalElements(saleResponsePage.getTotalElements());
+        log.debug("SaleResponsePageWrapper created with the size: " + size);
 
         log.trace("Exiting getAllSalesFilteredAndSorted method in SaleServiceImpl class");
         return saleResponsePageWrapper;
@@ -145,7 +146,9 @@ public class SaleServiceImpl implements SaleService {
 
         // Checking the campaign ids
         if (campaignIds != null && !campaignIds.isEmpty()) {
+            log.debug("Sale has campaigns");
             CampaignProcessResult campaignProcessResult = processCampaigns(campaignIds, products, total);
+
             products = campaignProcessResult.getProducts();
             totalWithCampaign = campaignProcessResult.getTotalWithCampaign();
             campaigns = campaignProcessResult.getCampaigns();
@@ -163,6 +166,7 @@ public class SaleServiceImpl implements SaleService {
             }
             default -> null;
         };
+        log.debug("Payment processed");
 
         // Creating the sale
         Sale sale = Sale.builder()
@@ -180,6 +184,7 @@ public class SaleServiceImpl implements SaleService {
         saleRepository.save(sale);
         products.forEach(product -> product.setSale(sale));
         productRepository.saveAll(products);
+        log.debug("Sale saved");
 
         // Sending a reduce message to the RabbitMQ
         reduceStocks(products);
@@ -211,6 +216,7 @@ public class SaleServiceImpl implements SaleService {
             log.warn("Payment method update not allowed for sale id: {}", id);
             throw new PaymentMethodUpdateNotAllowedException("Payment method update not allowed");
         }
+        log.debug("Payment method is the same as the existing sale");
 
         List<Product> oldProducts = existingSale.getProducts();
         returnProducts(oldProducts);
@@ -228,7 +234,9 @@ public class SaleServiceImpl implements SaleService {
 
             // Checking the campaign ids
             if (campaignIds != null && !campaignIds.isEmpty()) {
+                log.debug("Sale has campaigns");
                 CampaignProcessResult campaignProcessResult = processCampaigns(campaignIds, products, total);
+
                 products = campaignProcessResult.getProducts();
                 totalWithCampaign = campaignProcessResult.getTotalWithCampaign();
                 campaigns = campaignProcessResult.getCampaigns();
@@ -246,6 +254,7 @@ public class SaleServiceImpl implements SaleService {
                 }
                 default -> null;
             };
+            log.debug("Payment processed");
 
             // Setting the new values
             existingSale.setCashier(saleRequest.getCashier());
@@ -260,6 +269,7 @@ public class SaleServiceImpl implements SaleService {
             saleRepository.save(existingSale);
             products.forEach(product -> product.setSale(existingSale));
             productRepository.saveAll(products);
+            log.debug("Sale saved");
 
             // Sending a reduce message to the RabbitMQ
             reduceStocks(products);
@@ -287,10 +297,12 @@ public class SaleServiceImpl implements SaleService {
                     log.error("Sale doesn't exist with id: {}", id);
                     return new SaleNotFoundException("Sale doesn't exist with id " + id);
                 });
+        log.debug("Existing sale found");
 
         // Returning the products
         List<Product> oldProducts = existingSale.getProducts();
         returnProducts(oldProducts);
+        log.debug("Products returned");
 
         existingSale.setCancelled(true);
         saleRepository.save(existingSale);
@@ -309,6 +321,7 @@ public class SaleServiceImpl implements SaleService {
             log.error("Sale with id {} is not soft-deleted and cannot be restored", id);
             throw new SaleNotSoftDeletedException("Sale with id " + id + " is not soft-deleted and cannot be restored.");
         }
+        log.debug("Sale is soft-deleted");
 
         productRepository.restoreProductsBySaleId(id);
         saleRepository.restoreSale(id);
@@ -334,6 +347,7 @@ public class SaleServiceImpl implements SaleService {
             log.error("Sale doesn't exist with id: {}", id);
             throw new SaleNotFoundException("Sale doesn't exist with id " + id);
         }
+        log.debug("Sale exists with id: {}", id);
 
         saleRepository.deleteById(id);
         productRepository.deleteAllBySaleId(id);
@@ -351,6 +365,7 @@ public class SaleServiceImpl implements SaleService {
             log.error("Sale doesn't exist with id: {}", id);
             throw new SaleNotFoundException("Sale doesn't exist with id " + id);
         }
+        log.debug("Sale exists with id: {}", id);
 
         saleRepository.deleteCampaignsForSale(id);
         saleRepository.deleteProductsForSale(id);
@@ -473,6 +488,7 @@ public class SaleServiceImpl implements SaleService {
                     boolean areEnoughProductsInStock = Boolean.TRUE.equals(productResponse.getStockQuantity() >= productRequest.getQuantity());
 
                     if (areEnoughProductsInStock) {
+                        log.debug("There are enough products for the product " + productRequest.getId() + " in stock");
                         BigDecimal totalPrice = productResponse.getPrice().multiply(BigDecimal.valueOf(productRequest.getQuantity()));
                         products.add(Product.builder()
                                 .productId(productResponse.getId())
