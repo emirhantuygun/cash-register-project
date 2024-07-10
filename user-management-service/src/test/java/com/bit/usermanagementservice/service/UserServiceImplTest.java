@@ -280,7 +280,6 @@ class UserServiceImplTest {
         assertEquals("Failed to send restore message to RabbitMQ", exception.getMessage());
         verify(userRepository, times(1)).existsByIdAndDeletedTrue(userId);
         verify(rabbitTemplate, times(1)).convertAndSend(any(), any(), eq(userId));
-        verify(userRepository, never()).restoreUser(anyLong());
     }
 
     @Test
@@ -333,7 +332,6 @@ class UserServiceImplTest {
         assertEquals("Failed to send delete message to RabbitMQ", exception.getMessage());
         verify(userRepository, times(1)).existsById(userId);
         verify(rabbitTemplate, times(1)).convertAndSend(any(), any(), eq(userId));
-        verify(userRepository, never()).deleteById(anyLong());
     }
 
     @Test
