@@ -111,6 +111,7 @@ public class UserServiceImpl implements UserService {
 
         // Creating the pageable object
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.valueOf(direction.toUpperCase()), sortBy);
+        log.debug("Pageable created: " + pageable);
 
         // Getting the AppUser page
         Page<AppUser> usersPage = userRepository.findAll((root, query, criteriaBuilder) -> {
@@ -132,6 +133,7 @@ public class UserServiceImpl implements UserService {
         // Validating the request
         validateRoles(userRequest.getRoles());
         checkUniqueness(userRequest);
+        log.debug("User request is valid and unique");
 
         // Creating the user object
         AppUser user = AppUser.builder()
@@ -168,6 +170,7 @@ public class UserServiceImpl implements UserService {
 
         // Validating the roles
         validateRoles(userRequest.getRoles());
+        log.debug("User request is valid");
 
         // Creating the user object
         AppUser existingUser = userRepository.findById(id)
@@ -175,9 +178,11 @@ public class UserServiceImpl implements UserService {
                     log.error("User does not exist with id " + id);
                     return new UserNotFoundException("User doesn't exist with id " + id);
                 });
+        log.debug("User found with id " + id);
 
         // Checking uniqueness for update
         checkUniquenessForUpdate(existingUser, userRequest);
+        log.debug("User request is unique");
 
         // Setting the values
         existingUser.setName(userRequest.getName());
@@ -215,6 +220,7 @@ public class UserServiceImpl implements UserService {
             log.warn("User with id {} is not soft-deleted and cannot be restored.", id);
             throw new UserNotSoftDeletedException("User with id " + id + " is not soft-deleted and cannot be restored.");
         }
+        log.debug("User exists with id: {}", id);
 
         userRepository.restoreUser(id);
 
@@ -250,6 +256,8 @@ public class UserServiceImpl implements UserService {
             log.warn("User not found with id: {}", id);
             throw new UserNotFoundException("User not found with id " + id);
         }
+        log.debug("User exists with id: {}", id);
+
         userRepository.deleteById(id);
 
         // Sending a soft-delete message to RabbitMQ
@@ -276,6 +284,7 @@ public class UserServiceImpl implements UserService {
             log.warn("User not found with id: {}", id);
             throw new UserNotFoundException("User not found with id " + id);
         }
+        log.debug("User exists with id: {}", id);
 
         // Sending a permanent-delete message to RabbitMQ
         try {
@@ -345,12 +354,14 @@ public class UserServiceImpl implements UserService {
             log.warn("Username {} is already taken", userRequest.getUsername());
             throw new IllegalArgumentException("Username is already taken: " + userRequest.getUsername());
         }
+        log.debug("Username {} is unique", userRequest.getUsername());
 
         // Checking whether the email already exists in the database
         if (userRepository.existsByEmail(userRequest.getEmail())) {
             log.warn("Email {} is already taken", userRequest.getEmail());
             throw new IllegalArgumentException("Email is already taken: " + userRequest.getEmail());
         }
+        log.debug("Email {} is unique", userRequest.getEmail());
 
         log.trace("Exiting checkUniqueness method in UserServiceImpl");
     }
@@ -372,12 +383,14 @@ public class UserServiceImpl implements UserService {
             log.warn("Username {} is already taken by another user", userRequest.getUsername());
             throw new DataIntegrityViolationException("Username already exists: " + userRequest.getUsername());
         }
+        log.debug("Username {} is unique for user with id: {}", userRequest.getUsername(), appUser.getId());
 
         // Checking whether the email already exists in the database for another user, excluding the current user
         if (!userRequest.getEmail().equals(appUser.getEmail()) && userRepository.existsByEmail(userRequest.getEmail())) {
             log.warn("Email {} is already taken by another user", userRequest.getEmail());
             throw new DataIntegrityViolationException("Email already exists: " + userRequest.getEmail());
         }
+        log.debug("Email {} is unique for user with id: {}", userRequest.getEmail(), appUser.getId());
 
         log.trace("Exiting checkUniquenessForUpdate method in UserServiceImpl");
     }
@@ -397,6 +410,7 @@ public class UserServiceImpl implements UserService {
                 log.error("Invalid role: " + role);
                 throw new InvalidRoleException("Invalid role: " + role);
             }
+            log.debug("Valid role: " + role);
         }
 
         log.trace("Exiting validateRoles method in UserServiceImpl");

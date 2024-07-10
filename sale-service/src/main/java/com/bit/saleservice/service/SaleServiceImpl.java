@@ -551,6 +551,7 @@ public class SaleServiceImpl implements SaleService {
                 .products(products)
                 .total(total).build();
         CampaignProcessResponse campaignProcessResponse = campaignProcessService.processCampaigns(campaignProcessRequest);
+        log.debug("Got campaignProcessResponse");
 
         // Setting results from the campaignProcessResponse object
         List<Campaign> campaigns = campaignProcessService.getCampaigns(campaignIds);
@@ -625,12 +626,14 @@ public class SaleServiceImpl implements SaleService {
             log.error("Cash not provided");
             throw new CashNotProvidedException("Cash not provided");
         }
+        log.debug("Cash is provided");
 
         // Check whether cash is enough to cover the sale amount
         if (cash.compareTo(totalWithCampaign) < 0) {
             log.error("Cash is not enough to cover the sale amount.");
             throw new InsufficientCashException("Insufficient cash for payment");
         }
+        log.debug("Cash is enough to cover the sale amount");
 
         log.trace("Exiting processCashPayment method in SaleServiceImpl class");
         return cash.subtract(totalWithCampaign);
@@ -659,6 +662,8 @@ public class SaleServiceImpl implements SaleService {
             log.error("Mixed payment not found");
             throw new MixedPaymentNotFoundException("Mixed payment not found");
         }
+        log.debug("Mixed payment is provided");
+
         BigDecimal cashAmount = mixedPayment.getCashAmount();
         BigDecimal creditCardAmount = mixedPayment.getCreditCardAmount();
 
@@ -667,6 +672,7 @@ public class SaleServiceImpl implements SaleService {
             log.error("Invalid mixed payment");
             throw new InvalidMixedPaymentException("Invalid mixed payment");
         }
+        log.debug("Cash and credit card amounts are provided");
 
         BigDecimal amountPaid = cashAmount.add(creditCardAmount);
 
@@ -675,6 +681,7 @@ public class SaleServiceImpl implements SaleService {
             log.error("The total payment is not enough to cover the sale amount.");
             throw new InsufficientMixedPaymentException("The total payment is not enough to cover the sale amount.");
         }
+        log.debug("The total payment is enough to cover the sale amount");
 
         BigDecimal amountToBePaidByCash = totalWithCampaign.subtract(creditCardAmount);
 
