@@ -11,9 +11,13 @@
   </div>
 </div>
 
+<br>
+
 ## Project Architecture
 
 ![Project Logo](~images/architecture.png)
+
+<br>
 
 ## Table of Contents
 
@@ -30,6 +34,8 @@
 - [AI Insight Example](#ai-insight-example)
 - [ELK Stack Example](#elk-stack-example)
 - [Enabling ELK Stack](#enabling-elk-stack)
+
+<br>
 
 ## Technologies Used
 
@@ -72,6 +78,8 @@
   </tr>
 </table>
 
+<br>
+
 ## Features
 
 <table>
@@ -106,6 +114,8 @@
     </td>
   </tr>
 </table>
+
+<br>
 
 ## Getting Started
 
@@ -157,6 +167,8 @@ To stop all running services, use:
 docker-compose down
 ```
 
+<br>
+
 ## Services
 
 ### Service Registry
@@ -203,6 +215,8 @@ Report Service is responsible for **generating receipts** related to sales and t
 detailed sales information** and generate receipts for completed transactions. This service provides insights into sales
 performance, helping businesses make informed decisions based on sales data.
 
+<br>
+
 ## Default Ports
 
 Any changes to these ports require changes to the configuration files.
@@ -218,6 +232,8 @@ Any changes to these ports require changes to the configuration files.
 | Elasticsearch    | 9200       |
 | Logstash         | 5000, 9600 |
 | Kibana           | 5601       |
+
+<br>
 
 ## Roles & Users
 
@@ -249,6 +265,8 @@ To make requests to the relevant service, you need to have the following role.
 | MANAGER User | manager  | manager  | MANAGER                 |
 | ADMIN User   | admin    | admin    | ADMIN                   |
 
+<br>
+
 ## Authentication & Authorization
 
 > **⚠️Important:** All endpoints require a **JSON Web Token (JWT)** for authentication except auth/login, so **you need
@@ -263,6 +281,8 @@ An example of login request:
   "password": "super"
 }
 ```
+
+<br>
 
 ## Endpoints
 
@@ -327,6 +347,8 @@ All requests should be made to the **API Gateway's url** which is **http://local
 | GET         | /reports/deleted           | Get all deleted sales                  |
 | GET         | /reports/filteredAndSorted | Get all sales with filters and sorting |
 | GET         | /reports/receipt/{id}      | Get receipt by sale ID                 |
+
+<br>
 
 ## Request Body Examples
 
@@ -435,18 +457,25 @@ POST /auth/login
   "mixedPayment": null
 }
 ```
+<br>
 
 ## Receipt Example
 
 ![Receipt](~images/receipt.png)
 
+<br>
+
 ## AI Insight Example
 
 ![AI Insight](~images/ai_insight.png)
 
+<br>
+
 ## ELK Stack Example
 
 ![ELK](~images/elk.png)
+
+<br>
 
 ## Enabling ELK Stack
 
