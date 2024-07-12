@@ -1,57 +1,57 @@
 services:
-#  elasticsearch:
-#    image: elasticsearch:7.17.22
-#    container_name: elasticsearch
-#    environment:
-#      - bootstrap.memory_lock=true
-#      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-#      - "discovery.type=single-node"
-#      - xpack.security.enabled=false
-#    ports:
-#      - "${ELASTICSEARCH_PORT}:${ELASTICSEARCH_PORT}"
-#    healthcheck:
-#      test: [ "CMD-SHELL", "curl -f http://localhost:${ELASTICSEARCH_PORT}/_cluster/health || exit 1" ]
-#      interval: 10s
-#      timeout: 10s
-#      retries: 10
-#      start_period: 30s
-#    networks:
-#      - elk-stack
-#
-#  logstash:
-#    image: logstash:7.17.22
-#    container_name: logstash
-#    environment:
-#      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
-#    ports:
-#      - "${LOGSTASH_PORT}:${LOGSTASH_PORT}/tcp"
-#      - "${LOGSTASH_HEALTH_CHECK_PORT}:${LOGSTASH_HEALTH_CHECK_PORT}"
-#    volumes:
-#      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
-#    healthcheck:
-#      test: [ "CMD-SHELL", "curl -f http://localhost:${LOGSTASH_HEALTH_CHECK_PORT}/_node/pipelines || exit 1" ]
-#      interval: 10s
-#      retries: 15
-#      start_period: 30s
-#      timeout: 10s
-#    networks:
-#      - elk-stack
-#    depends_on:
-#      elasticsearch:
-#        condition: service_healthy
-#
-#  kibana:
-#    image: kibana:7.17.22
-#    container_name: kibana
-#    environment:
-#      ELASTICSEARCH_HOSTS: '["http://elasticsearch:${ELASTICSEARCH_PORT}"]'
-#    ports:
-#      - "${KIBANA_PORT}:${KIBANA_PORT}"
-#    networks:
-#      - elk-stack
-#    depends_on:
-#      elasticsearch:
-#        condition: service_healthy
+  elasticsearch:
+    image: elasticsearch:7.17.22
+    container_name: elasticsearch
+    environment:
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.type=single-node"
+      - xpack.security.enabled=false
+    ports:
+      - "${ELASTICSEARCH_PORT}:${ELASTICSEARCH_PORT}"
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:${ELASTICSEARCH_PORT}/_cluster/health || exit 1" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    networks:
+      - elk-stack
+
+  logstash:
+    image: logstash:7.17.22
+    container_name: logstash
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    ports:
+      - "${LOGSTASH_PORT}:${LOGSTASH_PORT}/tcp"
+      - "${LOGSTASH_HEALTH_CHECK_PORT}:${LOGSTASH_HEALTH_CHECK_PORT}"
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:${LOGSTASH_HEALTH_CHECK_PORT}/_node/pipelines || exit 1" ]
+      interval: 10s
+      retries: 15
+      start_period: 30s
+      timeout: 10s
+    networks:
+      - elk-stack
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+  kibana:
+    image: kibana:7.17.22
+    container_name: kibana
+    environment:
+      ELASTICSEARCH_HOSTS: '["http://elasticsearch:${ELASTICSEARCH_PORT}"]'
+    ports:
+      - "${KIBANA_PORT}:${KIBANA_PORT}"
+    networks:
+      - elk-stack
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
 
 
   redis:
@@ -120,8 +120,8 @@ services:
       - registry
       - zipkin
     depends_on:
-#      logstash:
-#        condition: service_healthy
+      logstash:
+        condition: service_healthy
       zipkin:
         condition: service_started
 

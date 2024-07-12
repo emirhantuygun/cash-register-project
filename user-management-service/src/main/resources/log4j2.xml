@@ -26,9 +26,9 @@
         </RollingFile>
 
         <!-- Logstash Appender -->
-<!--        <Socket name="Logstash" host="logstash" port="5000">-->
-<!--            <JsonLayout compact="true" eventEol="true" properties="true" objectMessageAsJsonObject="true"/>-->
-<!--        </Socket>-->
+        <Socket name="Logstash" host="logstash" port="5000">
+            <JsonLayout compact="true" eventEol="true" properties="true" objectMessageAsJsonObject="true"/>
+        </Socket>
     </Appenders>
 
     <Loggers>
@@ -42,7 +42,7 @@
         <Logger name="com.bit" level="trace" additivity="false">
             <AppenderRef ref="Console" />
             <AppenderRef ref="RollingFile" />
-<!--            <AppenderRef ref="Logstash"/>-->
+            <AppenderRef ref="Logstash"/>
         </Logger>
     </Loggers>
 </Configuration>
