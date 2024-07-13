@@ -34,6 +34,7 @@
 - [AI Insight Example](#ai-insight-example)
 - [ELK Stack Example](#elk-stack-example)
 - [Importing Dashboard Samples to Kibana](#importing-dashboard-samples-to-kibana)
+- [Contact](#contact)
 
 <br>
 
@@ -355,7 +356,7 @@ All requests should be made to the **API Gateway's url** which is **http://local
 ### Auth Service
 
 **Endpoint:**
-POST /auth/login
+- **POST** `/auth/login`
 
 ```json
 {
@@ -368,8 +369,8 @@ POST /auth/login
 
 **Endpoints:**
 
-- POST /users
-- PUT /users/{id}
+- **POST** `/users`
+- **PUT** `/users/{id}`
 
 ```json
 {
@@ -388,8 +389,8 @@ POST /auth/login
 
 **Endpoints:**
 
-- POST /products
-- PUT /products/{id}
+- **POST** `/products`
+- **PUT** `/products/{id}`
 
 ```json
 {
@@ -404,8 +405,8 @@ POST /auth/login
 
 **Endpoints:**
 
-- POST /sales
-- PUT /sales/{id}
+- **POST** `/sales`
+- **PUT** `/sales/{id}`
 
 ```json
 {
@@ -490,12 +491,25 @@ Open the Kibana instance in a web browser by going to **http://localhost:5601** 
 ### 2. Navigate to Saved Objects
 
 Go to `Stack Management` from the main menu.
-Click on`Saved Objects`.
+Click on `Saved Objects`.
 
 
 ### 3. Import the Dashboards
 
 Click the `Import` button. Select the dashboard sample in `~kibana_dashboards` directory.
+
+<br>
+
+---
+
+## Contact
+
+If you have any questions or feedback about this project, feel free to reach out to me!
+
+- **Name**: Emirhan Tuygun
+- **Email**: emiirhantuygun@gmail.com
+
+You can also open an issue or a pull request if you find any bugs or want to contribute to the project.
 
 
 
