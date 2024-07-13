@@ -33,7 +33,7 @@
 - [Receipt Example](#receipt-example)
 - [AI Insight Example](#ai-insight-example)
 - [ELK Stack Example](#elk-stack-example)
-- [Enabling ELK Stack](#enabling-elk-stack)
+- [Importing Dashboard Samples to Kibana](#importing-dashboard-samples-to-kibana)
 
 <br>
 
@@ -155,13 +155,13 @@ EMAIL_PASSWORD=<YOUR_SENDER_EMAIL_APP_PASSWORD>
 EMAIL_RECIPIENT=<YOUR_RECIPIENT_EMAIL_ADDRESS>
 ```
 
-To start all services defined in docker-compose.yml, use the following command:
+To **start** all services defined in docker-compose.yml, use the following command:
 
 ```bash
 docker-compose up -d
 ```
 
-To stop all running services, use:
+To **stop** all running services, use:
 
 ```bash
 docker-compose down
@@ -477,53 +477,25 @@ POST /auth/login
 
 <br>
 
-## Enabling ELK Stack
+## Importing Dashboard Samples to Kibana
 
-As the owner of the project, I preferred to disable the ELK stack for some presentation purposes.
-You can enable it by following the steps below.
+As the owner of the project, I prepared 4 dashboards for you.
+You can import it by following the steps below.
 
-### 1. Uncomment the Logstash Appender Reference
+### 1. Go to Kibana
 
-Navigate to `log4j2.xml` file in the `src/main/resources` directory of each service.
-Uncomment the Appender and AppenderRef for Logstash by removing the `<!--` and `-->` comment tags:
+Open the Kibana instance in a web browser by going to **http://localhost:5601** url.
 
-```xml
 
-<Appenders>
-    <!-- Logstash Appender -->
-    <!--        <Socket name="Logstash" host="logstash" port="5000">-->          Uncomment these three lines
-    <!--            <JsonLayout compact="true" eventEol="true" properties="true" objectMessageAsJsonObject="true"/>-->
-    <!--        </Socket>-->
-</Appenders>
-```
+### 2. Navigate to Saved Objects
 
-```xml
+Go to `Stack Management` from the main menu.
+Click on`Saved Objects`.
 
-<Logger name="com.bit" level="trace" additivity="false">
-    <AppenderRef ref="Console"/>
-    <AppenderRef ref="RollingFile"/>
-    <!-- <AppenderRef ref="Logstash"/> -->      Uncomment this line
-</Logger>
-```
 
-### 2. Uncomment the Services in docker-compose.yml
+### 3. Import the Dashboards
 
-Navigate to `docker-compose.yml` file and uncomment the **elasticsearch**, **logstash** and **kibana** services.
-Also uncomment the **service_healty condition** of service-registry service.
-
-```yml
-service-registry:
-  ...:
-  depends_on:
-    #      logstash:                           Uncomment these two lines
-    #        condition: service_healthy
-    zipkin:
-      condition: service_started
-```
-
-### 3. Build the Images
-
-Build the images using **Google Jib** or **Dockerfile**.
+Click the `Import` button. Select the dashboard sample in `~kibana_dashboards` directory.
 
 
 
