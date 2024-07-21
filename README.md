@@ -57,6 +57,7 @@
           <li>JUnit 5</li>
           <li>JUnit Suite Engine</li>
           <li>JaCoCo</li>
+          <li>NGINX</li>
         </ul>
     </td>
     <td>
@@ -97,6 +98,7 @@
           <li>Asynchronous Messaging</li>
           <li>Circuit Breaking</li>
           <li>Centralized Logging</li>
+          <li>Reverse Proxy</li>
         </ul>
     </td>
     <td>
@@ -144,6 +146,7 @@ ZIPKIN_PORT=9411
 POSTGRES_PORT=5433
 SERVICE_REGISTRY_PORT=8761
 API_GATEWAY_PORT=8080
+NGINX_PORT=80
 
 # API KEY
 GEMINI_ACTIVE=true           # Make it "false" if you don't want application to use Gemini and provide AI insights
@@ -224,6 +227,7 @@ Any changes to these ports require changes to the configuration files.
 
 | Container        | Port       |
 |------------------|------------|
+| NGINX            | 80         | 
 | API Gateway      | 8080       | 
 | Service Registry | 8761       | 
 | Redis            | 6380       | 
@@ -287,7 +291,9 @@ An example of login request:
 
 ## Endpoints
 
-All requests should be made to the **API Gateway's url** which is **http://localhost:8080**.
+All requests should be made to the **API Gateway's url** which is **http://localhost**. The url does **not include the port number**. 
+- **Url Example** `http://localhost/auth/login`
+
 
 ### Auth Service
 
@@ -356,6 +362,7 @@ All requests should be made to the **API Gateway's url** which is **http://local
 ### Auth Service
 
 **Endpoint:**
+
 - **POST** `/auth/login`
 
 ```json
@@ -458,6 +465,7 @@ All requests should be made to the **API Gateway's url** which is **http://local
   "mixedPayment": null
 }
 ```
+
 <br>
 
 ## Receipt Example
@@ -487,12 +495,10 @@ You can import it by following the steps below.
 
 Open the Kibana instance in a web browser by going to **http://localhost:5601** url.
 
-
 ### 2. Navigate to Saved Objects
 
 Go to `Stack Management` from the main menu.
 Click on `Saved Objects`.
-
 
 ### 3. Import the Dashboards
 
