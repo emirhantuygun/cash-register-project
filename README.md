@@ -191,32 +191,32 @@ that the user has the **necessary roles**.
 ### Auth Service
 
 Auth Service is responsible for managing **authentication**. It handles user **login, logout, registration**, and *
-*token & refresh-token generation**. When users log in, the service verifies their credentials and issues a JWT for
+*token & refresh-token generation**. When users log in, the service verifies their credentials and issues a **JWT** for
 authenticated users, which is then used to access protected endpoints through the API Gateway.
 
 ### User Service
 
 User Service manages **user-related** operations, including creating, updating, retrieving, and deleting user accounts.
-It handles user data and ensures that user information is securely stored and accessible to other services that require
+It handles **user data** and ensures that user information is securely stored and accessible to other services that require
 user details.
 
 ### Product Service
 
 Product Service manages **product-related** operations. It handles the creation, update, retrieval, and deletion of
-products. This service is responsible for maintaining product information, such as product names, descriptions, prices,
+products. This service is responsible for maintaining **product information**, such as product names, descriptions, prices,
 and stock levels.
 
 ### Sale Service
 
 Sale Service is responsible for handling **sales transactions** and **managing campaigns**. It allows for the creation,
-retrieval, and management of sales records. The service supports five types of payment methods: cash, credit card,
+retrieval, and management of sales records. The service supports **five types of payment methods**: cash, credit card,
 mixed, debit card, and PayPal.
 > **⚠️ Note:** The **MIXED** payment method consists of a **combination** of **cash** and **credit card** payments.
 
 ### Report Service
 
 Report Service is responsible for **generating receipts** related to sales and transactions. It allows users to **view
-detailed sales information** and generate receipts for completed transactions. This service provides insights into sales
+detailed sales information** and generate receipts for completed transactions. This service provides **AI insights** into sales
 performance, helping businesses make informed decisions based on sales data.
 
 <br>
@@ -291,8 +291,8 @@ An example of login request:
 
 ## Endpoints
 
-All requests should be made to the **API Gateway's url** which is **http://localhost**. The url does **not include the port number**. 
-- **Url Example** `http://localhost/auth/login`
+All requests should be made to the **API Gateway's URL** which is **http://localhost**. The url does **not include the port number**. 
+- **URL Example** `http://localhost/auth/login`
 
 
 ### Auth Service
