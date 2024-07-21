@@ -1,4 +1,15 @@
 services:
+  nginx:
+    container_name: nginx
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+    networks:
+      - nginx
+
+
   elasticsearch:
     image: elasticsearch:7.17.22
     container_name: elasticsearch
@@ -131,8 +142,8 @@ services:
     image: emirhantuygun/api-gateway:latest
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-    ports:
-      - "${API_GATEWAY_PORT}:${API_GATEWAY_PORT}"
+    expose:
+      - "${API_GATEWAY_PORT}"
     volumes:
       - ./logs:/logs
     networks:
@@ -140,11 +151,10 @@ services:
       - registry
       - redis
       - zipkin
+      - nginx
     depends_on:
-      service-registry:
-        condition: service_started
-      redis:
-        condition: service_started
+      - service-registry
+      - redis
 
 
   auth-service:
@@ -252,6 +262,7 @@ networks:
   redis:
   rabbitmq:
   zipkin:
+  nginx:
 
 volumes:
   postgres:
