@@ -245,11 +245,6 @@ services:
       - sale-service
 
 
-volumes:
-  postgres:
-  logs:
-  redis:
-
 networks:
   elk-stack:
   postgres:
@@ -258,5 +253,9 @@ networks:
   rabbitmq:
   zipkin:
 
+volumes:
+  postgres:
+  redis:
+  logs:
 
 
