@@ -434,7 +434,7 @@ All requests should be made to the **API Gateway's url** which is **http://local
 }
 ```
 
-> **⚠️ Note:** Since there are **4 types of payment methods**, this JSON object can vary. Below is also valid.
+> **⚠️ Note:** Since there are **5 types of payment methods**, this JSON object can vary. Below is also valid.
 
 ```json
 {
