@@ -8,6 +8,8 @@ services:
       - "${NGINX_PORT}:${NGINX_PORT}"
     networks:
       - nginx
+    depends_on:
+      - api-gateway
 
 
   elasticsearch:
@@ -102,14 +104,12 @@ services:
     container_name: postgres
     image: postgres:alpine
     environment:
-      POSTGRES_DB: auth-service
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: emirhan
-      PGDATA: /data/postgres
+      POSTGRES_MULTIPLE_DATABASES: auth-service, user-service, product-service, sale-service
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     volumes:
-      - ./postgres/main-services:/data/postgres
       - ./init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
     command: -p ${POSTGRES_PORT}
     networks:
