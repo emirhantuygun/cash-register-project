@@ -5,7 +5,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
     ports:
-      - "80:80"
+      - "${NGINX_PORT}:${NGINX_PORT}"
     networks:
       - nginx
 

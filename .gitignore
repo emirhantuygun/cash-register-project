@@ -6,7 +6,6 @@ target/
 /postgres/
 /redis/
 /logs/
-/logs-docker/
 .env
 
 ### STS ###
