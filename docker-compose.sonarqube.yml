@@ -13,10 +13,10 @@ services:
       - ./postgres-sonarqube:/data/postgres
     command: -p ${POSTGRES_SONARQUBE_PORT}
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U sonar" ]
-      interval: 10s
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
     networks:
       - sonarqube
     restart: always
