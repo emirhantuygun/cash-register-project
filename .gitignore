@@ -6,6 +6,8 @@ target/
 /postgres/
 /redis/
 /logs/
+/sonarqube/
+/postgres-sonarqube/
 .env
 
 ### STS ###
