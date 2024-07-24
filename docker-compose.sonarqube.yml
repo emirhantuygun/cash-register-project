@@ -1,4 +1,27 @@
 services:
+  postgres-sonarqube:
+    container_name: postgres-sonarqube
+    image: postgres:alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=emirhan
+      - POSTGRES_DB=sonarqube
+      - PGDATA=/data/postgres
+    ports:
+      - "${POSTGRES_SONARQUBE_PORT}:${POSTGRES_SONARQUBE_PORT}"
+    volumes:
+      - ./postgres-sonarqube:/data/postgres
+    command: -p ${POSTGRES_SONARQUBE_PORT}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U sonar" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sonarqube
+    restart: always
+
+
   sonarqube:
     container_name: sonarqube
     image: sonarqube:lts
@@ -17,25 +40,8 @@ services:
     networks:
       - sonarqube
     depends_on:
-      - postgres-sonarqube
-
-
-  postgres-sonarqube:
-    container_name: postgres-sonarqube
-    image: postgres:alpine
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=emirhan
-      - POSTGRES_DB=sonarqube
-      - PGDATA=/data/postgres
-    ports:
-      - "${POSTGRES_SONARQUBE_PORT}:${POSTGRES_SONARQUBE_PORT}"
-    volumes:
-      - ./postgres-sonarqube:/data/postgres
-    command: -p ${POSTGRES_SONARQUBE_PORT}
-    networks:
-      - sonarqube
-    restart: always
+      postgres-sonarqube:
+        condition: service_healthy
 
 
 networks:
