@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -66,12 +67,12 @@ public class GeminiService {
                 JsonObject candidateObject = candidateElement.getAsJsonObject();
                 JsonObject contentObject = candidateObject.getAsJsonObject("content");
                 JsonArray newPartsArray = contentObject.getAsJsonArray("parts");
-                for (JsonElement partElement : newPartsArray) {
-                    JsonObject partObject = partElement.getAsJsonObject();
 
-                    log.trace("Exiting getInsight method in GeminiService");
-                    return partObject.get("text").getAsString();
-                }
+                JsonElement partElement = newPartsArray.get(0);
+                JsonObject partObject = partElement.getAsJsonObject();
+
+                log.trace("Exiting getInsight method in GeminiService");
+                return partObject.get("text").getAsString();
             }
         }
         log.debug("Gemini connection failed, returning null");

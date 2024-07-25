@@ -91,8 +91,8 @@ public class Initializer implements CommandLineRunner {
                     .productId((long) i)
                     .barcodeNumber("0123456789" + i)
                     .quantity(i)
-                    .price(BigDecimal.valueOf(i * 10))
-                    .totalPrice(BigDecimal.valueOf(i * 10).multiply(BigDecimal.valueOf(i)))
+                    .price(BigDecimal.valueOf(i * 10L))
+                    .totalPrice(BigDecimal.valueOf(i * 10L).multiply(BigDecimal.valueOf(i)))
                     .build();
 
             BigDecimal total = product.getTotalPrice();
