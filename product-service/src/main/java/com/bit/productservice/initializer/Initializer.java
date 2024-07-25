@@ -48,7 +48,7 @@ public class Initializer implements CommandLineRunner {
         for (int i = 1; i <= 20; i++) {
             String name = String.format("Product %d", i);
             String description = String.format("This is product %d.", i);
-            BigDecimal price = BigDecimal.valueOf(i*10);
+            BigDecimal price = BigDecimal.valueOf(i*10L);
 
             Product product = Product.builder()
                     .name(name)
