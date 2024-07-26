@@ -214,8 +214,8 @@ public class ChartService {
 
                 // Formatting the sale analysis
                 if (saleAnalysis != null) {
-                    saleAnalysis = saleAnalysis.replaceAll("\\*\\*", "");
-                    saleAnalysis = saleAnalysis.replaceAll("##", "");
+                    saleAnalysis = saleAnalysis.replace("\\*\\*", "");
+                    saleAnalysis = saleAnalysis.replace("##", "");
 
                     String[] sentencesArray = saleAnalysis.split("(?<=[.!?])\\s*");
 

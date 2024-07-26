@@ -43,6 +43,9 @@ public class ProductServiceImpl implements ProductService {
     @Value("${send-email}")
     private String SEND_EMAIL;
 
+    private final static String NOT_FOUND_ERROR_MESSAGE = "Product not found with id: ";
+    private final static String SAVED_DEBUG_MESSAGE = "Product saved: {}";
+
     private final ProductRepository productRepository;
     private final BarcodeService barcodeService;
     private final CacheService cacheService;
@@ -56,8 +59,8 @@ public class ProductServiceImpl implements ProductService {
         // Finding the product
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.error("Product not found with id: {}", id);
-                    return new ProductNotFoundException("Product not found with id " + id);
+                    log.error(NOT_FOUND_ERROR_MESSAGE + id);
+                    return new ProductNotFoundException(NOT_FOUND_ERROR_MESSAGE + id);
                 });
         ProductResponse response = mapToProductResponse(product);
         log.debug("Product found: {}", response);
@@ -131,7 +134,7 @@ public class ProductServiceImpl implements ProductService {
                 .price(productRequest.getPrice())
                 .build();
         productRepository.save(product);
-        log.debug("Product saved: {}", product);
+        log.debug(SAVED_DEBUG_MESSAGE, product);
 
         ProductResponse productResponse = mapToProductResponse(product);
 
@@ -160,7 +163,7 @@ public class ProductServiceImpl implements ProductService {
         existingProduct.setStockQuantity(productRequest.getStockQuantity());
         existingProduct.setPrice(productRequest.getPrice());
         productRepository.save(existingProduct);
-        log.debug("Product saved: {}", existingProduct);
+        log.debug(SAVED_DEBUG_MESSAGE, existingProduct);
 
         ProductResponse productResponse = mapToProductResponse(existingProduct);
 
@@ -207,8 +210,8 @@ public class ProductServiceImpl implements ProductService {
         log.trace("Entering deleteProduct method in ProductServiceImpl class with id: {}", id);
 
         if (!productRepository.existsById(id)) {
-            log.warn("Product not found with id {}", id);
-            throw new ProductNotFoundException("Product not found with id " + id);
+            log.warn(NOT_FOUND_ERROR_MESSAGE + id);
+            throw new ProductNotFoundException(NOT_FOUND_ERROR_MESSAGE + id);
         }
         log.debug("Product exists with id: {}", id);
 
@@ -224,8 +227,8 @@ public class ProductServiceImpl implements ProductService {
         log.trace("Entering deleteProductPermanently method in ProductServiceImpl class with id: {}", id);
 
         if (!productRepository.existsById(id)) {
-            log.warn("Product not found with id {}", id);
-            throw new ProductNotFoundException("Product not found with id " + id);
+            log.warn(NOT_FOUND_ERROR_MESSAGE + id);
+            throw new ProductNotFoundException(NOT_FOUND_ERROR_MESSAGE + id);
         }
         log.debug("Product exists with id: {}", id);
 
@@ -250,13 +253,13 @@ public class ProductServiceImpl implements ProductService {
         // Finding and updating the product
         Product product = productRepository.findById(request.getId())
                 .orElseThrow(() -> {
-                    log.error("Product not found with id: {}", request.getId());
-                    return new ProductNotFoundException("Product not found with id " + request.getId());
+                    log.error(NOT_FOUND_ERROR_MESSAGE + request.getId());
+                    return new ProductNotFoundException(NOT_FOUND_ERROR_MESSAGE + request.getId());
                 });
 
         product.setStockQuantity(product.getStockQuantity() - request.getRequestedQuantity());
         productRepository.save(product);
-        log.debug("Product saved: {}", product);
+        log.debug(SAVED_DEBUG_MESSAGE, product);
 
         // Caching the updated product
         cacheService.updateProductCache(mapToProductResponse(product));
@@ -279,13 +282,13 @@ public class ProductServiceImpl implements ProductService {
         // Finding and updating the product
         Product product = productRepository.findById(request.getId())
                 .orElseThrow(() -> {
-                    log.error("Product not found with id: {}", request.getId());
-                    return new ProductNotFoundException("Product not found with id " + request.getId());
+                    log.error(NOT_FOUND_ERROR_MESSAGE + request.getId());
+                    return new ProductNotFoundException(NOT_FOUND_ERROR_MESSAGE + request.getId());
                 });
 
         product.setStockQuantity(product.getStockQuantity() + request.getReturnedQuantity());
         productRepository.save(product);
-        log.debug("Product saved: {}", product);
+        log.debug(SAVED_DEBUG_MESSAGE, product);
 
         // Caching the updated product
         cacheService.updateProductCache(mapToProductResponse(product));

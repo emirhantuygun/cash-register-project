@@ -312,7 +312,7 @@ class UserServiceImplTest {
         // Act & Assert
         UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userService.deleteUser(userId));
 
-        assertEquals("User not found with id " + userId, exception.getMessage());
+        assertEquals("User not found with id: " + userId, exception.getMessage());
         verify(userRepository, times(1)).existsById(userId);
         verify(userRepository, never()).deleteById(anyLong());
         verify(rabbitTemplate, never()).convertAndSend(anyString(), anyString(), anyLong());
@@ -343,7 +343,7 @@ class UserServiceImplTest {
         // Act & Assert
         UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userService.deleteUserPermanently(userId));
 
-        assertEquals("User not found with id " + userId, exception.getMessage());
+        assertEquals("User not found with id: " + userId, exception.getMessage());
         verify(userRepository, times(1)).existsById(userId);
         verify(userRepository, never()).deleteRolesForUser(anyLong());
         verify(userRepository, never()).deletePermanently(anyLong());

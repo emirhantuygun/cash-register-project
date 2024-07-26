@@ -51,6 +51,9 @@ public class SaleServiceImpl implements SaleService {
     @Value("${rabbitmq.routingKey}")
     private String ROUTING_KEY;
 
+    private final static String NOT_FOUND_ERROR_MESSAGE = "Sale not found with id: ";
+    private final static String NOT_EXIST_ERROR_MESSAGE = "Sale does not exist with id: ";
+
     private final SaleRepository saleRepository;
     private final ProductRepository productRepository;
     private final CampaignProcessService campaignProcessService;
@@ -63,8 +66,8 @@ public class SaleServiceImpl implements SaleService {
 
         Sale sale = saleRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.error("Sale not found with id: {}", id);
-                    return new SaleNotFoundException("Sale not found with id " + id);
+                    log.error(NOT_FOUND_ERROR_MESSAGE + id);
+                    return new SaleNotFoundException(NOT_FOUND_ERROR_MESSAGE + id);
                 });
         log.info("Sale retrieved successfully with id: {}", id);
 
@@ -206,8 +209,8 @@ public class SaleServiceImpl implements SaleService {
         // Finding the existing sale
         Sale existingSale = saleRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.error("Sale doesn't exist with id: {}", id);
-                    return new SaleNotFoundException("Sale doesn't exist with id " + id);
+                    log.error(NOT_EXIST_ERROR_MESSAGE + id);
+                    return new SaleNotFoundException(NOT_EXIST_ERROR_MESSAGE + id);
                 });
 
         // Checking whether the payment method is the same as the existing sale's payment method
@@ -294,8 +297,8 @@ public class SaleServiceImpl implements SaleService {
         // Finding the existing sale
         Sale existingSale = saleRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.error("Sale doesn't exist with id: {}", id);
-                    return new SaleNotFoundException("Sale doesn't exist with id " + id);
+                    log.error(NOT_EXIST_ERROR_MESSAGE + id);
+                    return new SaleNotFoundException(NOT_EXIST_ERROR_MESSAGE + id);
                 });
         log.debug("Existing sale found");
 
@@ -344,8 +347,8 @@ public class SaleServiceImpl implements SaleService {
 
         // Checking whether the sale exists
         if (!saleRepository.existsById(id)) {
-            log.error("Sale doesn't exist with id: {}", id);
-            throw new SaleNotFoundException("Sale doesn't exist with id " + id);
+            log.error(NOT_EXIST_ERROR_MESSAGE + id);
+            throw new SaleNotFoundException(NOT_EXIST_ERROR_MESSAGE + id);
         }
         log.debug("Sale exists with id: {}", id);
 
@@ -362,8 +365,8 @@ public class SaleServiceImpl implements SaleService {
 
         // Checking whether the sale exists
         if (!saleRepository.existsById(id)) {
-            log.error("Sale doesn't exist with id: {}", id);
-            throw new SaleNotFoundException("Sale doesn't exist with id " + id);
+            log.error(NOT_EXIST_ERROR_MESSAGE + id);
+            throw new SaleNotFoundException(NOT_EXIST_ERROR_MESSAGE + id);
         }
         log.debug("Sale exists with id: {}", id);
 

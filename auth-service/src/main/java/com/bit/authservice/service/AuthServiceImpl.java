@@ -49,6 +49,8 @@ public class AuthServiceImpl implements AuthService {
     @Value("${redis.port}")
     private String redisPort;
 
+    private final static String NOT_FOUND_ERROR_MESSAGE = "User not found";
+
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
@@ -92,8 +94,8 @@ public class AuthServiceImpl implements AuthService {
         // Finding the user from database
         AppUser appUser = userRepository.findByUsername(authRequest.getUsername())
                 .orElseThrow(() -> {
-                    log.error("User not found");
-                    return new UserNotFoundException("User not found");
+                    log.error(NOT_FOUND_ERROR_MESSAGE);
+                    return new UserNotFoundException(NOT_FOUND_ERROR_MESSAGE);
                 });
 
         // Generating access and refresh tokens
@@ -127,8 +129,8 @@ public class AuthServiceImpl implements AuthService {
                     log.info("Refresh token is valid");
                     AppUser appUser = userRepository.findByUsername(username)
                             .orElseThrow(() -> {
-                                log.error("User not found");
-                                return new UserNotFoundException("User not found");
+                                log.error(NOT_FOUND_ERROR_MESSAGE);
+                                return new UserNotFoundException(NOT_FOUND_ERROR_MESSAGE);
                             });
 
                     // Generating the access token
@@ -140,8 +142,8 @@ public class AuthServiceImpl implements AuthService {
                     log.trace("Exiting refreshToken method in AuthServiceImpl");
                     return Arrays.asList(accessToken, refreshToken);
                 } else {
-                    log.error("User not found");
-                    throw new UserNotFoundException("User not found");
+                    log.error(NOT_FOUND_ERROR_MESSAGE);
+                    throw new UserNotFoundException(NOT_FOUND_ERROR_MESSAGE);
                 }
             } else {
                 log.error("Username extraction failed");

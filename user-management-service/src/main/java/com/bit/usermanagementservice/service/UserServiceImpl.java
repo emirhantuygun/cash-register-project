@@ -63,8 +63,8 @@ public class UserServiceImpl implements UserService {
     @Value("${rabbitmq.routingKey.restore}")
     private String ROUTING_KEY_RESTORE;
 
-    private final String NOT_FOUND_ERROR_MESSAGE = "User not found with id: ";
-    private final String EXIST_DEBUG_MESSAGE = "User exists with id: {}";
+    private final static String NOT_FOUND_ERROR_MESSAGE = "User not found with id: ";
+    private final static String EXIST_DEBUG_MESSAGE = "User exists with id: {}";
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;

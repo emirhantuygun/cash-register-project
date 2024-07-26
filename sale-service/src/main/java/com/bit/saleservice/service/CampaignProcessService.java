@@ -101,6 +101,8 @@ public class CampaignProcessService {
                     log.debug("Processing campaign 3 for campaignProcessResponse: {}", campaignProcessResponse);
                     campaign_3(campaignProcessResponse);
                     break;
+
+                default:
             }
         }
         log.info("Successfully processed campaigns for campaignProcessRequest: {}", campaignProcessRequest);

@@ -55,6 +55,11 @@ public class GatewayService {
 
     @Value("${gateway.port}")
     private String GATEWAY_PORT;
+
+    private final static String SENDING_REQUEST_DEBUG_MESSAGE = "Sending GET request to: {}";
+    private final static String FETCH_FAILED_ERROR_MESSAGE = "Sale fetch failed in Sale Service!";
+    private final static String HTTP_ERROR_MESSAGE = "HTTP error for Sale Service: ";
+    private final static String REST_CLIENT_ERROR_MESSAGE = "REST client error for Sale Service: ";
     private String GATEWAY_URL;
     private final RestTemplate restTemplate;
 
@@ -81,7 +86,7 @@ public class GatewayService {
         log.trace("Entering getSale method in GatewayService");
         try {
             String getUrl = GATEWAY_URL + GET_SALE_ENDPOINT;
-            log.debug("Sending GET request to: {}", getUrl);
+            log.debug(SENDING_REQUEST_DEBUG_MESSAGE, getUrl);
 
             // Getting Http headers
             HttpHeaders headers = getHttpHeaders();
@@ -98,8 +103,8 @@ public class GatewayService {
 
             // Checking the status code
             if (!(responseEntity.getStatusCode().is2xxSuccessful())) {
-                log.error("Sale fetch failed in sale-service!");
-                throw new SaleServiceException("Sale fetch failed in sale-service!");
+                log.error(FETCH_FAILED_ERROR_MESSAGE);
+                throw new SaleServiceException(FETCH_FAILED_ERROR_MESSAGE);
             }
             log.debug("Received successful response for getSale: {}", responseEntity.getBody());
 
@@ -107,12 +112,12 @@ public class GatewayService {
             return responseEntity.getBody();
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
-            log.error("HTTP error: {} for sale service", e.getStatusCode(), e);
-            throw new SaleServiceException("HTTP error: " + e.getStatusCode() + " for sale service");
+            log.error(HTTP_ERROR_MESSAGE + e.getStatusCode(), e);
+            throw new SaleServiceException(HTTP_ERROR_MESSAGE + e.getStatusCode());
 
         } catch (RestClientException e) {
-            log.error("REST client error: {} for sale service", e.getMessage(), e);
-            throw new SaleServiceException("REST client error: " + e.getMessage() + " for sale service");
+            log.error(REST_CLIENT_ERROR_MESSAGE + e.getMessage(), e);
+            throw new SaleServiceException(REST_CLIENT_ERROR_MESSAGE + e.getMessage());
         }
     }
 
@@ -128,7 +133,7 @@ public class GatewayService {
 
         try {
             String getUrl = GATEWAY_URL + GET_ALL_SALES_ENDPOINT;
-            log.debug("Sending GET request to: {}", getUrl);
+            log.debug(SENDING_REQUEST_DEBUG_MESSAGE, getUrl);
 
             // Getting Http headers
             HttpHeaders headers = getHttpHeaders();
@@ -144,8 +149,8 @@ public class GatewayService {
 
             // Checking the status code
             if (!(responseEntity.getStatusCode().is2xxSuccessful())) {
-                log.error("Sales fetch failed in sale-service!");
-                throw new SaleServiceException("Sale fetch failed in sale-service!");
+                log.error(FETCH_FAILED_ERROR_MESSAGE);
+                throw new SaleServiceException(FETCH_FAILED_ERROR_MESSAGE);
             }
             log.debug("Received successful response for getAllSales: {}", responseEntity.getBody());
 
@@ -153,12 +158,12 @@ public class GatewayService {
             return responseEntity.getBody();
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
-            log.error("HTTP error: {} for sale service", e.getStatusCode(), e);
-            throw new SaleServiceException("HTTP error: " + e.getStatusCode() + " for sale service");
+            log.error(HTTP_ERROR_MESSAGE + e.getStatusCode(), e);
+            throw new SaleServiceException(HTTP_ERROR_MESSAGE + e.getStatusCode());
 
         } catch (RestClientException e) {
-            log.error("REST client error: {} for sale service", e.getMessage(), e);
-            throw new SaleServiceException("REST client error: " + e.getMessage() + " for sale service");
+            log.error(REST_CLIENT_ERROR_MESSAGE + e.getMessage(), e);
+            throw new SaleServiceException(REST_CLIENT_ERROR_MESSAGE + e.getMessage());
         }
     }
 
@@ -173,7 +178,7 @@ public class GatewayService {
         log.trace("Entering getDeletedSales method in GatewayService");
         try {
             String getUrl = GATEWAY_URL + GET_DELETED_SALES_ENDPOINT;
-            log.debug("Sending GET request to: {}", getUrl);
+            log.debug(SENDING_REQUEST_DEBUG_MESSAGE, getUrl);
 
             // Getting Http headers
             HttpHeaders headers = getHttpHeaders();
@@ -198,12 +203,12 @@ public class GatewayService {
             return responseEntity.getBody();
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
-            log.error("HTTP error: {} for sale service", e.getStatusCode(), e);
-            throw new SaleServiceException("HTTP error: " + e.getStatusCode() + " for sale service");
+            log.error(HTTP_ERROR_MESSAGE + e.getStatusCode(), e);
+            throw new SaleServiceException(HTTP_ERROR_MESSAGE + e.getStatusCode());
 
         } catch (RestClientException e) {
-            log.error("REST client error: {} for sale service", e.getMessage(), e);
-            throw new SaleServiceException("REST client error: " + e.getMessage() + " for sale service");
+            log.error(REST_CLIENT_ERROR_MESSAGE + e.getMessage(), e);
+            throw new SaleServiceException(REST_CLIENT_ERROR_MESSAGE + e.getMessage());
         }
     }
 
@@ -232,7 +237,7 @@ public class GatewayService {
 
         try {
             String getUrl = GATEWAY_URL + GET_ALL_SALES_FILTERED_AND_SORTED_ENDPOINT;
-            log.debug("Sending GET request to: {}", getUrl);
+            log.debug(SENDING_REQUEST_DEBUG_MESSAGE, getUrl);
 
             // Getting Http headers
             HttpHeaders headers = getHttpHeaders();
@@ -262,8 +267,8 @@ public class GatewayService {
 
             // Checking the status code
             if (!(responseEntity.getStatusCode().is2xxSuccessful())) {
-                log.error("Sales fetch failed in sale-service!");
-                throw new SaleServiceException("Sales fetch failed in sale-service!");
+                log.error(FETCH_FAILED_ERROR_MESSAGE);
+                throw new SaleServiceException(FETCH_FAILED_ERROR_MESSAGE);
             }
 
             PageWrapper<SaleResponse> pageWrapper = responseEntity.getBody();
@@ -273,17 +278,17 @@ public class GatewayService {
                 log.trace("Exiting getAllSalesFilteredAndSorted method in GatewayService");
                 return new PageImpl<>(pageWrapper.getContent(), PageRequest.of(page, size), pageWrapper.getTotalElements());
             } else {
-                log.error("Sales fetch failed in sale-service!");
-                throw new SaleServiceException("Sales fetch failed in sale-service!");
+                log.error(FETCH_FAILED_ERROR_MESSAGE);
+                throw new SaleServiceException(FETCH_FAILED_ERROR_MESSAGE);
             }
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
-            log.error("HTTP error: {} for sale service", e.getStatusCode(), e);
-            throw new SaleServiceException("HTTP error: " + e.getStatusCode() + " for sale service");
+            log.error(HTTP_ERROR_MESSAGE + e.getStatusCode(), e);
+            throw new SaleServiceException(HTTP_ERROR_MESSAGE + e.getStatusCode());
 
         } catch (RestClientException e) {
-            log.error("REST client error: {} for sale service", e.getMessage(), e);
-            throw new SaleServiceException("REST client error: " + e.getMessage() + " for sale service");
+            log.error(REST_CLIENT_ERROR_MESSAGE + e.getMessage(), e);
+            throw new SaleServiceException(REST_CLIENT_ERROR_MESSAGE + e.getMessage());
         }
     }
 
