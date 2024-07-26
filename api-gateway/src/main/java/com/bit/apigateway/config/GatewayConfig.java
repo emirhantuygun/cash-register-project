@@ -32,6 +32,8 @@ public class GatewayConfig {
     private String SALE_URI;
     @Value("${route.report}")
     private String REPORT_URI;
+    @Value("${circuit-breaker-name}")
+    private String CIRCUIT_BREAKER_NAME;
     private final Map<String, List<String>> endpointRoleMapping = new HashMap<>();
 
     /**
@@ -64,35 +66,35 @@ public class GatewayConfig {
                 .route("auth-service", r -> r.path("/auth/**")
                         .filters(f -> f
                                 .filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping)))
-                                .circuitBreaker(c -> c.setName("circuit-breaker").setFallbackUri("forward:/fallback/auth"))
+                                .circuitBreaker(c -> c.setName(CIRCUIT_BREAKER_NAME).setFallbackUri("forward:/fallback/auth"))
                         )
                         .uri(AUTH_URI))
 
                 .route("user-service", r -> r.path("/users/**")
                         .filters(f -> f
                                 .filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping)))
-                                .circuitBreaker(c -> c.setName("circuit-breaker").setFallbackUri("forward:/fallback/user"))
+                                .circuitBreaker(c -> c.setName(CIRCUIT_BREAKER_NAME).setFallbackUri("forward:/fallback/user"))
                         )
                         .uri(USER_URI))
 
                 .route("product-service", r -> r.path("/products/**")
                         .filters(f -> f
                                 .filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping)))
-                                .circuitBreaker(c -> c.setName("circuit-breaker").setFallbackUri("forward:/fallback/product"))
+                                .circuitBreaker(c -> c.setName(CIRCUIT_BREAKER_NAME).setFallbackUri("forward:/fallback/product"))
                         )
                         .uri(PRODUCT_URI))
 
                 .route("sale-service", r -> r.path("/sales/**", "/campaigns/**")
                         .filters(f -> f
                                 .filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping)))
-                                .circuitBreaker(c -> c.setName("circuit-breaker").setFallbackUri("forward:/fallback/sale"))
+                                .circuitBreaker(c -> c.setName(CIRCUIT_BREAKER_NAME).setFallbackUri("forward:/fallback/sale"))
                         )
                         .uri(SALE_URI))
 
                 .route("report-service", r -> r.path("/reports/**")
                         .filters(f -> f
                                 .filter(authGatewayFilterFactory.apply(new AuthGatewayFilterFactory.Config().setRoleMapping(endpointRoleMapping)))
-                                .circuitBreaker(c -> c.setName("circuit-breaker").setFallbackUri("forward:/fallback/report"))
+                                .circuitBreaker(c -> c.setName(CIRCUIT_BREAKER_NAME).setFallbackUri("forward:/fallback/report"))
                         )
                         .uri(REPORT_URI))
 

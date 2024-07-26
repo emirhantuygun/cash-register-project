@@ -30,10 +30,6 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <spring-cloud.version>2023.0.1</spring-cloud.version>
-<!--        <sonar.projectKey>cash-register-project</sonar.projectKey>-->
-<!--        <sonar.projectName>Cash Register Project</sonar.projectName>-->
-<!--        <sonar.host.url>http://localhost:9000</sonar.host.url>-->
-<!--        <sonar.login>squ_83524277b18bcf44337f90783572fa6e343912d9</sonar.login>-->
     </properties>
 
     <dependencies>
@@ -99,6 +95,7 @@
             <artifactId>zipkin-reporter-brave</artifactId>
         </dependency>
     </dependencies>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -179,6 +176,7 @@
             </plugin>
         </plugins>
     </build>
+
     <profiles>
         <profile>
             <id>sonar</id>

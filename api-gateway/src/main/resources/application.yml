@@ -25,4 +25,5 @@ redis:
   host: "localhost"
   port: "6379"
 
+circuit-breaker-name: "circuit-breaker"
 

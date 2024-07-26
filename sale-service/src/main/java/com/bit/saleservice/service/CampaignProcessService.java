@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.Optional;
 
 /**
@@ -44,7 +43,7 @@ public class CampaignProcessService {
                     .map(campaignRepository::findById)
                     .filter(Optional::isPresent)
                     .map(Optional::get)
-                    .collect(Collectors.toList());
+                    .toList();
             log.info("Successfully retrieved campaigns with ids: {}", ids);
         } catch (Exception e) {
             log.error("Error occurred while retrieving campaigns with ids: {}", ids, e);

@@ -1,5 +1,6 @@
 package com.bit.reportservice.service;
 
+import com.bit.reportservice.exception.ChartGenerationException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -63,22 +64,24 @@ public class GeminiService {
             String json = response.toString();
             JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
             JsonArray candidatesArray = jsonObject.getAsJsonArray("candidates");
-            for (JsonElement candidateElement : candidatesArray) {
-                JsonObject candidateObject = candidateElement.getAsJsonObject();
-                JsonObject contentObject = candidateObject.getAsJsonObject("content");
-                JsonArray newPartsArray = contentObject.getAsJsonArray("parts");
+            JsonElement candidateElement = candidatesArray.get(0);
+            JsonObject candidateObject = candidateElement.getAsJsonObject();
+            JsonObject contentObject = candidateObject.getAsJsonObject("content");
+            JsonArray newPartsArray = contentObject.getAsJsonArray("parts");
 
-                JsonElement partElement = newPartsArray.get(0);
-                JsonObject partObject = partElement.getAsJsonObject();
+            JsonElement partElement = newPartsArray.get(0);
+            JsonObject partObject = partElement.getAsJsonObject();
 
-                log.trace("Exiting getInsight method in GeminiService");
-                return partObject.get("text").getAsString();
-            }
+            log.trace("Exiting getInsight method in GeminiService");
+            return partObject.get("text").getAsString();
+
+        } catch (Exception e) {
+            log.error("Gemini connection failed");
+            throw new ChartGenerationException("Gemini connection failed");
+
+        } finally {
+            log.trace("Exiting getInsight method in GeminiService");
         }
-        log.debug("Gemini connection failed, returning null");
-
-        log.trace("Exiting getInsight method in GeminiService");
-        return null;
     }
 
     /**
