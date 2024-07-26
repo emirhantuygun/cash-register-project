@@ -1,4 +1,6 @@
 services:
+
+  # NGINX
   nginx:
     container_name: nginx
     image: nginx:latest
@@ -12,6 +14,7 @@ services:
       - api-gateway
 
 
+  # ELK STACK
   elasticsearch:
     image: elasticsearch:7.17.22
     container_name: elasticsearch
@@ -67,6 +70,7 @@ services:
         condition: service_healthy
 
 
+  # REDIS
   redis:
     container_name: redis
     image: redis:alpine
@@ -80,6 +84,7 @@ services:
     restart: always
 
 
+  # RABBITMQ
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:alpine
@@ -90,6 +95,7 @@ services:
     restart: always
 
 
+  # ZIPKIN
   zipkin:
     container_name: zipkin
     image: openzipkin/zipkin:latest
@@ -100,23 +106,65 @@ services:
     restart: always
 
 
-  postgres:
-    container_name: postgres
+  # POSTGRES DATABASES
+  postgres-auth:
+    container_name: postgres-auth
     image: postgres:alpine
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: emirhan
-      POSTGRES_MULTIPLE_DATABASES: auth-service, user-service, product-service, sale-service
+      POSTGRES_DB: auth-service
     ports:
-      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
-    volumes:
-      - ./init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
-    command: -p ${POSTGRES_PORT}
+      - "${POSTGRES_AUTH_PORT}:${POSTGRES_AUTH_PORT}"
+    command: -p ${POSTGRES_AUTH_PORT}
+    networks:
+      - postgres
+    restart: always
+
+  postgres-user:
+    container_name: postgres-user
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: emirhan
+      POSTGRES_DB: user-service
+    ports:
+      - "${POSTGRES_USER_PORT}:${POSTGRES_USER_PORT}"
+    command: -p ${POSTGRES_USER_PORT}
+    networks:
+      - postgres
+    restart: always
+
+  postgres-product:
+    container_name: postgres-product
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: emirhan
+      POSTGRES_DB: product-service
+    ports:
+      - "${POSTGRES_PRODUCT_PORT}:${POSTGRES_PRODUCT_PORT}"
+    command: -p ${POSTGRES_PRODUCT_PORT}
+    networks:
+      - postgres
+    restart: always
+
+  postgres-sale:
+    container_name: postgres-sale
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: emirhan
+      POSTGRES_DB: sale-service
+    ports:
+      - "${POSTGRES_SALE_PORT}:${POSTGRES_SALE_PORT}"
+    command: -p ${POSTGRES_SALE_PORT}
     networks:
       - postgres
     restart: always
 
 
+  # MAIN SERVICES
   service-registry:
     container_name: service-registry
     image: emirhantuygun/service-registry:latest
@@ -135,7 +183,6 @@ services:
         condition: service_healthy
       zipkin:
         condition: service_started
-
 
   api-gateway:
     container_name: api-gateway
@@ -156,7 +203,6 @@ services:
       - service-registry
       - redis
 
-
   auth-service:
     container_name: auth-service
     image: emirhantuygun/auth-service:latest
@@ -173,9 +219,8 @@ services:
       - zipkin
     depends_on:
       - api-gateway
-      - postgres
       - rabbitmq
-
+      - postgres-auth
 
   user-service:
     container_name: user-service
@@ -193,7 +238,7 @@ services:
     depends_on:
       - api-gateway
       - auth-service
-
+      - postgres-user
 
   product-service:
     container_name: product-service
@@ -215,9 +260,8 @@ services:
       - zipkin
     depends_on:
       - api-gateway
-      - postgres
+      - postgres-product
       - rabbitmq
-
 
   sale-service:
     container_name: sale-service
@@ -235,7 +279,7 @@ services:
     depends_on:
       - api-gateway
       - product-service
-
+      - postgres-sale
 
   report-service:
     container_name: report-service
@@ -254,7 +298,6 @@ services:
       - api-gateway
       - sale-service
 
-
 networks:
   elk-stack:
   postgres:
@@ -263,10 +306,5 @@ networks:
   rabbitmq:
   zipkin:
   nginx:
-
-volumes:
-  postgres:
-  redis:
-  logs:
 
 
