@@ -63,6 +63,9 @@ public class UserServiceImpl implements UserService {
     @Value("${rabbitmq.routingKey.restore}")
     private String ROUTING_KEY_RESTORE;
 
+    private final String NOT_FOUND_ERROR_MESSAGE = "User not found with id: ";
+    private final String EXIST_DEBUG_MESSAGE = "User exists with id: {}";
+
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final RabbitTemplate rabbitTemplate;
@@ -73,8 +76,8 @@ public class UserServiceImpl implements UserService {
 
         AppUser user = userRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.error("User not found with id: {}", id);
-                    return new UserNotFoundException("User not found with id " + id);
+                    log.error(NOT_FOUND_ERROR_MESSAGE + id);
+                    return new UserNotFoundException(NOT_FOUND_ERROR_MESSAGE + id);
                 });
         log.info("User found with id: {}", id);
 
@@ -220,7 +223,7 @@ public class UserServiceImpl implements UserService {
             log.warn("User with id {} is not soft-deleted and cannot be restored.", id);
             throw new UserNotSoftDeletedException("User with id " + id + " is not soft-deleted and cannot be restored.");
         }
-        log.debug("User exists with id: {}", id);
+        log.debug(EXIST_DEBUG_MESSAGE, id);
 
         userRepository.restoreUser(id);
 
@@ -253,10 +256,10 @@ public class UserServiceImpl implements UserService {
 
         // Checking whether the user exists
         if (!userRepository.existsById(id)) {
-            log.warn("User not found with id: {}", id);
-            throw new UserNotFoundException("User not found with id " + id);
+            log.warn(NOT_FOUND_ERROR_MESSAGE + id);
+            throw new UserNotFoundException(NOT_FOUND_ERROR_MESSAGE + id);
         }
-        log.debug("User exists with id: {}", id);
+        log.debug(EXIST_DEBUG_MESSAGE, id);
 
         userRepository.deleteById(id);
 
@@ -281,10 +284,10 @@ public class UserServiceImpl implements UserService {
 
         // Checking whether the user exists
         if (!userRepository.existsById(id)) {
-            log.warn("User not found with id: {}", id);
-            throw new UserNotFoundException("User not found with id " + id);
+            log.warn(NOT_FOUND_ERROR_MESSAGE + id);
+            throw new UserNotFoundException(NOT_FOUND_ERROR_MESSAGE + id);
         }
-        log.debug("User exists with id: {}", id);
+        log.debug(EXIST_DEBUG_MESSAGE, id);
 
         // Sending a permanent-delete message to RabbitMQ
         try {
