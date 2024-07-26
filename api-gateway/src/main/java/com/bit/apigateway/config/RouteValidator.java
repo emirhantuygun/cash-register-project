@@ -13,11 +13,11 @@ import java.util.function.Predicate;
 @Component
 public class RouteValidator {
 
-    public List<String> openEndpoints = List.of(
+    public static final List<String> openEndpoints = List.of(
             "/auth"
     );
 
-    public List<String> noRoleBasedAuthorizationEndpoints = List.of(
+    public static final List<String> noRoleBasedAuthorizationEndpoints = List.of(
             "/products"
     );
 
