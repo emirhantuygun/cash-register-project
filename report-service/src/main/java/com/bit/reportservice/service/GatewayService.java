@@ -56,10 +56,10 @@ public class GatewayService {
     @Value("${gateway.port}")
     private String GATEWAY_PORT;
 
-    private final static String SENDING_REQUEST_DEBUG_MESSAGE = "Sending GET request to: {}";
-    private final static String FETCH_FAILED_ERROR_MESSAGE = "Sale fetch failed in Sale Service!";
-    private final static String HTTP_ERROR_MESSAGE = "HTTP error for Sale Service: ";
-    private final static String REST_CLIENT_ERROR_MESSAGE = "REST client error for Sale Service: ";
+    private static final String SENDING_REQUEST_DEBUG_MESSAGE = "Sending GET request to: {}";
+    private static final String FETCH_FAILED_ERROR_MESSAGE = "Sale fetch failed in Sale Service!";
+    private static final String HTTP_ERROR_MESSAGE = "HTTP error for Sale Service: ";
+    private static final String REST_CLIENT_ERROR_MESSAGE = "REST client error for Sale Service: ";
     private String GATEWAY_URL;
     private final RestTemplate restTemplate;
 

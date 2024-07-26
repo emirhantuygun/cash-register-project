@@ -51,8 +51,8 @@ public class SaleServiceImpl implements SaleService {
     @Value("${rabbitmq.routingKey}")
     private String ROUTING_KEY;
 
-    private final static String NOT_FOUND_ERROR_MESSAGE = "Sale not found with id: ";
-    private final static String NOT_EXIST_ERROR_MESSAGE = "Sale does not exist with id: ";
+    private static final String NOT_FOUND_ERROR_MESSAGE = "Sale not found with id: ";
+    private static final String NOT_EXIST_ERROR_MESSAGE = "Sale does not exist with id: ";
 
     private final SaleRepository saleRepository;
     private final ProductRepository productRepository;

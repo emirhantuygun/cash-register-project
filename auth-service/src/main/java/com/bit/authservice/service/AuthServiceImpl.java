@@ -49,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
     @Value("${redis.port}")
     private String redisPort;
 
-    private final static String NOT_FOUND_ERROR_MESSAGE = "User not found";
+    private static final String NOT_FOUND_ERROR_MESSAGE = "User not found";
 
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;

@@ -43,8 +43,8 @@ public class ProductServiceImpl implements ProductService {
     @Value("${send-email}")
     private String SEND_EMAIL;
 
-    private final static String NOT_FOUND_ERROR_MESSAGE = "Product not found with id: ";
-    private final static String SAVED_DEBUG_MESSAGE = "Product saved: {}";
+    private static final String NOT_FOUND_ERROR_MESSAGE = "Product not found with id: ";
+    private static final String SAVED_DEBUG_MESSAGE = "Product saved: {}";
 
     private final ProductRepository productRepository;
     private final BarcodeService barcodeService;
