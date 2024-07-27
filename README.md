@@ -7,7 +7,7 @@
     <img src="~images/32bit.png" alt="32bit" style="height:20%;width:20%;" align="right">
   </div>
   <div>
-    This project is made for 32bit's Backend Competition 2024. The cash register project is designed to facilitate the process of a cashier handling sales transactions.
+    This project is made for <b>32bit's Backend Competition 2024</b>. The cash register project is designed to facilitate the process of a <b>cashier handling sales transactions</b>.
   </div>
 </div>
 
@@ -15,7 +15,7 @@
 
 ## Project Architecture
 
-![Project Logo](~images/architecture.png)
+![Architecture](~images/architecture.png)
 
 <br>
 
@@ -34,6 +34,8 @@
 - [AI Insight Example](#ai-insight-example)
 - [ELK Stack Example](#elk-stack-example)
 - [Importing Dashboard Samples to Kibana](#importing-dashboard-samples-to-kibana)
+- [SonarQube Result](#sonarqube-result)
+- [Using SonarQube for Code Quality Analysis](#using-sonarqube-for-code-quality-analysis)
 - [Contact](#contact)
 
 <br>
@@ -75,6 +77,7 @@
           <li>iTextPDF</li>
           <li>JFreeChart</li>
           <li>Google Gemini</li>
+          <li>SonarQube</li>
         </ul>
     </td>
   </tr>
@@ -113,6 +116,7 @@
           <li>Receipt Generation</li>
           <li>Chart Generation</li>
           <li>AI Insight</li>
+          <li>Static Code Analysis</li>
         </ul>
     </td>
   </tr>
@@ -143,7 +147,12 @@ KIBANA_PORT=5601
 REDIS_PORT=6380
 RABBITMQ_PORT=5672
 ZIPKIN_PORT=9411
-POSTGRES_PORT=5433
+POSTGRES_AUTH_PORT=5433
+POSTGRES_USER_PORT=5434
+POSTGRES_PRODUCT_PORT=5435
+POSTGRES_SALE_PORT=5436
+POSTGRES_SONARQUBE_PORT=5437
+SONARQUBE_PORT=9000
 SERVICE_REGISTRY_PORT=8761
 API_GATEWAY_PORT=8080
 NGINX_PORT=80
@@ -197,13 +206,15 @@ authenticated users, which is then used to access protected endpoints through th
 ### User Service
 
 User Service manages **user-related** operations, including creating, updating, retrieving, and deleting user accounts.
-It handles **user data** and ensures that user information is securely stored and accessible to other services that require
+It handles **user data** and ensures that user information is securely stored and accessible to other services that
+require
 user details.
 
 ### Product Service
 
 Product Service manages **product-related** operations. It handles the creation, update, retrieval, and deletion of
-products. This service is responsible for maintaining **product information**, such as product names, descriptions, prices,
+products. This service is responsible for maintaining **product information**, such as product names, descriptions,
+prices,
 and stock levels.
 
 ### Sale Service
@@ -216,7 +227,8 @@ mixed, debit card, and PayPal.
 ### Report Service
 
 Report Service is responsible for **generating receipts** related to sales and transactions. It allows users to **view
-detailed sales information** and generate receipts for completed transactions. This service provides **AI insights** into sales
+detailed sales information** and generate receipts for completed transactions. This service provides **AI insights**
+into sales
 performance, helping businesses make informed decisions based on sales data.
 
 <br>
@@ -225,18 +237,23 @@ performance, helping businesses make informed decisions based on sales data.
 
 Any changes to these ports require changes to the configuration files.
 
-| Container        | Port       |
-|------------------|------------|
-| NGINX            | 80         | 
-| API Gateway      | 8080       | 
-| Service Registry | 8761       | 
-| Redis            | 6380       | 
-| RabbitMQ         | 5672       | 
-| Zipkin           | 9411       | 
-| Postgres         | 5433       |
-| Elasticsearch    | 9200       |
-| Logstash         | 5000, 9600 |
-| Kibana           | 5601       |
+| Container          | Port       |
+|--------------------|------------|
+| NGINX              | 80         | 
+| API Gateway        | 8080       | 
+| Service Registry   | 8761       | 
+| Redis              | 6380       | 
+| RabbitMQ           | 5672       | 
+| Zipkin             | 9411       | 
+| Postgres-Auth      | 5433       |
+| Postgres-User      | 5434       |
+| Postgres-Product   | 5435       |
+| Postgres-Sale      | 5436       |
+| Postgres-SonarQube | 5437       |
+| SonarQube          | 9000       |
+| Elasticsearch      | 9200       |
+| Logstash           | 5000, 9600 |
+| Kibana             | 5601       |
 
 <br>
 
@@ -291,9 +308,10 @@ An example of login request:
 
 ## Endpoints
 
-All requests should be made to the **API Gateway's URL** which is **http://localhost**. The url does **not include the port number**. 
-- **URL Example** `http://localhost/auth/login`
+All requests should be made to the **API Gateway's URL** which is **http://localhost**. The url does **not include the
+port number**.
 
+- **URL Example** `http://localhost/auth/login`
 
 ### Auth Service
 
@@ -503,6 +521,44 @@ Click on `Saved Objects`.
 ### 3. Import the Dashboards
 
 Click the `Import` button. Select the dashboard sample in `~kibana_dashboards` directory.
+
+<br>
+
+## SonarQube Result
+
+![SonarQube](~images/sonarqube.png)
+
+<br>
+
+## Using SonarQube for Code Quality Analysis
+
+### 1. Start SonarQube with Docker Compose
+
+First, **run the following command** to start SonarQube:
+
+```bash
+docker compose -f docker-compose.sonarqube.yml up -d
+```
+
+### 2. Generate a Token in SonarQube
+
+Open your browser and navigate to **http://localhost:9000**.
+Log in with the **default credentials (admin/admin)**.
+Go to `My Account > Security`.
+Generate a new **token** and copy it
+
+### 3. Configure sonar-project.properties
+
+In your project's root directory, open the **sonar-project.properties** file and **add the token** as the value
+of `sonar.login` property.
+
+### 4. Run SonarQube Analysis
+
+Finally, **run the following command** to perform the SonarQube analysis:
+
+```bash
+./mvnw clean verify -Psonar sonar:sonar
+```
 
 <br>
 
