@@ -193,14 +193,12 @@ with the Service Registry, and other services can query the registry to find the
 ### API Gateway
 
 The API Gateway is the entry point for all client requests. It **routes** requests to the appropriate backend services
-and performs functions such as **load balancing** and rate limiting. Crucially, the API Gateway also handles *
-*authorization** by verifying the JWT in the Authorization header of incoming requests to ensure they are **valid** and
+and performs functions such as **load balancing** and rate limiting. Crucially, the API Gateway also handles **authorization** by verifying the JWT in the Authorization header of incoming requests to ensure they are **valid** and
 that the user has the **necessary roles**.
 
 ### Auth Service
 
-Auth Service is responsible for managing **authentication**. It handles user **login, logout, registration**, and *
-*token & refresh-token generation**. When users log in, the service verifies their credentials and issues a **JWT** for
+Auth Service is responsible for managing **authentication**. It handles user **login, logout, registration**, and **token & refresh-token generation**. When users log in, the service verifies their credentials and issues a **JWT** for
 authenticated users, which is then used to access protected endpoints through the API Gateway.
 
 ### User Service
